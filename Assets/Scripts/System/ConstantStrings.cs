@@ -5,9 +5,18 @@ using UnityEngine;
 public class ConstantStrings : MonoBehaviour
 {
 
-    public const string PREFAB_BULLET_1 = "Prefabs/Units/Bullet1";
-    public const string PREFAB_BULLET_NAGATO = "Prefabs/Units/Bullet_nagato";
-    public const string PREFAB_BULLET_HARUHI = "Prefabs/Units/Bullet_haruhi";
+    public const string PREFAB_BULLET_1 = "Prefabs/Projectiles/Bullet1";
+    public const string PREFAB_BULLET_ASAKURA = "Prefabs/Projectiles/Bullet_asakura";
+    public const string PREFAB_BULLET_NAGATO = "Prefabs/Projectiles/Bullet_nagato";
+    public const string PREFAB_BULLET_HARUHI = "Prefabs/Projectiles/Bullet_haruhi";
+    public const string PREFAB_BULLET_MIKURU = "Prefabs/Projectiles/Bullet_mikuru";
+    public const string PREFAB_BULLET_KOIZUMI = "Prefabs/Projectiles/Bullet_koizumi";
+    public const string PREFAB_BULLET_KUYOU = "Prefabs/Projectiles/Bullet_kuyou";
+    public const string PREFAB_BULLET_Body = "Prefabs/Projectiles/Bullet_Body";
+
+
+
+    public const string PREFAB_HEAL_1 = "Prefabs/Units/HealParticle";
     public const string PREFAB_PLAYER = "Prefabs/Units/Player";
     public const string PREFAB_STARTSCENE_PLAYERNAME = "Prefabs/ConnectedUserName";
     public const string TAG_PROJECTILE = "Projectile";

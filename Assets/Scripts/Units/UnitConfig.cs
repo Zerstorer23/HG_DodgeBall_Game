@@ -10,6 +10,7 @@ public class UnitConfig : ScriptableObject
    public CharacterType characterID;
     public string txt_name;
     public string colorHex;    
+    public string txt_skill_desc;    
     public Sprite portraitImage; 
 
 

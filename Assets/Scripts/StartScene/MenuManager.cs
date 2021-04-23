@@ -6,6 +6,7 @@ using Photon.Realtime;
 using UnityEngine.UI;
 using System;
 using ExitGames.Client.Photon;
+using TMPro;
 using static ConstantStrings;
 
 public class MenuManager : MonoBehaviourPunCallbacks
@@ -13,7 +14,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
     [SerializeField] GameObject playerNamePrefab;
     [SerializeField] GameObject localPlayerObject;
     [SerializeField] GameObject loadingChuu;
-    [SerializeField] InputField userNameInput;
     [SerializeField] Text numOfPlayers;
     [SerializeField] Text numReadyText;
     [SerializeField] GameObject[] disableInLoading;
@@ -22,40 +22,61 @@ public class MenuManager : MonoBehaviourPunCallbacks
     PhotonView pv;
 
     //***Players***//
-    string default_name = "ㅇㅇ";
     public const int MAX_PLAYER_PER_ROOM = 18;
-    HUD_UserName localPlayerInfo;
+    public static HUD_UserName localPlayerInfo;
     Dictionary<string, HUD_UserName> playerDictionary = new Dictionary<string, HUD_UserName>();
-    //***************//
-    public UnitConfig[] unitConfigs;
-   public static Dictionary<CharacterType, UnitConfig> unitDictionary = new Dictionary<CharacterType, UnitConfig>();
 
 
     //*****GAME SETTING***//
-    public int playerLives = 1;
-    public MapDifficulty mapDifficulty = MapDifficulty.Standard;
-    int[] mapDifficulties = { 0, 12, 24, 36 };
+    public static readonly int default_lives = 5;
+    public static readonly MapDifficulty default_difficult = MapDifficulty.None;
+    public int playerLives;
+    public MapDifficulty mapDifficulty;
 
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
-        loadingChuu.SetActive(true);
-        foreach (GameObject go in disableInLoading) {
-            go.SetActive(false);
-        }
+        Debug.Log("Nickname photon " + PhotonNetwork.NickName);
         forceStart.SetActive(false);
-        PhotonNetwork.AutomaticallySyncScene = true;
-        PhotonNetwork.ConnectUsingSettings();
-        PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
-
-        foreach (UnitConfig u in unitConfigs) {
-            unitDictionary.Add(u.characterID, u);
-        }
-
+  
         EventManager.StartListening(MyEvents.EVENT_PLAYER_JOINED, OnNewPlayerEnter);
         EventManager.StartListening(MyEvents.EVENT_PLAYER_LEFT, OnJoinedPlayerLeave);
+        EventManager.StartListening(MyEvents.EVENT_PLAYER_SELECTED_CHARACTER, OnCharacterSelected);
 
     }
+    private void OnDestroy()
+    {
+        EventManager.StopListening(MyEvents.EVENT_PLAYER_JOINED, OnNewPlayerEnter);
+        EventManager.StopListening(MyEvents.EVENT_PLAYER_LEFT, OnJoinedPlayerLeave);
+        EventManager.StopListening(MyEvents.EVENT_PLAYER_SELECTED_CHARACTER, OnCharacterSelected);
+
+    }
+    private void Start()
+    {
+        if (PhotonNetwork.IsConnected)
+        {
+            return;
+        }
+        else
+        {
+            Debug.Log("Do loading");
+            DoLoading();
+        }
+    }
+
+    private void DoLoading()
+    {
+        loadingChuu.SetActive(true);
+        foreach (GameObject go in disableInLoading)
+        {
+            go.SetActive(false);
+        }
+        PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.ConnectUsingSettings();
+    }
+
+   
+
 
     private void OnJoinedPlayerLeave(EventObject arg0)
     {
@@ -64,48 +85,51 @@ public class MenuManager : MonoBehaviourPunCallbacks
         {
             playerDictionary.Remove(id);
         }
+        if (PhotonNetwork.IsMasterClient) {
+            UpdateSettingsUI();
+        }
+        UpdatePlayersStatus();
     }
     [SerializeField] Transform playerListTransform;
     private void OnNewPlayerEnter(EventObject arg0)
     {
-        Debug.Log("Received player join");
+
         string id = arg0.stringObj;
         HUD_UserName info = arg0.gameObject.GetComponent<HUD_UserName>();
-        if (playerDictionary.ContainsKey(id)) {
+        if (playerDictionary.ContainsKey(id))
+        {
             playerDictionary[id] = info;
         }
-        else {
+        else
+        {
             playerDictionary.Add(id, info);
         }
-        arg0.gameObject.GetComponent<RectTransform>().SetParent(playerListTransform);
+        arg0.gameObject.GetComponent<Transform>().SetParent(playerListTransform, false);
+        UpdatePlayersStatus();
     }
 
-    private void OnDestroy()
-    {
-        PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
 
-    }
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log("Connected to master!");
         PhotonNetwork.JoinLobby(TypedLobby.Default);
     }
     public override void OnJoinedLobby()
     {
-        Debug.Log("Connected to Lobby");
         JoinRoom();
     }
     public void JoinRoom()
     {
         ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
-        hash.Add(HASH_MAP_DIFF, mapDifficulties[(int)mapDifficulty]);
+        mapDifficulty=(MapDifficulty) ConnectedPlayerManager.GetRoomSettings(HASH_MAP_DIFF, default_difficult);
+        playerLives=(int) ConnectedPlayerManager.GetRoomSettings(HASH_PLAYER_LIVES, default_lives);
+        hash.Add(HASH_MAP_DIFF, mapDifficulty);
         hash.Add(HASH_PLAYER_LIVES, playerLives);
         RoomOptions roomOpts = new RoomOptions()
         {
             IsVisible = true,
             IsOpen = true,
-            MaxPlayers = 10,
+            MaxPlayers = MAX_PLAYER_PER_ROOM,
             PublishUserId = true,
             CustomRoomProperties = hash
         };
@@ -114,11 +138,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
     }
     public override void OnJoinedRoom()
     {
-        //Play Game Scene
-        //    = new ExitGames.Client.Photon.Hashtable();
-
-        //     hash.Add("Team ", 0);
-        //  PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
         AddJoinedPlayer();
 
         loadingChuu.SetActive(false);
@@ -127,16 +146,14 @@ public class MenuManager : MonoBehaviourPunCallbacks
             go.SetActive(true);
         }
         UpdateSettingsUI();
-        userNameInput.placeholder.GetComponent<Text>().text = default_name;
         UpdatePlayersStatus();
 
     }
-    public override void OnPlayerEnteredRoom(Player newPlayer) {
-
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
     }
     public override void OnPlayerLeftRoom(Player newPlayer)
     {
-        UpdateSettingsUI();
     }
     [SerializeField] GameObject mapDiffPanel;
     [SerializeField] GameObject playerDiffPanel;
@@ -144,14 +161,20 @@ public class MenuManager : MonoBehaviourPunCallbacks
     [SerializeField] Text mapDiffText;
     [SerializeField] Text playerDiffText;
 
-    public void UpdateSettingsUI() {
+   [PunRPC]
+    public void UpdateSettingsUI()
+    {
+        ExitGames.Client.Photon.Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+        mapDifficulty = (MapDifficulty)hash[HASH_MAP_DIFF];
+        playerLives = (int)hash[HASH_PLAYER_LIVES];
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             mapDiffPanel.SetActive(true);
             playerDiffPanel.SetActive(true);
             forceStart.SetActive(true);
         }
-        else {
+        else
+        {
             mapDiffPanel.SetActive(false);
             playerDiffPanel.SetActive(false);
             forceStart.SetActive(false);
@@ -160,16 +183,16 @@ public class MenuManager : MonoBehaviourPunCallbacks
         switch (mapDifficulty)
         {
             case MapDifficulty.None:
-                mapDiffText.text += "없음";
+                mapDiffText.text += "쉬움";
+                break;
+            case MapDifficulty.BoxOnly:
+                mapDiffText.text += "장애물만";
                 break;
             case MapDifficulty.Standard:
                 mapDiffText.text += "표준";
                 break;
             case MapDifficulty.Hard:
                 mapDiffText.text += "어려움";
-                break;
-            case MapDifficulty.VeryHard:
-                mapDiffText.text += "개어려움";
                 break;
         }
         playerDiffText.text = "플레이어 라이프: " + playerLives;
@@ -188,125 +211,107 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     int totalPlayers;
     int readyPlayers;
-    private void UpdatePlayersStatus() {
+    private void UpdatePlayersStatus()
+    {
         totalPlayers = playerDictionary.Count;
         readyPlayers = 0;
         foreach (KeyValuePair<string, HUD_UserName> entry in playerDictionary)
         {
-            if (entry.Value.isReady) {
+            if (entry.Value.isReady)
+            {
                 readyPlayers++;
             }
         }
-        numOfPlayers.text = "현재접속: "+totalPlayers+" / " + MAX_PLAYER_PER_ROOM;
-        numReadyText.text = "준비: "+ readyPlayers + " / " + totalPlayers;
+        numOfPlayers.text = "현재접속: " + totalPlayers + " / " + MAX_PLAYER_PER_ROOM;
+        numReadyText.text = "준비: " + readyPlayers + " / " + totalPlayers;
 
     }
     private void CheckGameStart()
     {
-        if (readyPlayers == totalPlayers) {
-            pv.RPC("OnClick_ForceStart",RpcTarget.MasterClient);
+        if (readyPlayers == totalPlayers)
+        {
+            pv.RPC("OnClick_ForceStart", RpcTarget.MasterClient);
         }
     }
 
     [PunRPC]
     public void OnClick_ForceStart()
     {
-        if (PhotonNetwork.IsMasterClient) {
-            SetRoomSettings();
+        if (PhotonNetwork.IsMasterClient) { 
             PhotonNetwork.LoadLevel(1);
         }
     }
-    void SetRoomSettings() {
-        ExitGames.Client.Photon.Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
-        hash[HASH_MAP_DIFF]= mapDifficulties[(int)mapDifficulty];
-        hash[HASH_PLAYER_LIVES]  = playerLives;
-        PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
-
-    }
-
-    public void OnNameField_Changed()
+    [PunRPC]
+    void SetRoomSettings()
     {
-        localPlayerInfo.pv.RPC("ChangeName", RpcTarget.AllBuffered, userNameInput.text);
-    }
-    public void OnClick_MapDifficulty(int amount) {
-        if (PhotonNetwork.LocalPlayer.IsMasterClient) {
-            object[] datas = new object[] {amount};
-            SendSerializedEvent(SetingsCode.MapDifficulty, datas);
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            ExitGames.Client.Photon.Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+            hash[HASH_MAP_DIFF] = mapDifficulty;
+            hash[HASH_PLAYER_LIVES] = playerLives;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
         }
     }
 
+
+ 
+
     [SerializeField] Text myCharName;
     [SerializeField] Image myCharImage;
-    public void OnClick_SetCharacter(int charID) {
-        UnitConfig u = unitDictionary[(CharacterType)charID];
+    public void OnCharacterSelected(EventObject eo)
+    {
+        int charID = eo.intObj;
+        UnitConfig u =(UnitConfig)eo.objData;
         myCharName.text = u.txt_name;
         myCharImage.sprite = u.portraitImage;
-        localPlayerInfo.pv.RPC("ChangeCharacter",RpcTarget.AllBuffered,charID);
+        localPlayerInfo.pv.RPC("ChangeCharacter", RpcTarget.AllBuffered, charID);
 
     }
-
+    public void OnClick_MapDifficulty(int amount)
+    {
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            mapDifficulty = (MapDifficulty)amount;
+            pv.RPC("SetRoomSettings", RpcTarget.AllBuffered);
+            pv.RPC("UpdateSettingsUI", RpcTarget.AllBuffered);
+        }
+    }
     public void OnClick_PlayerDifficulty(int amount)
     {
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
-            object[] datas = new object[] { amount };
-            SendSerializedEvent(SetingsCode.PlayerDifficulty, datas);
+            playerLives = amount;
+            pv.RPC("SetRoomSettings", RpcTarget.AllBuffered);
+            pv.RPC("UpdateSettingsUI", RpcTarget.AllBuffered);
         }
     }
-    public void SendSerializedEvent(SetingsCode ecode, object[] parameters) {
-
-        RaiseEventOptions options = new RaiseEventOptions
-        {
-            CachingOption = EventCaching.DoNotCache,
-            Receivers = ReceiverGroup.All
-        };
-
-        SendOptions sendOptions = new SendOptions();
-        sendOptions.Reliability = true;
-
-        PhotonNetwork.RaiseEvent((byte)ecode, parameters, options, sendOptions);
-    }
-    private void OnEvent(EventData photonEvent)
+    public static string GetLocalName()
     {
-
-        byte eventCode = photonEvent.Code;
-        object content = photonEvent.CustomData;
-        SetingsCode code = (SetingsCode)eventCode;
-        object[] datas = content as object[];
-        switch (code)
-        {
-            case SetingsCode.MapDifficulty:
-                mapDifficulty = (MapDifficulty)datas[0];
-                break;
-            case SetingsCode.PlayerDifficulty:
-                playerLives = (int)datas[0];
-                break;
-        }
-        UpdateSettingsUI();
+        return PhotonNetwork.LocalPlayer.NickName;
     }
-
-
 
     #endregion
 
-    public List<HUD_UserName> connectedPlayerTexts = new List<HUD_UserName>();
-    [SerializeField] GameObject playerListContent;
-
-  
     private void AddJoinedPlayer()
     {
-        if (localPlayerObject == null) {
-            localPlayerObject = PhotonNetwork.Instantiate(ConstantStrings.PREFAB_STARTSCENE_PLAYERNAME, Vector3.zero, Quaternion.identity, 0);
-            localPlayerInfo = localPlayerObject.GetComponent<HUD_UserName>();
-            localPlayerInfo.pv.RPC("ChangeName", RpcTarget.AllBuffered, default_name);
-        }
+        localPlayerObject = PhotonNetwork.Instantiate(ConstantStrings.PREFAB_STARTSCENE_PLAYERNAME, Vector3.zero, Quaternion.identity, 0);
+        localPlayerInfo = localPlayerObject.GetComponent<HUD_UserName>();
+        string name = (string)ConnectedPlayerManager.GetPlayerSettings("NICKNAME", UI_ChangeName.default_name);
+        CharacterType character = (CharacterType)ConnectedPlayerManager.GetPlayerSettings("CHARACTER", CharacterType.HARUHI);
+        localPlayerInfo.pv.RPC("ChangeName", RpcTarget.AllBuffered, name);
+        localPlayerInfo.pv.RPC("ChangeCharacter", RpcTarget.AllBuffered, (int)character);
+
+        UnitConfig u = EventManager.unitDictionary[character];
+        myCharName.text = u.txt_name;
+        myCharImage.sprite = u.portraitImage;
+        EventManager.TriggerEvent(MyEvents.EVENT_SCENE_CHANGED, new EventObject() { intObj = 0 });
+/*        ScreenCapture.CaptureScreenshot(Application.dataPath + "/screenshots/" + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".png");
+        UnityEditor.AssetDatabase.Refresh();*/
     }
 }
-public enum SetingsCode { 
-    MapDifficulty =0,
-    PlayerDifficulty
-}
 
-public enum MapDifficulty { 
-    None = 0,Standard,Hard,VeryHard
+
+public enum MapDifficulty
+{
+    None = 0, BoxOnly, Standard, Hard
 }

@@ -6,17 +6,26 @@ using static BulletManager;
 
 public class Unit_Movement : MonoBehaviourPun
 {
-    public const float initialSpeed = 10f;
-    public float moveSpeed = initialSpeed;
-    [SerializeField] EdgeCollider2D[] pathColliders;
+    public const float initialSpeed = 8f;
+    public float moveSpeed;
     public bool[] isTouching = new bool[4];
     PhotonView pv;
-    internal Vector3 lastVector = Vector3.up;
+    public Vector3 lastVector = Vector3.up;
+    public static float xMin, xMax, yMin, yMax;
 
+    BuffManager buffManager;
 
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
+        buffManager = GetComponent<BuffManager>();
+    }
+    private void Start()
+    {
+        xMin = GameSession.xMin;
+        xMax = GameSession.xMax;
+        yMin = GameSession.yMin;
+        yMax = GameSession.yMax;
     }
     // Update is called once per frame
     void Update()
@@ -31,17 +40,16 @@ public class Unit_Movement : MonoBehaviourPun
     }
     private void CheckCollisions()
     {
-        for (int i = 0; i < pathColliders.Length; i++) {
-            bool isTouch =   Physics2D.IsTouchingLayers(pathColliders[i], LayerMask.GetMask("Boundary"));
-            isTouching[i] = isTouch;
-        }
+        isTouching[(int)Directions.W] = (transform.position.x <= xMin);
+        isTouching[(int)Directions.E] = (transform.position.x >= xMax);
+        isTouching[(int)Directions.N] = (transform.position.y >= yMax);
+        isTouching[(int)Directions.S] = (transform.position.y <= yMin);
     }
 
     private void Move()
     {
-        var deltaX = Input.GetAxis("Horizontal") * Time.deltaTime * moveSpeed;
-        var deltaY = Input.GetAxis("Vertical") * Time.deltaTime * moveSpeed;
-
+        var deltaX = Input.GetAxis("Horizontal") * Time.deltaTime * moveSpeed * buffManager.GetSpeedModifier();
+        var deltaY = Input.GetAxis("Vertical") * Time.deltaTime * moveSpeed * buffManager.GetSpeedModifier();
 
 
         if (isTouching[(int)Directions.W]) {
@@ -59,12 +67,12 @@ public class Unit_Movement : MonoBehaviourPun
         {
             deltaY = Mathf.Max(deltaY, 0f);
         }
-        lastVector = new Vector3(deltaX, deltaY);
+        Vector3 moveDir = new Vector3(deltaX, deltaY, 0f);
 
-
-        //  newXpos = Mathf.Clamp(newXpos, xMin, xMax);
-        //    newYpos = Mathf.Clamp(newYpos, yMin, yMax);
-        transform.Translate(lastVector);
+        if (moveDir != Vector3.zero) {
+            lastVector = moveDir;
+        }
+        transform.position+= moveDir;
 
     }
 

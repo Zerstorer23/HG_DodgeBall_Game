@@ -14,5 +14,8 @@ public class UI_CharactarButton : MonoBehaviour
         nameText.text = myConfig.txt_name;
 
     }
+    public void OnClickCharacter() {
+        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_SELECTED_CHARACTER, new EventObject() { intObj = (int)myConfig.characterID , objData  = myConfig});
+    }
 
 }

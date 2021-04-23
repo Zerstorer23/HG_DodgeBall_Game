@@ -7,6 +7,8 @@ public class EventManager : MonoBehaviour
 {
     private static EventManager prEvManager;
 
+    public UnitConfig[] unitConfigs;
+    public static Dictionary<CharacterType, UnitConfig> unitDictionary;
     public static EventManager eventManager
     {
         get
@@ -35,6 +37,12 @@ public class EventManager : MonoBehaviour
             eventDictionary = new Dictionary<string, EventOneArg>();
         }
     }
+
+    public static CharacterType GetRandomCharacter()
+    {
+        int rand = Random.Range(1, eventManager.unitConfigs.Length);
+        return eventManager.unitConfigs[rand].characterID;
+    }
     private void Awake()
     {
         EventManager[] obj =  FindObjectsOfType<EventManager>();
@@ -44,6 +52,11 @@ public class EventManager : MonoBehaviour
 
         }
         else {
+            unitDictionary = new Dictionary<CharacterType, UnitConfig>();
+            foreach (UnitConfig u in unitConfigs)
+            {
+                unitDictionary.Add(u.characterID, u);
+            }
 
             DontDestroyOnLoad(gameObject);
         }

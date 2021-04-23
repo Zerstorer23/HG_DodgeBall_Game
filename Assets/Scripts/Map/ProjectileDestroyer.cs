@@ -18,7 +18,7 @@ public class ProjectileDestroyer : MonoBehaviourPun
         switch (tag)
         {
             case TAG_PROJECTILE:
-                collision.gameObject.GetComponent<HealthPoint>().DoDamage();
+                collision.gameObject.GetComponent<HealthPoint>().DeathByException();
                 break;
         }
     }

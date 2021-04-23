@@ -23,7 +23,6 @@ public class Projectile_Movement : MonoBehaviourPun
     delegate void voidFunc();
     voidFunc DoMove;
     public MoveType moveType;
-    public ReactionType reaction;
 
     //Delay Move//
     float delay_enableAfter = 0f;
@@ -38,46 +37,46 @@ public class Projectile_Movement : MonoBehaviourPun
 
 
     [PunRPC]
-    public void SetBehaviour(int _moveType, int _reaction)
+    public void SetBehaviour(int _moveType, float _direction)
     {
         moveType = (MoveType)_moveType;
-        reaction = (ReactionType)_reaction;
-
         switch (moveType)
         {
             case MoveType.Static:
                 DoMove = DoMove_Static;
+                eulerAngle = transform.rotation.eulerAngles.z;
                 break;
             case MoveType.Curves:
                 DoMove = DoMove_Curve;
+                eulerAngle = _direction;
                 break;
             case MoveType.Straight:
                 DoMove = DoMove_Straight;
+                eulerAngle = _direction;// transform.rotation.eulerAngles.z;
                 break;
         }
     }
     [PunRPC]
-    public void SetMoveInformation(float blockWidth, float _speed,float _rotate,float rotateBound, float _direction) {
-        eulerAngle = _direction;
+    public void SetMoveInformation(float _speed,float _rotate,float rotateBound) {
         moveSpeed = _speed;
         rotateScale = _rotate;
         angleClockBound = rotateBound;
         angleAntiClockBound =  -rotateBound;
-        transform.localScale = new Vector3(blockWidth, blockWidth, 1);
     }
     [PunRPC]
     public void SetDelay(float delay) {
         delay_enableAfter = delay;
         myCollider.enabled = false;
     }
-
-
-    float targetScale;
     [PunRPC]
-    public void SetGradualScale(float delay, float maxScale)
+    public void SetScale(float w, float h) {
+        gameObject.transform.localScale = new Vector3(w, h, 1);
+    }
+
+    [PunRPC]
+    public void DoTweenScale(float delay, float maxScale)
     {
-        delay_duration = delay;
-        targetScale = maxScale;
+        gameObject.transform.DOScale(new Vector3(maxScale, maxScale, 1), delay);
     }
     [PunRPC]
     public void SetDuration(float delay)
@@ -89,7 +88,6 @@ public class Projectile_Movement : MonoBehaviourPun
     {
         delay_enableAfter = 0f;
         delay_duration = 0f;
-        targetScale = 0f;
         myCollider.enabled = true;
         mySprite.DORewind();
         gameObject.transform.DORewind();
@@ -103,13 +101,6 @@ public class Projectile_Movement : MonoBehaviourPun
             StartCoroutine(WaitAndEnable());
             mySprite.DOFade(1f, delay_enableAfter);
         }
-        if (delay_duration > 0) {
-            StartCoroutine(WaitAndKill());
-        }
-        if (targetScale > 0)
-        {
-            gameObject.transform.DOScale(new Vector3(targetScale, targetScale, 1), delay_duration);
-        }
     }
 
     private IEnumerator WaitAndEnable()
@@ -117,11 +108,7 @@ public class Projectile_Movement : MonoBehaviourPun
         yield return new WaitForSeconds(delay_enableAfter);
         myCollider.enabled = true;
     }
-    private IEnumerator WaitAndKill()
-    {
-        yield return new WaitForSeconds(delay_duration);
-        GetComponent<HealthPoint>().DoDamage(true);
-    }
+  
 
     private void Update()
     {
@@ -138,7 +125,7 @@ public class Projectile_Movement : MonoBehaviourPun
 
     private void DoMove_Straight()
     {
-        float rad = eulerAngle/180 * Mathf.PI ;
+        float rad = eulerAngle / 180 * Mathf.PI ;
         float dX = Mathf.Cos(rad) * moveSpeed * Time.deltaTime;
         float dY = Mathf.Sin(rad) * moveSpeed * Time.deltaTime; 
         Vector3 moveDir = new Vector3(dX, dY);
@@ -171,28 +158,20 @@ public class Projectile_Movement : MonoBehaviourPun
     {
         
     }
-  [Range(-15f,15f)]  public float boundFactor = 2f;
-    public void Bounce(ContactPoint2D contact, Vector3 contactPoint) {
 
+    public void Bounce2(ContactPoint2D contact, Vector3 contactPoint)
+    {
+        Vector3 normal = contact.normal;
         float rad = eulerAngle * Mathf.Deg2Rad;
         float dX = Mathf.Cos(rad) * moveSpeed * Time.deltaTime;
         float dY = Mathf.Sin(rad) * moveSpeed * Time.deltaTime;
         Vector3 velocity = new Vector3(dX, dY);
-
-        //Find the BOUNCE of the object
-        velocity = 2 * (Vector3.Dot(velocity, Vector3.Normalize(contact.normal))) * Vector3.Normalize(contact.normal) - velocity; //Following formula  v' = 2 * (v . n) * n - v
-
-        velocity *= -1; //Had to multiply everything by -1. Don't know why, but it was all backwards.
-        transform.position += velocity;
-        Vector3 v = contactPoint - transform.position;
-        float rawAngle = (Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg);// * boundFactor;
+         velocity = Vector3.Reflect(velocity, normal);
+        float rawAngle = (Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg);// * boundFactor;
+     //   Debug.Log("Prev angle " + eulerAngle + " -> " + rawAngle + " collision angle " + velocity);
         eulerAngle = rawAngle;
-        angleStack = 0;
+        transform.rotation = Quaternion.Euler(0, 0, eulerAngle);
+
     }
-
-}
-public enum ProjectileSkill { 
-    Normal, Nagato, Haruhi
-
 }
 

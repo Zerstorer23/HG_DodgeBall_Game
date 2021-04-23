@@ -15,4 +15,6 @@ MonoBehaviour:
   characterID: 3
   txt_name: "\uBBF8\uCFE0\uB8E8"
   colorHex: 
+  txt_skill_desc: "\uC9E7\uAC8C \uB450\uBC88 \uBBF8\uCFE0\uB8E8\uBE54 \uBC1C\uC0AC.
+    \uB9DE\uC740 \uD50C\uB808\uC774\uC5B4\uB294 \uC18D\uB3C4 \uAC10\uC18C"
   portraitImage: {fileID: 21300000, guid: 5bc5c41b8a4eafa4084f351d2d3e2170, type: 3}

@@ -5,18 +5,57 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviourPun
 {
-    BoxCollider2D myCollider;
+    internal Unit_Player player;
+    PhotonView pv;
+
     private void Awake()
     {
-        myCollider = GetComponent<BoxCollider2D>();
+        pv = GetComponent<PhotonView>();
+    }
+
+
+
+    [PunRPC]
+    public void SetParentPlayer(string owner)
+    {
+        Unit_Player parent = GameSession.GetInst().charSpawner.GetPlayerByOwnerID(owner);
+        if (parent != null)
+        {
+            parent.SetMyProjectile(gameObject);
+        }
+    }
+    [PunRPC]
+    public void ResetRotation() {
+        gameObject.transform.localRotation = Quaternion.identity;
+    }
+
+    private void OnEnable()
+    {
+        if (pv.Owner != PhotonNetwork.MasterClient) {
+            GetComponent<PhotonView>().TransferOwnership(PhotonNetwork.MasterClient);
+           // Debug.Log("Transfer done " + GetComponent<PhotonView>().Owner);
+        }
+    }
+    private void OnDisable()
+    {
+
+    }
+    private void OnDestroy()
+    {
+
+
     }
 
     [PunRPC]
-    public void SetParentPlayer(string owner) {
-        Transform parent = GameSession.GetInst().charSpawner.GetTransformOfPlayer(owner);
-        if (parent != null) {
-            transform.SetParent(parent);        
-        }
+    public void SetParentTransform()
+    {
+        transform.SetParent(BulletManager.GetInstance().Home_Bullets);
+    }
+
+    [PunRPC]
+    public void SetOwnerPlayer(string ownerID)
+    {
+        player = GameSession.GetPlayerByID(ownerID);
     }
 
 }
