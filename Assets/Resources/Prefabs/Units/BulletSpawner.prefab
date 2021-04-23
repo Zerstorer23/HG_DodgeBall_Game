@@ -85,7 +85,6 @@ MonoBehaviour:
   goClockwise: 1
   spawnDir: 0
   moveType: 0
-  reaction: 0
 --- !u!212 &8027940991771354421
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -152,7 +151,7 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents: []
   sceneViewId: 0

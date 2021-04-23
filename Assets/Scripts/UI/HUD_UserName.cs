@@ -9,14 +9,15 @@ public class HUD_UserName : MonoBehaviourPun
 {
     public PhotonView pv;
     public bool isReady = false;
-    public string playerName = "ㅇㅇ";
-    public CharacterType selectedCharacter = CharacterType.HARUHI;
+  //  public string playerName = "ㅇㅇ";
+   // public CharacterType selectedCharacter = CharacterType.HARUHI;
 
 
     [SerializeField]Image readySPrite;
     [SerializeField]Text nameText;
     [SerializeField]Image charPortrait;
-
+    string playerName = "ㅇㅇ";
+    CharacterType selectedCharacter = CharacterType.HARUHI;
 
     private void Awake()
     {
@@ -24,24 +25,28 @@ public class HUD_UserName : MonoBehaviourPun
     }
     private void OnEnable()
     {
+        if(pv.Owner!=null)
         EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_JOINED, new EventObject() { stringObj=pv.Owner.UserId, gameObject = gameObject });
+
+
+
     }
     private void OnDisable()
     {
         EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_LEFT, new EventObject() { stringObj = pv.Owner.UserId, gameObject = gameObject });
     }
 
-    [PunRPC]
+  [PunRPC]
     public void ChangeCharacter(int character)
     {
-        selectedCharacter =(CharacterType) character;
+        selectedCharacter = (CharacterType)character;
         UpdateUI();
     }
+
     [PunRPC]
     public void ChangeName(string text)
     {
         playerName = text;
-        PhotonNetwork.NickName = text;
         UpdateUI();
     }
 
@@ -54,15 +59,20 @@ public class HUD_UserName : MonoBehaviourPun
     public bool GetReady() {
         return isReady;
     }
-
     public void UpdateUI()
     {
         nameText.text = playerName;
         readySPrite.color = (isReady) ? Color.green : Color.black;
-        charPortrait.sprite = MenuManager.unitDictionary[selectedCharacter].portraitImage;
+        charPortrait.sprite =EventManager.unitDictionary[selectedCharacter].portraitImage;
+        if (pv.IsMine)
+        {
+            ConnectedPlayerManager.SetPlayerSettings("CHARACTER", selectedCharacter);
+            ConnectedPlayerManager.SetPlayerSettings("NICKNAME", playerName);
+            PhotonNetwork.LocalPlayer.NickName = playerName;
+            ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
+            hash.Add("CHARACTER", selectedCharacter);
+            pv.Owner.SetCustomProperties(hash);
+        }
 
-        ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
-        hash.Add("CHARACTER", selectedCharacter);
-        pv.Owner.SetCustomProperties(hash);
     }
 }
