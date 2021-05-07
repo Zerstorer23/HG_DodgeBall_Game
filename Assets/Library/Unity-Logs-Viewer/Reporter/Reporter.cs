@@ -572,19 +572,19 @@ public class Reporter : MonoBehaviour
 
 		GUISkin skin = images.reporterScrollerSkin;
 
-		toolbarScrollerSkin = (GUISkin)GameObject.Instantiate(skin);
+        toolbarScrollerSkin = (GUISkin)UnityEngine.GameObject.Instantiate(skin);
 		toolbarScrollerSkin.verticalScrollbar.fixedWidth = 0f;
 		toolbarScrollerSkin.horizontalScrollbar.fixedHeight = 0f;
 		toolbarScrollerSkin.verticalScrollbarThumb.fixedWidth = 0f;
 		toolbarScrollerSkin.horizontalScrollbarThumb.fixedHeight = 0f;
 
-		logScrollerSkin = (GUISkin)GameObject.Instantiate(skin);
+        logScrollerSkin = (GUISkin)UnityEngine.GameObject.Instantiate(skin);
 		logScrollerSkin.verticalScrollbar.fixedWidth = size.x * 2f;
 		logScrollerSkin.horizontalScrollbar.fixedHeight = 0f;
 		logScrollerSkin.verticalScrollbarThumb.fixedWidth = size.x * 2f;
 		logScrollerSkin.horizontalScrollbarThumb.fixedHeight = 0f;
 
-		graphScrollerSkin = (GUISkin)GameObject.Instantiate(skin);
+        graphScrollerSkin = (GUISkin)UnityEngine.GameObject.Instantiate(skin);
 		graphScrollerSkin.verticalScrollbar.fixedWidth = 0f;
 		graphScrollerSkin.horizontalScrollbar.fixedHeight = size.x * 2f;
 		graphScrollerSkin.verticalScrollbarThumb.fixedWidth = 0f;

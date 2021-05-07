@@ -7,6 +7,7 @@ TagManager:
   - MapBoundary
   - BoxObstacle
   - Projectile
+  - BuffObject
   layers:
   - Default
   - TransparentFX
@@ -22,8 +23,8 @@ TagManager:
   - Projectile
   - BoundaryFinder
   - ProjectileDestroyer
-  - 
-  - 
+  - BuffObject
+  - EnvironmentFinder
   - 
   - 
   - 

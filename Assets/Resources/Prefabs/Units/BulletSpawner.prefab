@@ -83,8 +83,17 @@ MonoBehaviour:
   angleAntiClockBound: 0
   angleStack: 0
   goClockwise: 1
+  delay: 0.25
   spawnDir: 0
   moveType: 0
+  reactionType: 0
+  moveSpeed: 0
+  rotateSpeed: 0
+  debug: 0
+  debugDuration: 50
+  debugAngleRange: 50
+  debugMovespeed: 20
+  debugRotateSpeed: 90
 --- !u!212 &8027940991771354421
 SpriteRenderer:
   m_ObjectHideFlags: 0

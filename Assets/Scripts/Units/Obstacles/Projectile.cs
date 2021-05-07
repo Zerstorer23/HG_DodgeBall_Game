@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,15 +7,13 @@ using UnityEngine;
 public class Projectile : MonoBehaviourPun
 {
     internal Unit_Player player;
-    PhotonView pv;
+    public PhotonView pv;
 
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
+
     }
-
-
-
     [PunRPC]
     public void SetParentPlayer(string owner)
     {
@@ -27,23 +26,6 @@ public class Projectile : MonoBehaviourPun
     [PunRPC]
     public void ResetRotation() {
         gameObject.transform.localRotation = Quaternion.identity;
-    }
-
-    private void OnEnable()
-    {
-        if (pv.Owner != PhotonNetwork.MasterClient) {
-            GetComponent<PhotonView>().TransferOwnership(PhotonNetwork.MasterClient);
-           // Debug.Log("Transfer done " + GetComponent<PhotonView>().Owner);
-        }
-    }
-    private void OnDisable()
-    {
-
-    }
-    private void OnDestroy()
-    {
-
-
     }
 
     [PunRPC]

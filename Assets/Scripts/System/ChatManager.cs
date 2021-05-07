@@ -1,26 +1,65 @@
 ﻿using Photon.Chat;
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ChatManager : MonoBehaviour, IChatClientListener
 {
 	private string userName;
 	public static string currentChannelName;
+	private static ChatManager instance;
 
-	public InputField inputField;
-	public Text outputText;
-	public ScrollRect scrollRect;
+	[Header("Pregame Screen")]
+
+	[SerializeField] UI_ChatBox preChat;
+
+	[Header("InGame Screen")]
+	[SerializeField] UI_ChatBox inChat;
+
+	/*	ScrollRect mainScroll;
+		InputField mainInput;*/
+	UI_ChatBox mainChatBox;
+
 	public static ChatClient chatClient;
 
 	MinigameManager minigameMachine;
     private void Awake()
     {
 		minigameMachine = GetComponent<MinigameManager>();
+		instance = this;
+		//DontDestroyOnLoad(gameObject.transform.parent.gameObject);
+		mainChatBox = preChat;
+		preChat.chatManager = this;
+		inChat.chatManager = this;
+		EventManager.StartListening(MyEvents.EVENT_SHOW_PANEL, OnShowPanel);
     }
+    private void OnDestroy()
+    {
+		EventManager.StopListening(MyEvents.EVENT_SHOW_PANEL, OnShowPanel);
+	}
+
+    private void OnShowPanel(EventObject obj)
+    {
+		ScreenType currentPanel = (ScreenType)obj.objData;
+        switch (currentPanel)
+        {
+            case ScreenType.PreGame:
+				mainChatBox = preChat;
+				mainChatBox.SetInputFieldVisibility(true);
+                break;
+
+            case ScreenType.InGame:
+				mainChatBox = inChat;
+				mainChatBox.SetInputFieldVisibility(false);
+				break;
+        }
+    }
+
 
     // Use this for initialization
     void Start()
@@ -41,16 +80,100 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 			Debug.LogError("You need to set the chat app ID in the PhotonServerSettings file in order to continue.");
 		}
 		chatClient.Connect(chatAppSettings.AppIdChat, "1.0", new AuthenticationValues(userName));
-
 		AddLine(string.Format("연결시도", userName));
+
+
 	}
 
 	public void AddLine(string lineString)
 	{
-		outputText.text += lineString + "\r\n";
-		ScrollToBottom();
+		inChat.AddLine(lineString);
+		preChat.AddLine(lineString);
+	}
+	void Update()
+	{
+		if (!gameObject.activeInHierarchy) return;
+		try
+		{
+			chatClient.Service();
+		}
+		catch (Exception e) {
+			Debug.Log(e.StackTrace);
+		}
 	}
 
+
+
+
+	public void SendChatMessage(string message)
+	{
+		if (chatClient.State == ChatState.ConnectedToFrontEnd)
+		{
+			if (string.IsNullOrEmpty(message)) return;
+			string msg = string.Format("//{0}... {1}", MenuManager.GetLocalName(), message);
+			chatClient.PublishMessage(currentChannelName, msg);
+			DetectMinigame(message);
+		}
+	}
+
+
+
+
+
+	public static void SendNotificationMessage(string msg, string color = "#C8C800")
+	{
+		if (chatClient.State != ChatState.ConnectedToFrontEnd) return;
+		string fmsg = string.Format("<color={0}>{1}</color>", color, msg);
+		chatClient.PublishMessage(currentChannelName, fmsg);
+
+
+	}
+	public static void FocusField() {
+		instance.mainChatBox.FocusOnField(true);
+	}
+	public static void SetInputFieldVisibility(bool enable)
+	{
+		instance.mainChatBox.SetInputFieldVisibility(enable);
+	}
+
+	private void DetectMinigame(string msg)
+	{
+
+		bool result = int.TryParse(msg, out int number);
+		if (!result) return;
+		minigameMachine.pv.RPC("AddNumber", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.UserId, number);
+		MinigameCode code = minigameMachine.GetLastCode();
+		string nick = PhotonNetwork.NickName;
+		string loserID;
+
+		switch (code)
+		{
+			case MinigameCode.Pass:
+				SendNotificationMessage(string.Format("{0}: {1}! ", nick, number.ToString()));
+				break;
+			case MinigameCode.Duplicated:
+				SendNotificationMessage(string.Format("{0}: {1}! ", nick, number.ToString()), "#FF0000");
+				SendNotificationMessage(nick + " 님이 졌습니다!!", "#FF0000");
+				loserID = minigameMachine.GetLastCalledPlayer();
+				StatisticsManager.RPC_AddToStat(StatTypes.MINIGAME, loserID, 1);
+				minigameMachine.pv.RPC("ResetGame", RpcTarget.AllBuffered);
+				break;
+			case MinigameCode.GameCannotBegin:
+				SendNotificationMessage("눈치게임은 사망자가 2명 있어야합니다.", "#FF0000");
+				break;
+			case MinigameCode.LastPlayerRemain:
+				SendNotificationMessage(nick + " 님이 우물쭈물거리다 졌습니다!!", "#FF0000");
+				loserID = minigameMachine.GetLastCalledPlayer();
+				StatisticsManager.RPC_AddToStat(StatTypes.MINIGAME, loserID, 1);
+				minigameMachine.pv.RPC("ResetGame", RpcTarget.AllBuffered);
+				break;
+			case MinigameCode.Begin:
+				SendNotificationMessage(nick + " 님이 눈치게임을 시작했습니다.");
+				SendNotificationMessage(string.Format("{0}: {1}! ", nick, number.ToString()));
+				break;
+		}
+	}
+	#region photonChat
 	public void OnApplicationQuit()
 	{
 		if (chatClient != null)
@@ -71,7 +194,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 		}
 		else
 		{
-			Debug.Log(message);
+		//	Debug.Log(message);
 		}
 	}
 
@@ -89,7 +212,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
 	public void OnChatStateChange(ChatState state)
 	{
-		Debug.Log("OnChatStateChange = " + state);
+		//Debug.Log("OnChatStateChange = " + state);
 	}
 
 	public void OnSubscribed(string[] channels, bool[] results)
@@ -120,82 +243,9 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 		Debug.Log("status : " + string.Format("{0} is {1}, Msg : {2} ", user, status, message));
 	}
 
-	void Update()
-	{
-		chatClient.Service();
-	//	if (Input.GetKeyUp(KeyCode.Return)) { SendMessage(); }
-		
-	}
-
-	public void Input_OnEndEdit()
-	{
-		SendMessage();
-	}
-	public void SendMessage() {
-		if (chatClient.State == ChatState.ConnectedToFrontEnd)
-		{
-			Debug.Log("Send detected");
-			if (string.IsNullOrEmpty(inputField.text)) return;
-			string msg = string.Format("//{0}... {1}", MenuManager.GetLocalName(), inputField.text);
-			chatClient.PublishMessage(currentChannelName, msg);
-			DetectMinigame(inputField.text);
-			inputField.text = "";
-		}
-	}
-	private void DetectMinigame(string msg) {
-
-        bool result = int.TryParse(msg, out int number);
-        if (!result) return;
-		minigameMachine.pv.RPC("AddNumber", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.UserId, number);
-		MinigameCode code = minigameMachine.GetLastCode();
-		string nick = PhotonNetwork.NickName;
-		string loserID;
-
-		switch (code)
-        {
-            case MinigameCode.Pass:
-				SendNotificationMessage(string.Format("{0}: {1}! ", nick, number.ToString()));
-				break;
-            case MinigameCode.Duplicated:
-				SendNotificationMessage(string.Format("{0}: {1}! ", nick, number.ToString()),"#FF0000");
-				SendNotificationMessage(nick + " 님이 졌습니다!!","#FF0000");
-				loserID = minigameMachine.GetLastCalledPlayer();
-				StatisticsManager.RPC_AddToStat(StatTypes.MINIGAME, loserID, 1);
-				minigameMachine.pv.RPC("ResetGame",RpcTarget.AllBuffered);
-				break;
-			case MinigameCode.GameCannotBegin:
-				SendNotificationMessage("눈치게임은 사망자가 2명 있어야합니다.", "#FF0000");
-				break;
-			case MinigameCode.LastPlayerRemain:
-				SendNotificationMessage(nick + " 님이 우물쭈물거리다 졌습니다!!", "#FF0000");
-				loserID = minigameMachine.GetLastCalledPlayer();
-				StatisticsManager.RPC_AddToStat(StatTypes.MINIGAME, loserID, 1);
-				minigameMachine.pv.RPC("ResetGame", RpcTarget.AllBuffered);
-				break;
-            case MinigameCode.Begin:
-				SendNotificationMessage(nick + " 님이 눈치게임을 시작했습니다.");
-				SendNotificationMessage(string.Format("{0}: {1}! ",nick,number.ToString()));
-				break;
-        }
-    }
-    public static void SendNotificationMessage(string msg, string color = "#C8C800")
-	{
-		if (chatClient.State != ChatState.ConnectedToFrontEnd) return;
-			string fmsg = string.Format("<color={0}>{1}</color>",color,msg);
-		chatClient.PublishMessage(currentChannelName, fmsg);
+	
 
 
-	}
-
-	public void ScrollToBottom()
-	{
-		StartCoroutine(WaitAndScroll());
-	}
-	IEnumerator WaitAndScroll() {
-		yield return new WaitForFixedUpdate();
-		scrollRect.normalizedPosition = new Vector2(0, 0);
-
-	}
 
 	public void OnUserSubscribed(string channel, string user)
     {
@@ -206,4 +256,5 @@ public class ChatManager : MonoBehaviour, IChatClientListener
     {
       //  throw new System.NotImplementedException();
     }
+    #endregion
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,8 +8,6 @@ public class EventManager : MonoBehaviour
 {
     private static EventManager prEvManager;
 
-    public UnitConfig[] unitConfigs;
-    public static Dictionary<CharacterType, UnitConfig> unitDictionary;
     public static EventManager eventManager
     {
         get
@@ -28,6 +27,7 @@ public class EventManager : MonoBehaviour
             return prEvManager;
         }
     }
+
     private Dictionary<string, EventOneArg> eventDictionary;
 
     void Init() {
@@ -38,33 +38,14 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    public static CharacterType GetRandomCharacter()
+    internal static void TriggerEvent(string eVENT_PLAYER_DIED, object onPlayerDied)
     {
-        int rand = Random.Range(1, eventManager.unitConfigs.Length);
-        return eventManager.unitConfigs[rand].characterID;
-    }
-    private void Awake()
-    {
-        EventManager[] obj =  FindObjectsOfType<EventManager>();
-        if (obj.Length > 1)
-        {
-            Destroy(gameObject);
-
-        }
-        else {
-            unitDictionary = new Dictionary<CharacterType, UnitConfig>();
-            foreach (UnitConfig u in unitConfigs)
-            {
-                unitDictionary.Add(u.characterID, u);
-            }
-
-            DontDestroyOnLoad(gameObject);
-        }
+        throw new NotImplementedException();
     }
 
     public EventOneArg GetEvent(string eventName) {
 
-        EventOneArg thisEvent = null;
+        EventOneArg thisEvent;
         eventDictionary.TryGetValue(eventName, out thisEvent);
         return thisEvent;
 //       bool found= eventDictionary.TryGetValue(eventName,out thisEvent);

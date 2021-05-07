@@ -8,7 +8,7 @@ public class EventObject
     public int intObj;
     public float floatObj;
     public string stringObj;
-    public GameObject gameObject;
+    public GameObject goData;
     public object objData;
     public Vector3 vectorObj;
 

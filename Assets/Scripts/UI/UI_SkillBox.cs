@@ -14,12 +14,13 @@ public class UI_SkillBox : MonoBehaviour
     GameSession session;
     public void SetSkillInfo(SkillManager skm) {
         skill = skm;
-        portrait.sprite = EventManager.unitDictionary[skm.myCharacter].portraitImage;
-        desc.text = EventManager.unitDictionary[skm.myCharacter].txt_skill_desc;
+        portrait.sprite = GameSession.unitDictionary[skm.myCharacter].portraitImage;
+        desc.text = GameSession.unitDictionary[skm.myCharacter].txt_skill_desc;
     
     }
     private void Update()
     {
+        if (skill == null) return;
         UpdateCooltime();
     }
 

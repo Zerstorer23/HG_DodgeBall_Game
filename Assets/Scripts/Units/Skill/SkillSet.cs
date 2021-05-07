@@ -7,7 +7,7 @@ using UnityEngine;
 public class SkillSet
 {
     //Caster Object
-    internal GameObject caster;
+    internal UnityEngine.GameObject caster;
     internal SkillManager skillManager;
     internal Unit_Player castingPlayer;
 
@@ -15,18 +15,18 @@ public class SkillSet
     internal PhotonView pv,casterPV; 
 
     //GameObject
-    internal GameObject spawnedObject;
+    internal UnityEngine.GameObject spawnedObject;
 
     private Dictionary<SkillParams, object> parameters = new Dictionary<SkillParams, object>();
 
     internal object GetParam(SkillParams key)
     {
-        Debug.Assert(parameters.ContainsKey(key), " missing param");
+        Debug.Assert(parameters.ContainsKey(key), " missing param : "+key);
         return parameters[key];
     }
 
 
-    public SkillSet(GameObject casterObj, SkillManager skm)
+    public SkillSet(UnityEngine.GameObject casterObj, SkillManager skm)
     {
         caster = casterObj;
         castingPlayer = casterObj.GetComponent<Unit_Player>();
@@ -55,16 +55,15 @@ public class SkillSet
              
             }
             catch (Exception e) {
-                Debug.Log(e.Message);
+                Debug.LogWarning(e.Message);
+                Debug.LogWarning(e.StackTrace);
             }
             if (delay > Mathf.Epsilon)
             {
-           //     Debug.Log("Wait " + delay);
                 yield return new WaitForSeconds(delay);
-           //     Debug.Log("Wait finish " + delay);
             }
         }
-        skillManager.pv.RPC("SetLastActivated", RpcTarget.AllBuffered);
+        skillManager.pv.RPC("SetLastActivated", RpcTarget.AllBuffered,false);
     }
 
 
@@ -88,7 +87,8 @@ public class SkillSet
 }
 public enum SkillParams { 
     Width,Height,PrefabName,Transform,Duration,GameObject,Quarternion,Vector3
-        ,MoveSpeed,EulerAngle,UserID,Modifier,Color,Enable,AnimationTag
+        ,MoveSpeed,EulerAngle,UserID,Modifier,Color,Enable,AnimationTag,ReactionType
+        ,BuffData
 
 }
 

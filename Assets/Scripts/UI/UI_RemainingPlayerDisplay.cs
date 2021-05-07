@@ -20,11 +20,21 @@ public class UI_RemainingPlayerDisplay : MonoBehaviour
     }
 
 
+    private void OnEnable()
+    {
 
+        StartCoroutine(WaitAFrame());
+    }
     // Update is called once per frame
     void OnPlayerUpdate(EventObject eo)
     {
+        if(gameObject.activeInHierarchy)
+            StartCoroutine(WaitAFrame());
+    }
+    IEnumerator WaitAFrame() {
+        yield return new WaitForFixedUpdate();
         int remain = PlayerSpawner.GetRemainingPlayerNumber();
         displayText.text = "남은 플레이어 : " + remain;
     }
+
 }

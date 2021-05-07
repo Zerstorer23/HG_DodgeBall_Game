@@ -1,23 +1,24 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_PlayerIncreaseMovespeed : SkillAction
+public class Action_Player_AddBuff : SkillAction
 {
     public override float Activate()
     {
-        float mod = (float)GetParam(SkillParams.Modifier);
-        parent.caster.GetComponent<BuffManager>().speedModifier += mod;
-        Debug.Log("Set move speed " + mod);
+        BuffData buff = (BuffData)GetParam(SkillParams.BuffData);
+        parent.caster.GetComponent<BuffManager>().pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)buff.buffType, buff.modifier, buff.duration);
         return 0f;
     }
 }
-public class Action_PlayerDecreaseMovespeed : SkillAction
+public class Action_Player_InvincibleBuff : SkillAction
 {
     public override float Activate()
     {
-        float mod = (float)GetParam(SkillParams.Modifier);
-        parent.caster.GetComponent<BuffManager>().speedModifier -= mod;
+        if (GameSession.suddenDeathCalled) return 0f;
+        float duration = (float)GetParam(SkillParams.Duration);
+        parent.caster.GetComponent<BuffManager>().pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.InvincibleFromBullets,0f,(double) duration);
         return 0f;
     }
 }

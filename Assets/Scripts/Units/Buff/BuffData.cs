@@ -12,15 +12,20 @@ public class BuffData
     public BuffType buffType;
     public float modifier;
     public double duration;
-    public string triggerByID;
     double endTime;
     bool timerStarted = false;
-
-    public BuffData(BuffType bType, float mod, double _duration, string trigger) {
+    public BuffData(BuffType bType, float mod, double _duration)
+    {
         buffType = bType;
         modifier = mod;
         duration = _duration;
-        triggerByID = trigger;
+    }
+
+    public BuffData(object[] data)
+    {
+        buffType = (BuffType) data[0];
+        modifier = (float)data[1];
+        duration = (double)data[2];
     }
     public double StartTimer() {
         endTime = PhotonNetwork.Time + duration;
@@ -32,12 +37,22 @@ public class BuffData
         if (!timerStarted) return false;
         return PhotonNetwork.Time >= endTime;
     }
+    public void PrintContent() {
+        Debug.Log("Buff : " + buffType + " " + modifier + " for " + duration);
+    }
 
+    public object[] SerialiseToList() {
+        object[] obj = new object[4];
+        obj[0] = buffType;
+        obj[1] = modifier;
+        obj[2] = duration;
+        return obj;
+    }
 }
 [System.Serializable]
 public enum BuffType
 { 
-    None,MoveSpeed
+    None,MoveSpeed,Cooltime,HealthPoint,InvincibleFromBullets
 }
 
 
