@@ -98,6 +98,11 @@ public class Unit_AutoDrive : MonoBehaviour
     Vector3 lastVector = Vector3.zero;
     private void FixedUpdate()
     {
+        if (movement == null || !movement.gameObject.activeInHierarchy) {
+
+            gameObject.SetActive(false);
+            return;
+        }
         Vector3 dir = EvaluateMoves();
         lastVector = dir;
         float aimAngle = GameSession.GetAngle(Vector3.zero, dir); //벡터 곱 비교

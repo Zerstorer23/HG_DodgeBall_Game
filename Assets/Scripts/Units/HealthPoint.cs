@@ -31,11 +31,17 @@ public class HealthPoint : MonoBehaviourPun
         buffManager = GetComponent<BuffManager>();
         unitPlayer = GetComponent<Unit_Player>();
         damageDealer = GetComponent<Projectile_DamageDealer>();
+        try
+        {
+            isHomeTeam = (bool)pv.Owner.CustomProperties["TEAM"];//TODO
+        }
+        catch (Exception e) { 
+        
+        }
     }
     private void Start()
     {
 
-        isHomeTeam = unitPlayer.isHomeTeam;
     }
 
     private void OnGameFinish(EventObject obj)
