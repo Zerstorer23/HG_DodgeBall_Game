@@ -29,7 +29,7 @@ public class Unit_HUD : MonoBehaviour
         if (isTeamGame)
         {
             teamIndicator.enabled = true;
-            teamIndicator.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[player.isHomeTeam ? 0 : 1]);
+            teamIndicator.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[player.myTeam==Team.HOME ? 0 : 1]);
         }
         else
         {

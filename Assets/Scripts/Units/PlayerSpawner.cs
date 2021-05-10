@@ -56,7 +56,8 @@ public class PlayerSpawner : MonoBehaviourPunCallbacks
 
         var hash = PhotonNetwork.LocalPlayer.CustomProperties;
         var roomSetting = PhotonNetwork.CurrentRoom.CustomProperties;
-        maxLives = (int)roomSetting[ConstantStrings.HASH_PLAYER_LIVES];
+        int liveIndex = (int)roomSetting[ConstantStrings.HASH_PLAYER_LIVES];
+        maxLives = UI_MapOptions.lives[liveIndex];
         
         if (hash.ContainsKey("CHARACTER"))
         {
@@ -220,6 +221,7 @@ public class PlayerSpawner : MonoBehaviourPunCallbacks
         Transform nearest = null;
         float nearestDistance = 0;
         int i = 0;
+        bool isTeamGame = (GameSession.gameMode == GameMode.TEAM);
         foreach (var entry in instance.players)
         {
             Debug.Log("Search ... " + i++);
@@ -230,6 +232,8 @@ public class PlayerSpawner : MonoBehaviourPunCallbacks
             if (entry.Value.gameObject.activeInHierarchy)
             {
                 if (entry.Value.pv.Owner.UserId == exclusionID) continue;
+               // if (isTeamGame &&
+              //      (Team)entry.Value.pv.Owner.CustomProperties["TEAM"] == myTeam) continue;
                 Transform trans = entry.Value.gameObject.transform;
                 float dist = Vector3.Distance(position, trans.position);
                 Debug.Log("Found " + trans.position + " at " + dist);
@@ -245,7 +249,7 @@ public class PlayerSpawner : MonoBehaviourPunCallbacks
 
     public GameStatus GetGameStatus() {
         GameStatus stat = new GameStatus();
-        bool myTeam = (bool)UI_PlayerLobbyManager.GetPlayerProperty("TEAM", true);
+        Team myTeam = (Team)UI_PlayerLobbyManager.GetPlayerProperty("TEAM", Team.HOME);
         bool isTeamGame = GameSession.gameMode == GameMode.TEAM;
         foreach (Unit_Player p in players.Values)
         {
@@ -256,7 +260,7 @@ public class PlayerSpawner : MonoBehaviourPunCallbacks
                 stat.alive++;
                 if (isTeamGame)
                 {
-                    if (p.isHomeTeam != myTeam)
+                    if (p.myTeam != myTeam)
                     {
                         stat.toKill++;
                     }

@@ -143,7 +143,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
             {
                 if (otherHP.damageDealer.isMapObject) return true; //아무거나 -> 맵 무조건 딜
             } 
-            return (otherHP.isHomeTeam != myHealth.isHomeTeam); //그외 팀구분
+            return (otherHP.myTeam != myHealth.myTeam); //그외 팀구분
         }
         return true;
     
@@ -154,10 +154,10 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         double curr = PhotonNetwork.Time;
         if (attackedIDs.ContainsKey(uid))
         {
-            if (curr - attackedIDs[uid] >= 0.25d) {
+         /*   if (curr - attackedIDs[uid] >= 1.25d) {
                 attackedIDs[uid] = curr;
                 return true;
-            }
+            }*/
             return false;
         }
         else {

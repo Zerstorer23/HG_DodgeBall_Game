@@ -21,7 +21,7 @@ public class GameOverManager : MonoBehaviourPun
     [SerializeField] Text miniWinnerName, miniWinnerTitle;
     [SerializeField] Image miniWinnerImage;
     Player finalWinner;
-   public PhotonView pv;
+    public PhotonView pv;
 
     private void Awake()
     {
@@ -31,7 +31,7 @@ public class GameOverManager : MonoBehaviourPun
     public double startTime;
     public double timeoutWait = -1;
 
- 
+
     public void SetPanel(string winnerID)
     {
         startTime = PhotonNetwork.Time;
@@ -39,10 +39,25 @@ public class GameOverManager : MonoBehaviourPun
         if (winnerID != null)
         {
             finalWinner = ConnectedPlayerManager.GetPlayerByID(winnerID);
-            if (winnerID == PhotonNetwork.LocalPlayer.UserId)
+            if (GameSession.gameMode == GameMode.TEAM)
             {
-                StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_WINS, 1);
+                Team winnerTeam = (Team)finalWinner.CustomProperties["TEAM"];
+                Team myTeam = (Team)PhotonNetwork.LocalPlayer.CustomProperties["TEAM"];
+                if (winnerTeam == myTeam)
+                {
+                    StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_WINS, 1);
+                    finalWinner = PhotonNetwork.LocalPlayer;
+                }
             }
+            else if (winnerID == PhotonNetwork.LocalPlayer.UserId)
+            {
+
+                StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_WINS, 1);
+
+
+            }
+
+
         }
         SetWinner();
         SetSubWinner();
@@ -52,9 +67,9 @@ public class GameOverManager : MonoBehaviourPun
     {
         if (timeoutWait <= 0) return;
         double remain = (startTime + timeoutWait) - PhotonNetwork.Time;
-        if (remain <= 0 )
+        if (remain <= 0)
         {
-            timeoutWait =-1f;
+            timeoutWait = -1f;
             StartCoroutine(WaitAndOut());
         }
         else
@@ -68,12 +83,13 @@ public class GameOverManager : MonoBehaviourPun
         yield return new WaitForFixedUpdate();
         if (PhotonNetwork.IsMasterClient)
         {
-            pv.RPC("ShowPanel", RpcTarget.All);        
+            pv.RPC("ShowPanel", RpcTarget.All);
         }
 
     }
     [PunRPC]
-    void ShowPanel() {
+    void ShowPanel()
+    {
         EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.PreGame });
     }
 
@@ -125,9 +141,11 @@ public class GameOverManager : MonoBehaviourPun
 
     public CharacterType GetPlayerCharacter(Player player)
     {
+        if (!player.CustomProperties.ContainsKey("CHARACTER")) return CharacterType.NONE;
         CharacterType character = (CharacterType)player.CustomProperties["CHARACTER"];
         if (character == CharacterType.NONE)
         {
+            if (!player.CustomProperties.ContainsKey("ACTUAL_CHARACTER")) return CharacterType.NONE;
             character = (CharacterType)player.CustomProperties["ACTUAL_CHARACTER"];
         }
         return character;
@@ -143,9 +161,13 @@ public class GameOverManager : MonoBehaviourPun
             winnerImage.sprite = GameSession.unitDictionary[character].portraitImage;
             if (GameSession.gameMode == GameMode.TEAM)
             {
-                winnerName.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[(bool)finalWinner.CustomProperties["TEAM"] ? 0 : 1]);
+                if (!finalWinner.CustomProperties.ContainsKey("TEAM")) return ;
+                Team winnerTeam = (Team)finalWinner.CustomProperties["TEAM"];
+                winnerName.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[winnerTeam == Team.HOME ? 0 : 1]);
+                winnerName.text = string.Format("{0}님의 {1}팀", finalWinner.NickName, ConstantStrings.team_name[winnerTeam == Team.HOME ? 0 : 1]);
             }
-            else {
+            else
+            {
                 winnerName.color = ConstantStrings.GetColorByHex("#3AFF00");
             }
         }

@@ -22,7 +22,7 @@ public class Unit_Player : MonoBehaviourPun
 
     List<GameObject> myUnderlings = new List<GameObject>();
 
-    public bool isHomeTeam = true;
+    public Team myTeam = Team.HOME;
 
     // Start is called before the first frame update
     public int evasion = 0;
@@ -51,7 +51,7 @@ public class Unit_Player : MonoBehaviourPun
         evasion = 0;
         myPortrait.color = new Color(1, 1, 1);
         myUnderlings = new List<GameObject>();
-        isHomeTeam = (bool)pv.Owner.CustomProperties["TEAM"];//TODO NULL ERROR
+        myTeam = (Team)pv.Owner.CustomProperties["TEAM"];
         if (pv.IsMine)
         {
           //  movement.autoDriver = NetworkPosition.GetInst().autoDriver;
@@ -84,8 +84,22 @@ public class Unit_Player : MonoBehaviourPun
         myCharacter = (CharacterType)array[0];
         skillManager.SetSkill(myCharacter);
         myPortrait.sprite = GameSession.unitDictionary[myCharacter].portraitImage;
-        health.SetMaxLife(array[1]);
+        int maxLife = array[1];
+        if (GameSession.gameMode == GameMode.TEAM) {
+            maxLife += GetTeamBalancedLife((Team)pv.Owner.CustomProperties["TEAM"]);
+        }
+        health.SetMaxLife(maxLife);
     }
+    private int GetTeamBalancedLife(Team myTeam) {
+        int numMyTeam = ConnectedPlayerManager.GetNumberInTeam(myTeam);
+        int otherTeam = ConnectedPlayerManager.GetNumberInTeam((myTeam == Team.HOME) ? Team.AWAY : Team.HOME);
+        Debug.Log("My team :" + myTeam + " = " + numMyTeam + " / " + otherTeam);
+        int underdogged = otherTeam - numMyTeam;
+        if (underdogged <= 0) return 0; //같거나 우리팀이 더 많음
+        Debug.Log("Add nmodifier :" + underdogged / numMyTeam);
+        return underdogged / numMyTeam; //차이 /우리팀수 
+    }
+
     [PunRPC]
     public void ChangePortraitColor(string hexColor)
     {

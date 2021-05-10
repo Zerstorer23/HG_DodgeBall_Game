@@ -10,27 +10,23 @@ public class UI_GamePadOptions : MonoBehaviour
     [SerializeField] Toggle psToggle, xboxToggle;
     public static bool useGamepad = false;
     public static PadType padType;
-  /*  private void Awake()
+   private void Awake()
     {
-        EventManager.StartListening(MyEvents.EVENT_POP_UP_PANEL, OnPanelOpen);
+        EventManager.StartListening(MyEvents.EVENT_SHOW_PANEL, OnPanelOpen);
     }
 
     private void OnPanelOpen(EventObject arg0)
     {
-        if ((ScreenType)arg0.objData == ScreenType.Settings) {
-            if (arg0.boolObj)
-            {
-                InitInfo();
+        if ((ScreenType)arg0.objData == ScreenType.PreGame) {
 
-            }
-        
+                InitInfo();
         }
     }
 
     private void OnDestroy()
     {
         EventManager.StopListening(MyEvents.EVENT_POP_UP_PANEL, OnPanelOpen);
-    }*/
+    }
     private void Start()
     {
         InitInfo();

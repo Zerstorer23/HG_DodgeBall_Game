@@ -150,15 +150,15 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 1f });
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Height, paramValue = 1f });
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 0.25f });
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 0.33f });
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
         mySkill.Enqueue(new Action_InstantiateBulletAt());
         mySkill.Enqueue(new Action_SetProjectileScale());
         mySkill.Enqueue(new Action_SetProjectileStatic());
         mySkill.Enqueue(new Action_Projectile_ParentTransformAsPlayer());
         //   mySkill.Enqueue(new Action_SetProjectileExcludePlayer());
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 4f }); //5.5
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Height, paramValue = 4f });
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 5.5f }); //5.5
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Height, paramValue = 5.5f });
         mySkill.Enqueue(new Action_DoScaleTween());
         mySkill.Enqueue(new Action_DoDeathAfter());
        // mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 1f });
@@ -175,7 +175,7 @@ public class SkillManager : MonoBehaviourPun
         int steps = 30;
         float dur = 2f;
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = dur });
-        BuffData buff = new BuffData(BuffType.MoveSpeed, 0.2f, dur);
+        BuffData buff = new BuffData(BuffType.MoveSpeed, 0.25f, dur);
         mySkill.SetParam(SkillParams.BuffData, buff);
         mySkill.Enqueue(new Action_Player_InvincibleBuff());
         mySkill.Enqueue(new Action_Player_AddBuff());//

@@ -14,7 +14,7 @@ public class UI_MapOptions : MonoBehaviourPun
     public static readonly MapDifficulty default_difficult = MapDifficulty.None;
    // public int playerLives;
    // public MapDifficulty mapDifficulty;
-    public bool gameStarted = false;
+    bool gameStarted = false;
     PhotonView pv;
 
 
@@ -30,14 +30,20 @@ public class UI_MapOptions : MonoBehaviourPun
 
     public static int[] lives = new int[] { 1, 3, 5 };
 
+    public void SetGameStarted(bool enable) {
+        gameStarted = enable;
+    }
+    public bool GetGameStarted() => gameStarted;
+
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
         forceStart.SetActive(false);
-        mapDiff = default_difficult;
-        livesIndex = default_lives_index;
     }
-
+    private void OnEnable()
+    {
+        UpdateSettingsUI();
+    }
     public void OnDropdown_MapDifficulty()
     {
         if (PhotonNetwork.IsMasterClient)
@@ -77,6 +83,28 @@ public class UI_MapOptions : MonoBehaviourPun
         livesDropdown.SetValueWithoutNotify((int)livesIndex);
         gamemodeDropdown.SetValueWithoutNotify((int)GameSession.gameMode);
     }
+
+    internal void LoadRoomSettings()
+    {
+        var hash = PhotonNetwork.CurrentRoom.CustomProperties;
+        mapDiff = (MapDifficulty)hash[HASH_MAP_DIFF];
+        livesIndex= (int)hash[HASH_PLAYER_LIVES];
+        Debug.Log("Found lives " + livesIndex);
+        string versionCode = (string)hash[HASH_VERSION_CODE];
+        Debug.Log("Received version " + versionCode);
+        if (versionCode != GameSession.GetVersionCode())
+        {
+            Debug.Log("Received Wrong " + versionCode); 
+            PhotonNetwork.NickName = string.Format(
+            "<color=#ff0000>클라이언트 버전</color>이 맞지않습니다. 방장 버전 {0}",
+             versionCode);
+        }
+        gameStarted = (bool)hash[HASH_GAME_STARTED];
+        GameSession.gameMode = (GameMode)hash[HASH_GAME_MODE];
+        Debug.Log("난입유저 룸세팅 동기화 끝");
+        UpdateSettingsUI();
+    }
+
     public void OnClick_ChangeTeam()
     {
         if (UI_PlayerLobbyManager.localPlayerInfo == null) return;
@@ -106,7 +134,7 @@ public class UI_MapOptions : MonoBehaviourPun
     {
         var hash = new ExitGames.Client.Photon.Hashtable();
         hash.Add(HASH_MAP_DIFF, default_difficult);
-        hash.Add(HASH_PLAYER_LIVES, lives[default_lives_index]);
+        hash.Add(HASH_PLAYER_LIVES, default_lives_index);
         hash.Add(HASH_VERSION_CODE, GameSession.GetVersionCode());
         hash.Add(HASH_GAME_MODE, GameMode.PVP);
         hash.Add(HASH_GAME_STARTED, false);
@@ -117,7 +145,7 @@ public class UI_MapOptions : MonoBehaviourPun
     {
         var hash = new ExitGames.Client.Photon.Hashtable();
         hash.Add(HASH_MAP_DIFF, mapDiff);
-        hash.Add(HASH_PLAYER_LIVES, lives[livesIndex]);
+        hash.Add(HASH_PLAYER_LIVES, livesIndex);
         hash.Add(HASH_VERSION_CODE, GameSession.GetVersionCode());
         hash.Add(HASH_GAME_STARTED, gameStarted);
         hash.Add(HASH_GAME_MODE, GameSession.gameMode);

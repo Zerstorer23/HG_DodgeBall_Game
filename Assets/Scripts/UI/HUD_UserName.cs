@@ -18,7 +18,7 @@ public class HUD_UserName : MonoBehaviourPun
     Image teamColorImage;
     string playerName = "ㅇㅇ";
     CharacterType selectedCharacter = CharacterType.HARUHI;
-    bool isHomeTeam = true;
+    Team myTeam = Team.HOME;
 
     private void Awake()
     {
@@ -45,22 +45,22 @@ public class HUD_UserName : MonoBehaviourPun
         if (pv.IsMine) {
             GameMode currMode = (GameMode)arg0.objData;
             if (currMode == GameMode.TEAM) {
-                isHomeTeam = ConnectedPlayerManager.GetMyIndex() % 2 == 0;
+                myTeam = (ConnectedPlayerManager.GetMyIndex() % 2 == 0) ? Team.HOME : Team.AWAY;
             }
-            pv.RPC("SetTeam", RpcTarget.AllBuffered, isHomeTeam);
+            pv.RPC("SetTeam", RpcTarget.AllBuffered, (int)myTeam);
         }
 
     }
     [PunRPC]
-    public void SetTeam(bool isHome)
+    public void SetTeam(int teamNumber)
     {
-        isHomeTeam = isHome;
+        myTeam =(Team)teamNumber;
         UpdateUI();
     }
     [PunRPC]
     public void ToggleTeam()
     {
-        isHomeTeam = !isHomeTeam;
+        myTeam = (myTeam == Team.HOME) ? Team.AWAY : Team.HOME;
         UpdateUI();
     }
     [PunRPC]
@@ -98,7 +98,7 @@ public class HUD_UserName : MonoBehaviourPun
         if (GameSession.gameMode == GameMode.TEAM)
         {
             teamColorImage.enabled = true;
-            teamColorImage.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[isHomeTeam ? 0 : 1]);
+            teamColorImage.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[myTeam == Team.HOME ? 0 : 1]);
         }
         else
         {
@@ -110,7 +110,7 @@ public class HUD_UserName : MonoBehaviourPun
             PhotonNetwork.LocalPlayer.NickName = playerName;
             ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
             hash.Add("CHARACTER", selectedCharacter);
-            hash.Add("TEAM", isHomeTeam);
+            hash.Add("TEAM", myTeam);
             pv.Owner.SetCustomProperties(hash);
         }
 

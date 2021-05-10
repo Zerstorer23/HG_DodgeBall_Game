@@ -35,30 +35,23 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     public void ConnectedToRoom()
     {
         Debug.Log("Joined room");
-        var hash = PhotonNetwork.CurrentRoom.CustomProperties;
-        mapOptions.gameStarted = (bool)hash[HASH_GAME_STARTED];
-        string roomversion = (string)hash[HASH_VERSION_CODE];
-        if (GameSession.GetVersionCode() != roomversion) {
-            PhotonNetwork.NickName = string.Format(
-                "<color=#ff0000>클라이언트 버전</color>이 맞지않습니다. 방장 버전 {0}",
-                roomversion);
-        }
-
-        Debug.Log("Game started? " + mapOptions.gameStarted);
-        if (!mapOptions.gameStarted)
+        mapOptions.LoadRoomSettings();
+        ExitGames.Client.Photon.Hashtable playerHash = new ExitGames.Client.Photon.Hashtable();
+        playerHash.Add("TEAM", Team.HOME);
+        playerHash.Add("CHARACTER", CharacterType.NONE);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(playerHash);
+        Debug.Log("Game started? " + mapOptions.GetGameStarted());
+        if (!mapOptions.GetGameStarted())
         {
             Debug.Log("Instantiate after connection");
-
-
             InstantiateMyself();
             UpdateReadyStatus();
             mapOptions.UpdateSettingsUI();//I join room
         }
         else {
             //난입유저 바로시작
-            ExitGames.Client.Photon.Hashtable playerHash = new ExitGames.Client.Photon.Hashtable();
-            playerHash.Add("TEAM", true);
-            PhotonNetwork.LocalPlayer.SetCustomProperties(playerHash);
+ 
+            ConnectedPlayerManager.CountPlayersInTeam();
             Debug.Log("난입세팅끝");
             RPC_StartGame();
         }
@@ -68,6 +61,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     {
         playerDictionary = new Dictionary<string, HUD_UserName>();
         if (!PhotonNetwork.IsConnectedAndReady) return;
+        mapOptions.SetGameStarted(false);
         Debug.Log("Instantiate after regame");
         if (PhotonNetwork.IsMasterClient) {
             Player randomPlayer = ConnectedPlayerManager.GetRandomPlayerExceptMe();
@@ -86,10 +80,10 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         localPlayerInfo = localPlayerObject.GetComponent<HUD_UserName>();
         string name = PhotonNetwork.NickName;
         CharacterType character = (CharacterType)GetPlayerProperty("CHARACTER", CharacterType.HARUHI);
-        bool isHomeTeam = (bool)GetPlayerProperty("TEAM", true);
+        Team myTeam = (Team)GetPlayerProperty("TEAM", Team.HOME);
         localPlayerInfo.pv.RPC("ChangeName", RpcTarget.AllBuffered, name);
         localPlayerInfo.pv.RPC("ChangeCharacter", RpcTarget.AllBuffered, (int)character);
-        localPlayerInfo.pv.RPC("SetTeam", RpcTarget.AllBuffered, (bool)isHomeTeam);
+        localPlayerInfo.pv.RPC("SetTeam", RpcTarget.AllBuffered, (int)myTeam);
         charSelector.SetInformation(character);
         UpdateReadyStatus();
     }
@@ -153,25 +147,28 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     [PunRPC]
     public void OnClick_ForceStart()
     {
-        Debug.Log("Start requested");
-        var Hash = PhotonNetwork.CurrentRoom.CustomProperties;
-        bool gameStarted = (bool)Hash[HASH_GAME_STARTED];
-        Debug.Log("Game start? " + gameStarted);
         if (PhotonNetwork.IsMasterClient)
         {
-            //정식유저 룸프로퍼티 대기
-            Debug.Log("Mastercleint push setting requested");
-            mapOptions.gameStarted = true;
-            mapOptions.PushRoomSettings();
+            if (readyPlayers < (totalPlayers) / 2) {
+                ChatManager.SendNotificationMessage(string.Format("절반({0}명) 이상이 준비된 상태에서만 강제시작이 가능합니다. ", (totalPlayers / 2)));
+                return;
+            }
+        Debug.Log("Start requested");
+        //정식유저 룸프로퍼티 대기
+        Debug.Log("Mastercleint push setting requested");
+        mapOptions.SetGameStarted(true);
+        mapOptions.PushRoomSettings();
         }
     }
     public void OnRoomPropertiesChanged()
     {
         var Hash = PhotonNetwork.CurrentRoom.CustomProperties;
         bool gameStarted = (bool)Hash[HASH_GAME_STARTED];
+        mapOptions.SetGameStarted(gameStarted);
       //  Debug.Log("Start requested "+ gameStarted);
         if (gameStarted)
         {
+            ConnectedPlayerManager.CountPlayersInTeam();
             Debug.Log("RPC Start game");
             RPC_StartGame();
         }

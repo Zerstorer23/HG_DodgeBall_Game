@@ -9,6 +9,7 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
 {
     private static ConnectedPlayerManager prConnMan;
     public int myId = 0;
+    public static bool init = false;
     //***************//
 
    public override void OnJoinedRoom()
@@ -41,6 +42,9 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
     public Dictionary<string, object> playerSettings = new Dictionary<string, object>();
     public int currentPlayerNum = 0;
     public void Init() {
+        if (init) return;
+        init = true;
+
         playerDict = new Dictionary<string, Player>();
         Player[] players = PhotonNetwork.PlayerList;
         foreach (Player p in players) { 
@@ -115,6 +119,31 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
             return null;
         }
     }
+
+    internal static int GetNumberInTeam(Team myTeam)
+    {
+        if (instance.teamCount == null) return 0;
+        if (!instance.teamCount.ContainsKey(myTeam)) return 0;
+        return instance.teamCount[myTeam];
+    }
+
+    Dictionary<Team, int> teamCount = new Dictionary<Team, int>();
+    public static void CountPlayersInTeam() {
+        instance.teamCount = new Dictionary<Team, int>();
+        foreach (var p in instance.playerDict.Values)
+        {
+            if (!p.CustomProperties.ContainsKey("TEAM")) continue;
+            Team pTeam = (Team)p.CustomProperties["TEAM"];
+            if (instance.teamCount.ContainsKey(pTeam))
+            {
+                instance.teamCount[pTeam]++;
+            }
+            else {
+                instance.teamCount.Add(pTeam, 1);
+            }
+        }
+    }
+
 
  /*   public void Disconnect()
     {

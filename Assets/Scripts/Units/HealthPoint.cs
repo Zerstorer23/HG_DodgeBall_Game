@@ -21,7 +21,7 @@ public class HealthPoint : MonoBehaviourPun
     internal BuffManager buffManager;
     internal Unit_Player unitPlayer;
     internal Projectile_DamageDealer damageDealer;
-    internal bool isHomeTeam = true;
+    internal Team myTeam = Team.HOME;
 
 
 
@@ -33,7 +33,7 @@ public class HealthPoint : MonoBehaviourPun
         damageDealer = GetComponent<Projectile_DamageDealer>();
         try
         {
-            isHomeTeam = (bool)pv.Owner.CustomProperties["TEAM"];//TODO
+            myTeam = (Team)pv.Owner.CustomProperties["TEAM"];//TODO
         }
         catch (Exception e) { 
         
