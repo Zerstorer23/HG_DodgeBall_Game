@@ -97,6 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b05d870a9944fe841b7eb6c0dca26845, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncTransform: 0
   eulerAngle: 0
   moveSpeed: 0
   rotateScale: 0
@@ -105,6 +106,7 @@ MonoBehaviour:
   angleStack: 0
   goClockwise: 1
   moveType: 0
+  reactionType: 1
   mySprite: {fileID: 8629071319339072152}
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
@@ -120,8 +122,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitType: 2
   currentLife: 0
-  isDead: 0
   invincibleFromBullets: 0
+  invincibleFromMapBullets: 0
+  dontKillByException: 0
 --- !u!114 &6212558457632629342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -136,7 +139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   exclusionPlayerID: 
   canKillBullet: 0
-  dieOnCollision: 1
+  isMapObject: 1
   customBuffs: []
 --- !u!114 &4556413170392631494
 MonoBehaviour:
@@ -150,6 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd9ab128256aebb44a82410bd2d295c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pv: {fileID: 0}
 --- !u!114 &8629071319047820328
 MonoBehaviour:
   m_ObjectHideFlags: 0

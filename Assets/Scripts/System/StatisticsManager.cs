@@ -13,6 +13,25 @@ public class StatisticsManager : MonoBehaviourPun
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
+        EventManager.StartListening(MyEvents.EVENT_POP_UP_PANEL, OnPopUpPanel);
+        EventManager.StartListening(MyEvents.EVENT_GAME_STARTED, OnGameStart);
+    }
+    private void OnDestroy()
+    {
+
+        EventManager.StopListening(MyEvents.EVENT_POP_UP_PANEL, OnPopUpPanel);
+        EventManager.StopListening(MyEvents.EVENT_GAME_STARTED, OnGameStart);
+    }
+
+    private void OnGameStart(EventObject obj)
+    {
+        Init();
+    }
+
+    private void OnPopUpPanel(EventObject obj)
+    {
+        if((ScreenType)obj.objData == ScreenType.GameOver)
+        SaveMyStats();
     }
 
     public static StatisticsManager instance
@@ -33,14 +52,18 @@ public class StatisticsManager : MonoBehaviourPun
         }
     }
     private Dictionary<StatTypes, Dictionary<string, int>> statLibrary;
+    private Dictionary<string, int> localStatLibrary;
     public  void Init()
     {
+        Debug.Log("Init stat lib");
         statLibrary = new Dictionary<StatTypes, Dictionary<string, int>>();
         for (int i = 0; i < (int)StatTypes.END;  i++) {
             StatTypes head = (StatTypes)i;
             Dictionary<string, int> library = new Dictionary<string, int>();
             statLibrary.Add(head, library);
         }
+        localStatLibrary = new Dictionary<string, int>();
+        LoadMyStats();
     }
     public static void RPC_AddToStat(StatTypes stype ,string tag, int amount)
     {
@@ -62,13 +85,34 @@ public class StatisticsManager : MonoBehaviourPun
             statLibrary[head][tag] += amount;
         }
     }
+    public  void LoadMyStats() {
+
+        int kills = PlayerPrefs.GetInt(ConstantStrings.PREFS_KILLS, 0);
+        int wins = PlayerPrefs.GetInt(ConstantStrings.PREFS_WINS, 0);
+        int evades = PlayerPrefs.GetInt(ConstantStrings.PREFS_EVADES, 0);
+        localStatLibrary.Add(ConstantStrings.PREFS_KILLS, kills);
+        localStatLibrary.Add(ConstantStrings.PREFS_WINS, wins);
+        localStatLibrary.Add(ConstantStrings.PREFS_EVADES, evades);
+    }
+    public void SaveMyStats() {
+        PlayerPrefs.SetInt(ConstantStrings.PREFS_KILLS, localStatLibrary[ConstantStrings.PREFS_KILLS]);
+        PlayerPrefs.SetInt(ConstantStrings.PREFS_WINS, localStatLibrary[ConstantStrings.PREFS_WINS]);
+        PlayerPrefs.SetInt(ConstantStrings.PREFS_EVADES, localStatLibrary[ConstantStrings.PREFS_EVADES]);
+    }
+    public void AddToLocalStat(string tag, int value) {
+        if (statLibrary == null)
+        {
+            Init();
+        }
+        localStatLibrary[tag] += value;
+    }
+    public int GetLocalStat(string tag, int value) {
+        return localStatLibrary[tag];
+    }
 
     internal static string GetHighestPlayer(StatTypes header)
     {
         Dictionary<string, int> statBoard = instance.statLibrary[header];
-/*        foreach (KeyValuePair<string, int> entry in statBoard) {
-            Debug.Log(entry.Key + " / " + entry.Value);
-        }*/
         if (statBoard.Count == 0) {
             return null;
         }else      if (statBoard.Count == 1) {
@@ -77,31 +121,6 @@ public class StatisticsManager : MonoBehaviourPun
         var keyOfMaxValue = statBoard.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         return keyOfMaxValue;
     }
-    /*
-        private void SortInfo(Image[] images, Text[] texts, string tag)
-    {
-        Dictionary<string, int> statBoard = new Dictionary<string, int>();
-        foreach (string uid in UID_List)
-        {
-            int kill = StatisticsManager.GetStat(tag + uid);
-            statBoard.Add(uid, kill);
-        }
-
-        var items = from pair in statBoard
-                    orderby pair.Value descending
-                    select pair;
-        var listed = items.ToList();
-        for (int i = 0; i < mostKilledSprites.Length; i++)
-        {
-            if (i < listed.Count)
-            {
-                UnitConfig u557 = unitDictionary[listed[i].Key];
-                images[i].sprite = u557.myPortraitSprite;
-                texts[i].text = listed[i].Value.ToString();
-            }
-        }
-    }
-     */
 
 
     public static int GetStat(StatTypes stype,string playerID) {

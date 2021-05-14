@@ -12,7 +12,7 @@ public class ReporterEditor : Editor
 	public static void CreateReporter()
 	{
 		const int ReporterExecOrder = -12000;
-		GameObject reporterObj = new GameObject();
+        UnityEngine.GameObject reporterObj = new UnityEngine.GameObject();
 		reporterObj.name = "Reporter";
 		Reporter reporter = reporterObj.AddComponent<Reporter>();
 		reporterObj.AddComponent<ReporterMessageReceiver>();

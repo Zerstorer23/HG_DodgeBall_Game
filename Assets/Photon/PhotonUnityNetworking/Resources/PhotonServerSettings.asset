@@ -32,7 +32,45 @@ MonoBehaviour:
   EnableSupportLogger: 0
   RunInBackground: 1
   StartInOfflineMode: 0
-  RpcList: []
+  RpcList:
+  - AddBuff
+  - AddNumber
+  - AddToStat
+  - ChangeCharacter
+  - ChangeHP
+  - ChangeName
+  - ChangePortraitColor
+  - CheckWinConditions
+  - ClickRpc
+  - DecrementSpawned
+  - DestroyRpc
+  - DoDeathAfter
+  - DoTweenScale
+  - IncrementSpawned
+  - OnClick_ForceStart
+  - ResetGame
+  - ResetRotation
+  - SetBehaviour
+  - SetCooltime
+  - SetDelay
+  - SetDuration
+  - SetExclusionPlayer
+  - SetGunAngle
+  - SetInformation
+  - SetInvincible
+  - SetLastActivated
+  - SetMapDifficulty
+  - SetMoveInformation
+  - SetOwnerPlayer
+  - SetParentPlayer
+  - SetParentTransform
+  - SetPlayerLives
+  - SetProjectile
+  - SetScale
+  - ShowPanel
+  - ToggleReady
+  - TriggerGunAnimation
+  - DoDamage
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

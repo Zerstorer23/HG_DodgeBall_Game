@@ -23,8 +23,10 @@ public class Explosion : MonoBehaviourPun
 
     public void KillMe()
     {
-        if(pv.IsMine)
-        PhotonNetwork.Destroy(gameObject);
+        if (pv.IsMine)
+        {
+            PhotonNetwork.Destroy(pv);
+        }
     }
 
 }

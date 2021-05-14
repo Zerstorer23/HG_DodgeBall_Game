@@ -12,7 +12,8 @@ public class Action_SetProjectileStatic : SkillAction
     public override float Activate()
     {
         if (parent.pv == null) return 0f;
-        parent.pv.RPC("SetBehaviour", RpcTarget.AllBuffered, (int)MoveType.Static, 0f);
+        int reaction = (int)GetParam(SkillParams.ReactionType);
+        parent.pv.RPC("SetBehaviour", RpcTarget.AllBuffered, (int)MoveType.Static, reaction, 0f);
         return 0f;
     }
 }
@@ -24,7 +25,22 @@ public class Action_SetProjectileStraight : SkillAction
         if (parent.pv == null) return 0f;
         float direction = (float)GetParam(SkillParams.EulerAngle);
         float moveSpeed = (float)GetParam(SkillParams.MoveSpeed);
-        parent.pv.RPC("SetBehaviour", RpcTarget.AllBuffered, (int)MoveType.Straight, direction);
+        int reaction = (int)GetParam(SkillParams.ReactionType);
+        parent.pv.RPC("SetBehaviour", RpcTarget.AllBuffered, (int)MoveType.Straight, reaction, direction);
+        parent.pv.RPC("SetMoveInformation", RpcTarget.AllBuffered, moveSpeed, 0f, 0f);
+        return 0f;
+    }
+}
+public class Action_SetProjectile_Orbit : SkillAction
+{
+    // Start is called before the first frame update
+    public override float Activate()
+    {
+        if (parent.pv == null) return 0f;
+        float direction = (float)GetParam(SkillParams.EulerAngle);
+        float moveSpeed = (float)GetParam(SkillParams.MoveSpeed);
+        int reaction = (int)GetParam(SkillParams.ReactionType);
+        parent.pv.RPC("SetBehaviour", RpcTarget.AllBuffered, (int)MoveType.OrbitAround, reaction, direction);
         parent.pv.RPC("SetMoveInformation", RpcTarget.AllBuffered, moveSpeed, 0f, 0f);
         return 0f;
     }
@@ -38,7 +54,8 @@ public class Action_SetProjectileCurves : SkillAction
         if (parent.pv == null) return 0f;
         float direction =(float)GetParam(SkillParams.EulerAngle);
         float moveSpeed = (float)GetParam(SkillParams.MoveSpeed);
-        parent.pv.RPC("SetBehaviour", RpcTarget.AllBuffered, (int)MoveType.Curves , direction);
+        int reaction = (int)GetParam(SkillParams.ReactionType);
+        parent.pv.RPC("SetBehaviour", RpcTarget.AllBuffered, (int)MoveType.Curves, reaction, direction);
         parent.pv.RPC("SetMoveInformation", RpcTarget.AllBuffered, moveSpeed, 0f, 0f);
         return 0f;
     }
@@ -69,16 +86,7 @@ public class Action_DoDeathAfter : SkillAction
     {
         if (parent.pv == null) return 0f;
         float duration = (float)GetParam(SkillParams.Duration);
-        parent.pv.RPC("DoDeathAfter", RpcTarget.AllBuffered, duration);
-        return 0f;
-    }
-}
-public class Action_NoDeathOnCollision : SkillAction
-{
-    public override float Activate()
-    {
-        if (parent.pv == null) return 0f;
-        parent.pv.RPC("DisableCollisionDeath", RpcTarget.AllBuffered);
+        parent.pv.GetComponent<HealthPoint>().DoDeathAfter(duration);
         return 0f;
     }
 }

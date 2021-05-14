@@ -9,6 +9,9 @@ using static ConstantStrings;
 
 public class Projectile_Movement : MonoBehaviourPun
 {
+    public bool syncTransform = false;
+    TransformSynchronisation transSync;
+
      public float eulerAngle;
     public float moveSpeed;
 
@@ -23,23 +26,39 @@ public class Projectile_Movement : MonoBehaviourPun
     delegate void voidFunc();
     voidFunc DoMove;
     public MoveType moveType;
+    public ReactionType reactionType = ReactionType.Bounce;
 
     //Delay Move//
     float delay_enableAfter = 0f;
     float delay_duration;
-    BoxCollider2D myCollider;
+    PolygonCollider2D myColliderP;
+    CircleCollider2D myColliderC;
+    BoxCollider2D myColliderB;
     [SerializeField] SpriteRenderer mySprite;
+
+    PhotonView pv;
 
     private void Awake()
     {
-        myCollider = GetComponent<BoxCollider2D>();
+        myColliderP = GetComponent<PolygonCollider2D>();
+        myColliderC = GetComponent<CircleCollider2D>();
+        myColliderB = GetComponent<BoxCollider2D>();
+        pv = GetComponent<PhotonView>();
+        if (syncTransform) {
+            transSync = GetComponent<TransformSynchronisation>();
+        }
+
+    }
+    private void OnEnable()
+    {
+        distanceMoved = 0;
     }
 
-
     [PunRPC]
-    public void SetBehaviour(int _moveType, float _direction)
+    public void SetBehaviour(int _moveType, int _reaction, float _direction)
     {
         moveType = (MoveType)_moveType;
+        reactionType = (ReactionType)_reaction;
         switch (moveType)
         {
             case MoveType.Static:
@@ -54,8 +73,14 @@ public class Projectile_Movement : MonoBehaviourPun
                 DoMove = DoMove_Straight;
                 eulerAngle = _direction;// transform.rotation.eulerAngles.z;
                 break;
+            case MoveType.OrbitAround:
+                DoMove = DoMove_Orbit;
+                eulerAngle = _direction;
+                break;
         }
     }
+
+
     [PunRPC]
     public void SetMoveInformation(float _speed,float _rotate,float rotateBound) {
         moveSpeed = _speed;
@@ -66,7 +91,7 @@ public class Projectile_Movement : MonoBehaviourPun
     [PunRPC]
     public void SetDelay(float delay) {
         delay_enableAfter = delay;
-        myCollider.enabled = false;
+        EnableColliders(false);
     }
     [PunRPC]
     public void SetScale(float w, float h) {
@@ -88,7 +113,7 @@ public class Projectile_Movement : MonoBehaviourPun
     {
         delay_enableAfter = 0f;
         delay_duration = 0f;
-        myCollider.enabled = true;
+        EnableColliders(true);
         mySprite.DORewind();
         gameObject.transform.DORewind();
     }
@@ -97,16 +122,30 @@ public class Projectile_Movement : MonoBehaviourPun
     {
         if(delay_enableAfter > 0)
         {
-            myCollider.enabled = false;
+            EnableColliders(false);
             StartCoroutine(WaitAndEnable());
             mySprite.DOFade(1f, delay_enableAfter);
         }
     }
+    private void EnableColliders(bool enable) {
+        if (myColliderP != null)
+        {
+            myColliderP.enabled = enable;
+        }
+        if (myColliderB != null)
+        {
+            myColliderB.enabled = enable;
+        }
+        if (myColliderC != null)
+        {
+            myColliderC.enabled = enable;
+        }
 
+    }
     private IEnumerator WaitAndEnable()
     {
         yield return new WaitForSeconds(delay_enableAfter);
-        myCollider.enabled = true;
+        EnableColliders(true);
     }
   
 
@@ -129,10 +168,7 @@ public class Projectile_Movement : MonoBehaviourPun
         float dX = Mathf.Cos(rad) * moveSpeed * Time.deltaTime;
         float dY = Mathf.Sin(rad) * moveSpeed * Time.deltaTime; 
         Vector3 moveDir = new Vector3(dX, dY);
-     //   Debug.Log("Move to " + moveDir + "rad"+rad+" cos"+ Mathf.Cos(rad)+" dx "+dX);
-     //   Debug.Log("Move to " + moveDir + "rad"+rad+ " Sin" + Mathf.Sin(rad)+" dy "+dY);
-        transform.localPosition += moveDir;
-       // transform.Translate(moveDir);
+        ChangeTransform(moveDir, eulerAngle);
     }
     private void DoMove_Curve()
     {
@@ -151,9 +187,34 @@ public class Projectile_Movement : MonoBehaviourPun
         float dX = Mathf.Cos(rad) * moveSpeed * Time.deltaTime;
         float dY = Mathf.Sin(rad) * moveSpeed * Time.deltaTime;
         Vector3 moveDir = new Vector3(dX, dY);
-        transform.localPosition += moveDir;
-        transform.eulerAngles = new Vector3(0, 0, eulerAngle);
+        ChangeTransform(moveDir, eulerAngle);
+        
     }
+    float orbitLength = 4f;
+    float distanceMoved = 0;
+   float orbitSpeed = 120f;
+    private void DoMove_Orbit()
+    {
+        if (distanceMoved < orbitLength)
+        {
+            float rad = eulerAngle / 180 * Mathf.PI;
+            float dX = Mathf.Cos(rad) * moveSpeed * Time.deltaTime * 2;
+            float dY = Mathf.Sin(rad) * moveSpeed * Time.deltaTime * 2;
+            Vector3 moveDir = new Vector3(dX, dY);
+            distanceMoved += Vector2.Distance(moveDir, Vector3.zero);
+            ChangeTransform(moveDir, eulerAngle);
+        }
+        else {
+            eulerAngle += orbitSpeed * Time.deltaTime;
+            float rad = eulerAngle / 180 * Mathf.PI;
+            float dX = Mathf.Cos(rad) * orbitLength;
+            float dY = Mathf.Sin(rad) * orbitLength;
+            transform.localPosition = Vector3.zero;
+            Vector3 moveDir = new Vector3(dX, dY);
+            ChangeTransform(moveDir, eulerAngle);
+        }
+    }
+
     private void DoMove_Static()
     {
         
@@ -167,11 +228,21 @@ public class Projectile_Movement : MonoBehaviourPun
         float dY = Mathf.Sin(rad) * moveSpeed * Time.deltaTime;
         Vector3 velocity = new Vector3(dX, dY);
          velocity = Vector3.Reflect(velocity, normal);
-        float rawAngle = (Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg);// * boundFactor;
-     //   Debug.Log("Prev angle " + eulerAngle + " -> " + rawAngle + " collision angle " + velocity);
-        eulerAngle = rawAngle;
-        transform.rotation = Quaternion.Euler(0, 0, eulerAngle);
+        eulerAngle = (Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg);// * boundFactor;
+                                                       //   Debug.Log("Prev angle " + eulerAngle + " -> " + rawAngle + " collision angle " + velocity);
+        ChangeTransform(Vector3.zero, eulerAngle);
+    }
 
+    void ChangeTransform(Vector3 newDirection, float newEulerAngle) {
+        if (syncTransform && pv.IsMine)
+        {
+            transSync.EnqueueLocalPosition(transSync.networkPos + newDirection, Quaternion.Euler(0, 0, newEulerAngle));
+        }
+        else
+        {
+            transform.localPosition += newDirection;
+            transform.rotation = Quaternion.Euler(0, 0, newEulerAngle);
+        }
     }
 }
 

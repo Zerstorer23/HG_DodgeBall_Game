@@ -9,7 +9,6 @@ public class AudioManager : MonoBehaviour
     AudioSource audioPlayer;
 
     private static AudioManager prAudioManager;
-    public static Dictionary<CharacterType, UnitConfig> unitDictionary;
     public static AudioManager instance
     {
         get
@@ -30,30 +29,45 @@ public class AudioManager : MonoBehaviour
     }
     private void Awake()
     {
-        AudioManager[] obj = FindObjectsOfType<AudioManager>();
-        if (obj.Length > 1)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            audioPlayer = GetComponent<AudioSource>();
-            DontDestroyOnLoad(gameObject);
-        }
-        EventManager.StartListening(MyEvents.EVENT_SCENE_CHANGED, OnSceneChanged);
-
+        EventManager.StartListening(MyEvents.EVENT_SHOW_PANEL, OnSceneChanged);
+        audioPlayer = GetComponent<AudioSource>();
     }
+    public static bool GetMuted() {
+        return instance.audioPlayer.mute;
+    }
+    public static void SetMute(bool enable)
+    {
+        instance.audioPlayer.mute = enable;
+    }
+
     private void OnDestroy()
     {
-        EventManager.StopListening(MyEvents.EVENT_SCENE_CHANGED, OnSceneChanged);
+        EventManager.StopListening(MyEvents.EVENT_SHOW_PANEL, OnSceneChanged);
     }
 
     private void OnSceneChanged(EventObject arg0)
     {
-        int sceneIdx = arg0.intObj;
+        ScreenType sceneIdx = (ScreenType)arg0.objData;
+        switch (sceneIdx)
+        {
+            case ScreenType.PreGame:
+                PlayAudio(audioLists[0]);
+                break;
+            case ScreenType.InGame:
+                PlayAudio(audioLists[UnityEngine.Random.Range(1,audioLists.Length)]);
+                break;
+            case ScreenType.GameOver:
+                break;
+        }
 
-        Debug.Log("Scene changed" + sceneIdx);
-        audioPlayer.clip = audioLists[sceneIdx];
-        audioPlayer.Play();
+    }
+    public static void PlayAudio(AudioClip audio) {
+       instance.audioPlayer.clip = audio;
+       instance.audioPlayer.Play();
+    }
+    public static void PlayAudioOneShot(AudioClip audio)
+    {
+        if (GetMuted()) return;
+        instance.audioPlayer.PlayOneShot(audio);
     }
 }

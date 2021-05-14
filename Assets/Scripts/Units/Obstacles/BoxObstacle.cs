@@ -15,13 +15,13 @@ public class BoxObstacle : MonoBehaviourPun
     BoxCollider2D myCollider;
     PhotonView pv;
     [SerializeField] SpriteRenderer fillSprite;
+    [SerializeField] SpriteRenderer boundarySprite;
     IEnumerator deleteRoutine;
 
     private void Awake()
     {
         myCollider = GetComponent<BoxCollider2D>();
         pv = GetComponent<PhotonView>();
-        EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameEnd);
     }
 
     private void OnGameEnd(EventObject arg0)
@@ -30,8 +30,11 @@ public class BoxObstacle : MonoBehaviourPun
     }
     private void OnEnable()
     {
+        EventManager.StartListening(MyEvents.EVENT_FIELD_FINISHED, OnGameEnd);
         isDead = false;
-      
+        boundarySprite.enabled = true;
+        EventManager.TriggerEvent(MyEvents.EVENT_BOX_SPAWNED, new EventObject() { goData = gameObject });
+
     }
 
 /*    private void Update()
@@ -74,6 +77,7 @@ public class BoxObstacle : MonoBehaviourPun
     private void OnDisable()
     {
         fillSprite.DORewind();
+        EventManager.StopListening(MyEvents.EVENT_FIELD_FINISHED, OnGameEnd);
     }
     private void StartFadeIn()
     {
@@ -83,8 +87,8 @@ public class BoxObstacle : MonoBehaviourPun
         fillSprite.DOFade(1f, warnDelay).OnComplete(()=> {
             //CheckContacts
             fillSprite.color = Color.green;
-            if (deleteRoutine != null)
-                StopCoroutine(deleteRoutine);
+            boundarySprite.enabled = false;
+            if (deleteRoutine != null)StopCoroutine(deleteRoutine);
             deleteRoutine = WaitAndDestroy();
             StartCoroutine(deleteRoutine);
         });
@@ -93,24 +97,19 @@ public class BoxObstacle : MonoBehaviourPun
 
     private void CheckContacts()
     {
-        //if (!PhotonNetwork.LocalPlayer.IsMasterClient) return;
-          //  Debug.Log("Location " + transform.position + " scale " + transform.localScale + " z " + transform.eulerAngles.z);
-        Collider2D[] collisions = Physics2D.OverlapBoxAll(transform.position,  transform.localScale,transform.eulerAngles.z,LayerMask.GetMask("Player","Projectile"),minDepth:-3f,maxDepth:3f);
-      //  Collider[] collisions = Physics.OverlapBox(transform.position,  transform.localScale,transform.eulerAngles.z);
-        
+       Collider2D[] collisions = Physics2D.OverlapBoxAll(transform.position,  transform.localScale,transform.eulerAngles.z,LayerMask.GetMask("Player","Projectile"),minDepth:-3f,maxDepth:3f);
+     
         for (int i = 0; i < collisions.Length; i++) {
             Collider2D c = collisions[i];
-           // Debug.Log(i + ". " + c.gameObject.name + " collision " + c.gameObject.tag + " / " + c.gameObject.layer + " / " + c.gameObject.name);
             HealthPoint healthPoint = c.gameObject.GetComponent<HealthPoint>();
            if (healthPoint == null) return;
-       //     Debug.Log(i + ". collision hp " + healthPoint + " vs " + ConstantStrings.TAG_PLAYER);
                switch (c.gameObject.tag) {
                   case ConstantStrings.TAG_PLAYER:
-                      healthPoint.DoDamage(null, true);
+                    healthPoint.Kill_Immediate();
                       break;
                   case ConstantStrings.TAG_PROJECTILE:
-                      healthPoint.DoDamage(null, true);
-                      break;
+                    healthPoint.Kill_Immediate();
+                    break;
               }
 
         }
@@ -119,6 +118,7 @@ public class BoxObstacle : MonoBehaviourPun
     {
         yield return new WaitForSeconds(warnDelay);
         CheckContacts();
+        EventManager.TriggerEvent(MyEvents.EVENT_BOX_ENABLED, new EventObject() { goData = gameObject });
         yield return new WaitForFixedUpdate();
         myCollider.enabled = true;
     }
@@ -135,15 +135,7 @@ public class BoxObstacle : MonoBehaviourPun
         isDead = true;
         if (pv.IsMine) {
             EventManager.TriggerEvent(MyEvents.EVENT_SPAWNER_EXPIRE, null);
-            try
-            {
-                PhotonNetwork.Destroy(pv);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e.StackTrace);
-
-            }
+            PhotonNetwork.Destroy(pv);
         }
 
     }

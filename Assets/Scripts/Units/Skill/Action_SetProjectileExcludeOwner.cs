@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_SetProjectileExcludePlayer : SkillAction
+/*public class Action_SetProjectileExcludePlayer : SkillAction
 {
 
     public override float Activate()
@@ -12,3 +12,4 @@ public class Action_SetProjectileExcludePlayer : SkillAction
         return 0;
     }
 }
+*/

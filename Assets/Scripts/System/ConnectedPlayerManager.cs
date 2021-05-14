@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,22 +8,11 @@ using UnityEngine;
 public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
 {
     private static ConnectedPlayerManager prConnMan;
+    public int myId = 0;
+    public static bool init = false;
     //***************//
 
-    private void Awake()
-    {
-        ConnectedPlayerManager[] obj = FindObjectsOfType<ConnectedPlayerManager>();
-        if (obj.Length > 1)
-        {
-            Destroy(gameObject);
-
-        }
-        else
-        {
-            DontDestroyOnLoad(gameObject);
-        }
-    }
-    public override void OnJoinedRoom()
+   public override void OnJoinedRoom()
     {
         Init();
     }
@@ -37,6 +27,9 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
                 if (!prConnMan)
                 {
                 }
+                else {
+                   // prConnMan.Init();
+                }
             }
 
             return prConnMan;
@@ -49,65 +42,52 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
     public Dictionary<string, object> playerSettings = new Dictionary<string, object>();
     public int currentPlayerNum = 0;
     public void Init() {
+        if (init) return;
+        init = true;
+
         playerDict = new Dictionary<string, Player>();
         Player[] players = PhotonNetwork.PlayerList;
         foreach (Player p in players) { 
             playerDict.Add(p.UserId,p);
         }
         currentPlayerNum = playerDict.Count;
+        roomSettings = new Dictionary<string, object>();
+        playerSettings = new Dictionary<string, object>();
         Debug.Log("<color=#00ff00>Conn man : current size</color> " + currentPlayerNum);
     }
     public static Dictionary<string, Player> GetPlayerDictionary() {
         return instance.playerDict;
     }
-    public static void SetRoomSettings(string key, object value)
+
+    internal static int GetMyIndex()
     {
-        if (instance.roomSettings.ContainsKey(key))
+
+        Player[] players = PhotonNetwork.PlayerList;
+
+        SortedSet<string> myList = new SortedSet<string>();
+        foreach (Player p in players) {
+            myList.Add(p.UserId);
+        }
+        int i = 0;
+        string myID = PhotonNetwork.LocalPlayer.UserId;
+        foreach (var val in myList)
         {
-            instance.roomSettings[key] = value;
+            if(val== myID) return i;
+            i++;
+        }
+        return 0;
+    }
+
+    internal static Player GetRandomPlayerExceptMe()
+    {
+        Player[] players = PhotonNetwork.PlayerListOthers;
+        if (players.Length > 0)
+        {
+            return players[UnityEngine.Random.Range(0, players.Length)];
+
         }
         else {
-            instance.roomSettings.Add(key, value);
-        }
-    }
-    public static object GetRoomSettings(string key, object defaultVal = null) {
-        if (instance.roomSettings.ContainsKey(key))
-        {
-            return instance.roomSettings[key];
-        }
-        else
-        {
-            if (defaultVal != null) {
-                instance.roomSettings.Add(key, defaultVal);
-            }
-            return defaultVal;
-        }
-    }
-    public static void SetPlayerSettings(string key, object value)
-    {
-        if (instance.playerSettings.ContainsKey(key))
-        {
-            instance.playerSettings[key] = value;
-        }
-        else
-        {
-            instance.playerSettings.Add(key, value);
-        }
-    }
-    public static object GetPlayerSettings(string key, object defaultVal = null)
-    {
-        
-        if (instance.playerSettings.ContainsKey(key))
-        {
-            return instance.playerSettings[key];
-        }
-        else
-        {
-            if (defaultVal != null)
-            {
-                instance.playerSettings.Add(key, defaultVal);
-            }
-            return defaultVal;
+            return null;
         }
     }
 
@@ -130,6 +110,55 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         }
     }
     public static Player GetPlayerByID(string id) {
-        return instance.playerDict[id];
+        if (instance.playerDict.ContainsKey(id))
+        {
+
+            return instance.playerDict[id];
+        }
+        else {
+            return null;
+        }
     }
+
+    internal static int GetNumberInTeam(Team myTeam)
+    {
+        if (instance.teamCount == null) return 0;
+        if (!instance.teamCount.ContainsKey(myTeam)) return 0;
+        return instance.teamCount[myTeam];
+    }
+
+    Dictionary<Team, int> teamCount = new Dictionary<Team, int>();
+    public static void CountPlayersInTeam() {
+        instance.teamCount = new Dictionary<Team, int>();
+        foreach (var p in instance.playerDict.Values)
+        {
+            if (!p.CustomProperties.ContainsKey("TEAM")) continue;
+            Team pTeam = (Team)p.CustomProperties["TEAM"];
+            if (instance.teamCount.ContainsKey(pTeam))
+            {
+                instance.teamCount[pTeam]++;
+            }
+            else {
+                instance.teamCount.Add(pTeam, 1);
+            }
+        }
+    }
+
+
+ /*   public void Disconnect()
+    {
+        PhotonNetwork.Disconnect();
+    }
+
+    public void Reconnect()
+    {
+        if (!PhotonNetwork.IsConnected && wasConnected)
+        {
+            PhotonNetwork.ReconnectAndRejoin();
+        }
+        else
+        {
+            PhotonNetwork.ConnectUsingSettings();
+        }
+    }*/
 }

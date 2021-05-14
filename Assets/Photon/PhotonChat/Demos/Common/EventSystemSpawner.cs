@@ -24,7 +24,7 @@ namespace Photon.Chat.UtilityScripts
 			EventSystem sceneEventSystem = FindObjectOfType<EventSystem>();
 			if (sceneEventSystem == null)
 			{
-				GameObject eventSystem = new GameObject("EventSystem");
+                UnityEngine.GameObject eventSystem = new UnityEngine.GameObject("EventSystem");
 
 				eventSystem.AddComponent<EventSystem>();
 				eventSystem.AddComponent<StandaloneInputModule>();

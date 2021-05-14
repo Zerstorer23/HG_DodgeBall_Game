@@ -29,19 +29,19 @@ public class ObjectPool : MonoBehaviour
             return prObjectPool;
         }
     }
-    private Dictionary<string, Queue<GameObject>> objectLibrary;
+    private Dictionary<string, Queue<UnityEngine.GameObject>> objectLibrary;
     void Init()
     {
 
         if (objectLibrary == null)
         {
-            objectLibrary = new Dictionary<string, Queue<GameObject>>();
+            objectLibrary = new Dictionary<string, Queue<UnityEngine.GameObject>>();
         }
     }
 
-    public static void SaveObject(string tag , GameObject obj) {
+    public static void SaveObject(string tag , UnityEngine.GameObject obj) {
         if (!instance.objectLibrary.ContainsKey(tag)) {
-            instance.objectLibrary.Add(tag, new Queue<GameObject>());
+            instance.objectLibrary.Add(tag, new Queue<UnityEngine.GameObject>());
         }
         if (!obj.activeSelf) {
             Debug.LogWarning("Saving inactive obj? " + tag);
@@ -49,12 +49,12 @@ public class ObjectPool : MonoBehaviour
         obj.SetActive(false);
         instance.objectLibrary[tag].Enqueue(obj);
     }
-    public static GameObject PollObject(string tag, Vector3 position, Quaternion angle) {
+    public static UnityEngine.GameObject PollObject(string tag, Vector3 position, Quaternion angle) {
         if (!instance.objectLibrary.ContainsKey(tag)||
                 instance.objectLibrary[tag].Count <= 0) {
             return null;
         }
-        GameObject obj = instance.objectLibrary[tag].Dequeue();
+        UnityEngine.GameObject obj = instance.objectLibrary[tag].Dequeue();
         obj.SetActive(true);
         obj.transform.position = position;
         obj.transform.rotation = angle;

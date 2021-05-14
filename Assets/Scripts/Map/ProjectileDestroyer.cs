@@ -6,20 +6,15 @@ using static ConstantStrings;
 
 public class ProjectileDestroyer : MonoBehaviourPun
 {
-    // Start is called before the first frame update
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
 
-        Debug.Log("Destoryer Collision " + collision.gameObject.layer);
-    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         string tag = collision.gameObject.tag;
-        switch (tag)
+        if (tag == TAG_PLAYER || tag == TAG_PROJECTILE)
         {
-            case TAG_PROJECTILE:
-                collision.gameObject.GetComponent<HealthPoint>().DeathByException();
-                break;
+            HealthPoint hp = collision.GetComponent<HealthPoint>();
+            if (hp == null || hp.dontKillByException) return;
+            hp.Kill_Immediate();
         }
     }
 }

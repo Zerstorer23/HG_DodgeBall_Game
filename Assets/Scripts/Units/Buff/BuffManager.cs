@@ -7,15 +7,17 @@ public class BuffManager : MonoBehaviourPun
 {
     public UnitType unitType;
     public PhotonView pv;
+    HealthPoint healthPoint;
 
     //COMMON
     [SerializeField] List<BuffData> Buffs_active = new List<BuffData>();
     [SerializeField] SpriteRenderer mySprite;
-    internal float speedModifier = 1f;
-    internal int numStun;
+    Dictionary<BuffType, float> buffDictionary = new Dictionary<BuffType, float>();
+    Dictionary<BuffType, int> buffTriggers = new Dictionary<BuffType, int>();
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
+        healthPoint = GetComponent<HealthPoint>();
     }
     private void Update()
     {
@@ -24,6 +26,7 @@ public class BuffManager : MonoBehaviourPun
     private void OnEnable()
     {
         RemoveAllBuff();
+        buffDictionary = new Dictionary<BuffType, float>();
     }
 
 
@@ -43,32 +46,94 @@ public class BuffManager : MonoBehaviourPun
         }
     }
 
-    public void RPC_AddBuff(BuffData buff)
-    {
-        pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)buff.buffType,buff.modifier,buff.duration,buff.triggerByID);
-    }
     [PunRPC]
-    void AddBuff(int bType, float mod, double _duration, string trigger)
+    void AddBuff(int bType, float mod, double _duration)
     {
-        BuffData myBuff = new BuffData((BuffType) bType,  mod,  _duration, trigger);
-
-        
-        switch (myBuff.buffType)
+        BuffData buff = new BuffData((BuffType) bType,  mod,  _duration);
+        buff.PrintContent();
+        switch (buff.buffType)
         {
             case BuffType.None:
                 break;
-            case BuffType.MoveSpeed:
-                ChangeSpeedModifier(myBuff.modifier, true);
+            case BuffType.HealthPoint:
+                healthPoint.HealHP(1);
+                break;
+            case BuffType.InvincibleFromBullets:
+                SetTrigger(buff.buffType, true);
+                break;
+            default:
+                SetBuff(buff.buffType, buff.modifier, true);
                 break;
         }
-        myBuff.StartTimer();
-        Buffs_active.Add(myBuff);
-        UpdateBuffIndicator();
+
+        if (buff.duration > 0) {
+            buff.StartTimer();
+            Buffs_active.Add(buff);
+            UpdateBuffIndicator();
+        }
     }
+    public void RemoveBuff(BuffData buff)
+    {
+        switch (buff.buffType)
+        {
+            case BuffType.None:
+                break;
+            case BuffType.InvincibleFromBullets:
+                SetTrigger(buff.buffType, false);
+                break;
+            default:
+                SetBuff(buff.buffType, buff.modifier, false);
+                break;
+        }
+    }
+    private void SetTrigger(BuffType type, bool enable)
+    {
+        if (buffTriggers.ContainsKey(type))
+        {
+            if (enable)
+            {
+                buffTriggers[type]++;
+            }
+            else {
+                if(buffTriggers[type] > 0)
+                    buffTriggers[type]--;
+            }
+        }
+        else
+        {
+            buffTriggers.Add(type, (enable)?1:0);
+        }
+    }
+
+    private void SetBuff(BuffType type, float amount, bool enable) {
+
+        if (buffDictionary.ContainsKey(type))
+        {
+            buffDictionary[type] += (enable) ? amount : -amount;
+        }
+        else { 
+            float buffAmount = (enable) ? 1f + amount : 1f - amount;
+            buffDictionary.Add(type, buffAmount);        
+        }
+    }
+    public float GetBuff(BuffType type) {
+        if (!buffDictionary.ContainsKey(type))
+        {
+            buffDictionary.Add(type, 1f);
+        }
+        return Mathf.Max(buffDictionary[type],0.01f);    
+    }
+    public bool GetTrigger(BuffType type)
+    {
+        if (!buffTriggers.ContainsKey(type))
+        {
+            buffTriggers.Add(type, 0);
+        }
+        return buffTriggers[type] > 0;
+    }
+
     void UpdateBuffIndicator() {
-        Debug.Log("Change color " + ((Buffs_active.Count > 0) ? Color.red : Color.white));
-        mySprite.color = (Buffs_active.Count > 0) ? Color.red : Color.white;
-    
+        mySprite.color = (Buffs_active.Count > 0) ? Color.red : Color.white;    
     }
 
     private void RemoveAllBuff()
@@ -82,46 +147,5 @@ public class BuffManager : MonoBehaviourPun
     }
 
 
-    public void RemoveBuff(BuffData buff)
-    {
-        switch (buff.buffType)
-        {
-            case BuffType.None:
-                break;
-            case BuffType.MoveSpeed:
-                ChangeSpeedModifier(buff.modifier, false);
-                break;
-        }
-    }
-
-
-    internal void ChangeSpeedModifier(float _mod, bool enable)
-    {
-        if (enable)
-        {
-            speedModifier += _mod;
-        }
-        else {
-            speedModifier -= _mod;
-        }
-    }
-    public float GetSpeedModifier() {
-        return Mathf.Max(speedModifier, 0.01f);
-    
-    }
-
-    private void ApplyKnockBack()
-    {
-        numStun++;
-    }
-
-  
-
-
-
-    private void RemoveKnockback()
-    {
-        numStun--;
-    }
 
 }

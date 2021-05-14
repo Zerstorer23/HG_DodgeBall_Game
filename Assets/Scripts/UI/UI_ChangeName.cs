@@ -8,16 +8,19 @@ public class UI_ChangeName : MonoBehaviourPun
 {
     [SerializeField] InputField userNameInput;
     public static string default_name = "ㅇㅇ";
-    private void Awake()
-    {
 
+    private void OnEnable()
+    {
         userNameInput.placeholder.GetComponent<Text>().text = (PhotonNetwork.NickName.Length <= 1) ? default_name : PhotonNetwork.NickName;
     }
     public void OnNameField_Changed()
     {
         string name = userNameInput.text;
         if (name.Length < 1) return;
-        Debug.Assert(MenuManager.localPlayerInfo != null, " no local player");
-        MenuManager.localPlayerInfo.pv.RPC("ChangeName", RpcTarget.AllBuffered, userNameInput.text);
+        if (name.Length > 15) {
+            name = name.Substring(0, 15);
+        }
+        Debug.Assert(UI_PlayerLobbyManager.localPlayerInfo != null, " no local player");
+        UI_PlayerLobbyManager.localPlayerInfo.pv.RPC("ChangeName", RpcTarget.AllBuffered, name);
     }
 }

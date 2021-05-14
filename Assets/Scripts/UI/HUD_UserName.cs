@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,37 +10,71 @@ public class HUD_UserName : MonoBehaviourPun
 {
     public PhotonView pv;
     public bool isReady = false;
-  //  public string playerName = "ㅇㅇ";
-   // public CharacterType selectedCharacter = CharacterType.HARUHI;
+    //  public string playerName = "ㅇㅇ";
+    // public CharacterType selectedCharacter = CharacterType.HARUHI;
 
-
-    [SerializeField]Image readySPrite;
-    [SerializeField]Text nameText;
-    [SerializeField]Image charPortrait;
+    [SerializeField] Image readySprite;
+    [SerializeField] Text nameText;
+    [SerializeField] Image charPortrait;
+    Image teamColorImage;
     string playerName = "ㅇㅇ";
     CharacterType selectedCharacter = CharacterType.HARUHI;
+    Team myTeam = Team.HOME;
 
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
+        teamColorImage = GetComponent<Image>();
+        teamColorImage.enabled = false;
     }
     private void OnEnable()
     {
-        if(pv.Owner!=null)
-        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_JOINED, new EventObject() { stringObj=pv.Owner.UserId, gameObject = gameObject });
-
-
-
+        EventManager.StartListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
+        playerName = pv.Owner.NickName;
+        isReady = false;
+        UpdateUI();
+        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_JOINED, new EventObject() { stringObj = pv.Owner.UserId, goData = gameObject });
     }
     private void OnDisable()
     {
-        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_LEFT, new EventObject() { stringObj = pv.Owner.UserId, gameObject = gameObject });
+        EventManager.StopListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
+
     }
 
-  [PunRPC]
+    private void OnGamemodeChanged(EventObject arg0)
+    {
+        if (pv.IsMine) {
+            GameMode currMode = (GameMode)arg0.objData;
+            if (currMode == GameMode.TEAM) {
+                myTeam = (ConnectedPlayerManager.GetMyIndex() % 2 == 0) ? Team.HOME : Team.AWAY;
+            }
+            pv.RPC("SetTeam", RpcTarget.AllBuffered, (int)myTeam);
+        }
+
+    }
+    [PunRPC]
+    public void SetTeam(int teamNumber)
+    {
+        myTeam = (Team)teamNumber;
+        if (pv.IsMine)
+        {
+            PushPlayerSetting(pv.Owner, "TEAM", myTeam);
+        }
+        UpdateUI();
+    }
+    [PunRPC]
+    public void ToggleTeam()
+    {
+        myTeam = (myTeam == Team.HOME) ? Team.AWAY : Team.HOME;
+        UpdateUI();
+    }
+    [PunRPC]
     public void ChangeCharacter(int character)
     {
         selectedCharacter = (CharacterType)character;
+        if (pv.IsMine) {
+            PushPlayerSetting(pv.Owner, "CHARACTER", selectedCharacter);
+        }
         UpdateUI();
     }
 
@@ -47,32 +82,42 @@ public class HUD_UserName : MonoBehaviourPun
     public void ChangeName(string text)
     {
         playerName = text;
+        PhotonNetwork.LocalPlayer.NickName = playerName;
         UpdateUI();
     }
 
     [PunRPC]
     public void ToggleReady()
     {
-        isReady = !isReady; 
+        isReady = !isReady;
+        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_TOGGLE_READY, new EventObject());
         UpdateUI();
     }
+
+
     public bool GetReady() {
         return isReady;
     }
     public void UpdateUI()
     {
         nameText.text = playerName;
-        readySPrite.color = (isReady) ? Color.green : Color.black;
-        charPortrait.sprite =EventManager.unitDictionary[selectedCharacter].portraitImage;
-        if (pv.IsMine)
-        {
-            ConnectedPlayerManager.SetPlayerSettings("CHARACTER", selectedCharacter);
-            ConnectedPlayerManager.SetPlayerSettings("NICKNAME", playerName);
-            PhotonNetwork.LocalPlayer.NickName = playerName;
-            ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
-            hash.Add("CHARACTER", selectedCharacter);
-            pv.Owner.SetCustomProperties(hash);
-        }
+        readySprite.color = (isReady) ? Color.green : Color.black;
+        charPortrait.sprite = GameSession.unitDictionary[selectedCharacter].portraitImage;
 
+        if (GameSession.gameMode == GameMode.TEAM)
+        {
+            teamColorImage.enabled = true;
+            teamColorImage.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[myTeam == Team.HOME ? 0 : 1]);
+        }
+        else
+        {
+            teamColorImage.enabled = false;
+        };
     }
+    public static void PushPlayerSetting(Player p, string key, object value) {
+        ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
+        hash.Add(key, value);
+        p.SetCustomProperties(hash);
+        
+    } 
 }

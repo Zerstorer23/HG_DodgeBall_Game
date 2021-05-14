@@ -56,24 +56,24 @@ public class ChatGui : MonoBehaviour, IChatClientListener
     protected internal ChatAppSettings chatAppSettings;
 
 
-    public GameObject missingAppIdErrorPanel;
-	public GameObject ConnectingLabel;
+    public UnityEngine.GameObject missingAppIdErrorPanel;
+	public UnityEngine.GameObject ConnectingLabel;
 
 	public RectTransform ChatPanel;     // set in inspector (to enable/disable panel)
-	public GameObject UserIdFormPanel;
+	public UnityEngine.GameObject UserIdFormPanel;
 	public InputField InputFieldChat;   // set in inspector
 	public Text CurrentChannelText;     // set in inspector
 	public Toggle ChannelToggleToInstantiate; // set in inspector
 
 
-	public GameObject FriendListUiItemtoInstantiate;
+	public UnityEngine.GameObject FriendListUiItemtoInstantiate;
 
 	private readonly Dictionary<string, Toggle> channelToggles = new Dictionary<string, Toggle>();
 
 	private readonly Dictionary<string,FriendItem> friendListItemLUT =  new Dictionary<string, FriendItem>();
 
 	public bool ShowState = true;
-	public GameObject Title;
+	public UnityEngine.GameObject Title;
 	public Text StateText; // set in inspector
 	public Text UserIdText; // set in inspector
 
@@ -476,7 +476,7 @@ public class ChatGui : MonoBehaviour, IChatClientListener
 
 	private void InstantiateFriendButton(string friendId)
 	{
-		GameObject fbtn = (GameObject)Instantiate(this.FriendListUiItemtoInstantiate);
+        UnityEngine.GameObject fbtn = (UnityEngine.GameObject)Instantiate(this.FriendListUiItemtoInstantiate);
 		fbtn.gameObject.SetActive(true);
 		FriendItem  _friendItem =	fbtn.GetComponent<FriendItem>();
 

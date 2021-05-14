@@ -17,22 +17,39 @@ public class BulletSpawner : MonoBehaviourPun
     public float angleAntiClockBound;
     public float angleStack;
     public int goClockwise = 1;
-    float delay;
+    public float delay = 0.25f;
     float delayStack;
 
     //Bulllet
     public SpawnDirection spawnDir;
     public MoveType moveType;
-    private float blockWidth;
-    float moveSpeed;
-    float rotateSpeed;
+    public ReactionType reactionType;
+    private float blockWidth = 1f;
+    public float moveSpeed;
+    public float rotateSpeed;
     private bool isDead = false;
-
+    public bool debug = false;
+    [SerializeField] float debugDuration = 50f;
+    [SerializeField] float debugAngleRange = 50f;
+    [SerializeField] float debugMovespeed = 20f;
+    [SerializeField] float debugRotateSpeed = 90f;
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
         EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameEnd);
+
+        SetDebug();
+
     }
+    void SetDebug()
+    {
+        if (debug)
+        {
+            SetBehaviour(0, debugAngleRange, 0.25f, debugDuration);
+            SetProjectile(2, 1,(int) reactionType, 1f, debugMovespeed, debugRotateSpeed);
+        }
+    }
+
     private void OnEnable()
     {
         isDead = false;
@@ -70,14 +87,7 @@ public class BulletSpawner : MonoBehaviourPun
         if (!pv.IsMine || isDead) return;
         isDead = true;
         EventManager.TriggerEvent(MyEvents.EVENT_SPAWNER_EXPIRE, null);
-        try
-        {
-            PhotonNetwork.Destroy(pv);
-        }
-        catch (Exception e) {
-            Debug.Log(e.StackTrace);
-            
-        }
+        PhotonNetwork.Destroy(pv);
     }
     void SetAngles(Directions shootDirection, float angleRange)
     {
@@ -90,10 +100,11 @@ public class BulletSpawner : MonoBehaviourPun
     }
 
     [PunRPC]
-    public void SetProjectile(int _spawnDir, int _moveType, float width, float _pMovespeed,float _pRotateSpeed)
+    public void SetProjectile(int _spawnDir, int _moveType, int _reaction,float width, float _pMovespeed,float _pRotateSpeed)
     {
         spawnDir = (SpawnDirection)_spawnDir;
         moveType = (MoveType)_moveType;
+        reactionType = (ReactionType)_reaction;
         blockWidth = width;
         moveSpeed = _pMovespeed;
         rotateSpeed = _pRotateSpeed;
@@ -104,6 +115,7 @@ public class BulletSpawner : MonoBehaviourPun
     private void Update()
     {
         if (!PhotonNetwork.IsMasterClient) return;
+        SetDebug();
         DoRotation();
         CheckFire();
     }
@@ -113,12 +125,12 @@ public class BulletSpawner : MonoBehaviourPun
         delayStack += Time.deltaTime;
         if (delayStack >= delay) {
             delayStack -= delay;
-                                                                                                        //
-            GameObject obj = PhotonNetwork.InstantiateRoomObject(ConstantStrings.PREFAB_BULLET_1, spawnPos.position, transform.rotation,0);
+            //
+            UnityEngine.GameObject obj = PhotonNetwork.InstantiateRoomObject(ConstantStrings.PREFAB_BULLET_1, spawnPos.position, transform.rotation,0);
             PhotonView pv = obj.GetComponent<PhotonView>();
             pv.RPC("SetMoveInformation", RpcTarget.AllBuffered, moveSpeed, rotateSpeed, angleClockBound);
             pv.RPC("SetScale",RpcTarget.AllBuffered, blockWidth, blockWidth);
-            obj.GetComponent<PhotonView>().RPC("SetBehaviour", RpcTarget.AllBuffered, (int)moveType, transform.eulerAngles.z);
+            obj.GetComponent<PhotonView>().RPC("SetBehaviour", RpcTarget.AllBuffered, (int)moveType,(int)reactionType, transform.eulerAngles.z);
             pv.RPC("SetParentTransform", RpcTarget.AllBuffered);
         }
     }
