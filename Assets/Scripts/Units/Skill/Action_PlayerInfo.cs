@@ -16,7 +16,7 @@ public class Action_Player_InvincibleBuff : SkillAction
 {
     public override float Activate()
     {
-        if (GameSession.suddenDeathCalled) return 0f;
+        if (GameFieldManager.CheckSuddenDeathCalled(parent.castingPlayer.fieldNo)) return 0f;
         float duration = (float)GetParam(SkillParams.Duration);
         parent.caster.GetComponent<BuffManager>().pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.InvincibleFromBullets,0f,(double) duration);
         return 0f;

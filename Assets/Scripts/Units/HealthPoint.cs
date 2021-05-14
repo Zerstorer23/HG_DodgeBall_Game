@@ -22,7 +22,7 @@ public class HealthPoint : MonoBehaviourPun
     internal Unit_Player unitPlayer;
     internal Projectile_DamageDealer damageDealer;
     internal Team myTeam = Team.HOME;
-
+    internal int associatedField = 0;
 
 
     private void Awake()
@@ -44,9 +44,9 @@ public class HealthPoint : MonoBehaviourPun
 
     }
 
-    private void OnGameFinish(EventObject obj)
+    private void OnFieldFinish(EventObject obj)
     {
-        if (!isDead)
+        if (!isDead && obj.intObj == associatedField)
         {
             Kill_Immediate();
         }
@@ -73,16 +73,19 @@ public class HealthPoint : MonoBehaviourPun
 
     private void OnEnable()
     {
-        EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinish);
+        EventManager.StartListening(MyEvents.EVENT_FIELD_FINISHED, OnFieldFinish);
         currentLife = maxLife;
         //    unitType = DetermineType();
         isDead = false;
         if (unitType == UnitType.Projectile) currentLife = 1;
     }
+    public void SetAssociatedField(int no) {
+        associatedField = no;
+    }
 
     private void OnDisable()
     {
-        EventManager.StopListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinish);
+        EventManager.StopListening(MyEvents.EVENT_FIELD_FINISHED, OnFieldFinish);
         isDead = true;
     }
 
@@ -183,9 +186,7 @@ public class HealthPoint : MonoBehaviourPun
         {
             if (unitType == UnitType.Player)
             {
-                Unit_Player player = PlayerSpawner.GetPlayers()[attackerUserID];
-                if (player == null) return;
-                player.IncrementKill();
+                EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID });
             }
         }
     }

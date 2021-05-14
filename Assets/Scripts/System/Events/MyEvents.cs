@@ -4,8 +4,10 @@
 public class MyEvents {
     //HUD Manager
     public const string EVENT_SPAWNER_EXPIRE = "SpanwerExpired";
+    public const string EVENT_SPAWNER_SPAWNED = "SpawnerSpawned";
     public const string EVENT_PLAYER_SPAWNED = "PlayerSpawned";
     public const string EVENT_PLAYER_DIED = "PlayerDied";
+    public const string EVENT_PLAYER_KILLED_A_PLAYER = "PlayerKilledAPlayer";
     public const string EVENT_BOX_SPAWNED = "BoxSpawned";
     public const string EVENT_BOX_ENABLED = "BoxEnabled";
 
@@ -15,6 +17,8 @@ public class MyEvents {
     public const string EVENT_PLAYER_SELECTED_CHARACTER = "PlayerSelectedCharacter";
 
     public const string EVENT_GAME_FINISHED = "GameFinished";
+    public const string EVENT_FIELD_FINISHED = "FieldFinished";
+    public const string EVENT_FIELD_STARTED = "FieldStarted";
     public const string EVENT_GAME_STARTED = "GameStarted";
     public const string EVENT_GAMEMODE_CHANGED = "GameModeChanged";
     public const string EVENT_REQUEST_SUDDEN_DEATH = "SuddenDeathRequested";

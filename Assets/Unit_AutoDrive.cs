@@ -203,9 +203,9 @@ public class Unit_AutoDrive : MonoBehaviour
     }
 
     Vector3 GetAwayFromWalls() {
-        Vector3 center = new Vector3(xMid, yMid);
+        Vector3 center = new Vector3(movement.mapSpec.xMid, movement.mapSpec.yMid);
         float dist = Vector2.Distance(center, movement.networkPos);
-        float notDistance = xMid - xMin;
+        float notDistance = movement.mapSpec.xMid - movement.mapSpec.xMin;
         Vector3 dir = center - movement.networkPos;
         dir.Normalize();
         dir = dir * GetMultiplier(notDistance - dist);

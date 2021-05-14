@@ -20,8 +20,8 @@ public class Projectile_CustomDamageDealer : MonoBehaviour
     }
     private void OnEnable()
     {
-      //  foundTargets = new HashSet<string>();
-        playerDict = PlayerSpawner.GetPlayers();
+        //  foundTargets = new HashSet<string>();
+        playerDict = GameFieldManager.GetPlayersInArea(proj.player.fieldNo);
         playerList = new List<string>(playerDict.Keys);
         Debug.Assert(playerDict.Count == playerList.Count, " player dict mismatch");
     }

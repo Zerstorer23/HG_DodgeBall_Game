@@ -8,10 +8,8 @@ using static GameFieldManager;
 using ExitGames.Client.Photon;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class BulletManager : MonoBehaviourPun
+public class BulletManager : MonoBehaviour
 {
-    public Transform Home_Bullets;
-    private static BulletManager instance;
     public float startSpawnAfter = 2f;
     double startTime;
 
@@ -29,63 +27,48 @@ public class BulletManager : MonoBehaviourPun
     public float maxWidth = 10f;
     public float spawnDelay = 3f;
 
-    PhotonView pv;
-
     int[] mapDifficulties = { 0, 12, 16, 32 };
     public int modPerPerson = 5;
     public float modPerStep = 0.5f;
 
     MapDifficulty currentDifficult;
-    private void Awake()
-    {
 
-        pv = GetComponent<PhotonView>();
-        instance = this;
-        EventManager.StartListening(MyEvents.EVENT_SPAWNER_EXPIRE, OnSpawnerExpired);
-        EventManager.StartListening(MyEvents.EVENT_GAME_STARTED, OnGameStart);
-        EventManager.StartListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
-    }
-
+  [SerializeField]  GameField gameField;
     private void OnSuddenDeath(EventObject obj)
     {
-        activeMax += 4;
+       // activeMax += 4;
     }
-
-    private void OnDestroy()
+    private void OnEnable()
     {
+
+        EventManager.StartListening(MyEvents.EVENT_SPAWNER_EXPIRE, OnSpawnerExpired);
+        EventManager.StartListening(MyEvents.EVENT_SPAWNER_SPAWNED, OnSpawnerSpawned);
+        EventManager.StartListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
+    }
+    private void OnDisable()
+    {
+
         EventManager.StopListening(MyEvents.EVENT_SPAWNER_EXPIRE, OnSpawnerExpired);
-        EventManager.StopListening(MyEvents.EVENT_GAME_STARTED, OnGameStart);
+        EventManager.StopListening(MyEvents.EVENT_SPAWNER_SPAWNED, OnSpawnerSpawned);
         EventManager.StopListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
     }
-    private void OnGameStart(EventObject obj)
-    {
-        StartEngine();
-    }
 
 
-
-    private void StartEngine()
+    public void StartEngine()
     {
         Hashtable roomSetting = PhotonNetwork.CurrentRoom.CustomProperties;
         MapDifficulty mapDiff =(MapDifficulty)roomSetting[ConstantStrings.HASH_MAP_DIFF];
         currentDifficult = mapDiff;
         float baseNum = mapDifficulties[(int)currentDifficult];
-        float modifier = 1+ ConnectedPlayerManager.GetPlayerDictionary().Count / modPerPerson * modPerStep;
+        float modifier = 1+ gameField.playerSpawner.playersOnMap.Count / modPerPerson * modPerStep;
 
         Debug.Log("Modifier base"+baseNum+" mod " + modifier);
         activeMax =(int)( baseNum * modifier);
         startTime = PhotonNetwork.Time;
     }
-    public static BulletManager GetInstance() {
-        return instance;
-    }
-
     // Update is called once per frame
     void Update()
     {
-/*            Debug.Log("mc "+PhotonNetwork.IsMasterClient);
-            Debug.Log("spawn "+ doSpawning);
-          Debug.Log("time "+ PhotonNetwork.Time+" at "+ startTime);*/
         if (!PhotonNetwork.IsMasterClient || !GameSession.gameStarted) return;
         if (PhotonNetwork.Time <= startTime + startSpawnAfter) return;
         CheckSpawnerSpawns();
@@ -101,7 +84,7 @@ public class BulletManager : MonoBehaviourPun
             MoveType moveType = GetRandomMoveType(spawnDir);
             ReactionType reaction = GetRandomReactionType();
             InstantiateSpanwer(spawnDir, moveType, reaction);
-            pv.RPC("IncrementSpawned", RpcTarget.AllBuffered);
+            currentSpawned++;
         }
     }
 
@@ -110,19 +93,13 @@ public class BulletManager : MonoBehaviourPun
         return (ReactionType)Random.Range(0, (int)ReactionType.None);
     }
 
-    [PunRPC]
-    public void IncrementSpawned() {
-        currentSpawned++;
-    }
-    [PunRPC]
-    public void DecrementSpawned()
+    private void OnSpawnerExpired(EventObject eo = null)
     {
         currentSpawned--;
     }
-
-    private void OnSpawnerExpired(EventObject eo = null)
+    private void OnSpawnerSpawned(EventObject arg0)
     {
-        pv.RPC("DecrementSpawned", RpcTarget.AllBuffered);
+        currentSpawned++;
     }
     private void InstantiateSpanwer(SpawnDirection spawnDir, MoveType moveType, ReactionType reaction)
     {
@@ -150,7 +127,7 @@ public class BulletManager : MonoBehaviourPun
     private void InstantiateBox()
     {
         float randW = Random.Range(1f, maxWidth);
-        Vector3 randPos = GameSession.GetRandomPosOnMap();
+        Vector3 randPos = gameField.GetRandomPosition();
 
         UnityEngine.GameObject box = PhotonNetwork.InstantiateRoomObject("Prefabs/Units/BoxObstacle", randPos, Quaternion.identity,0);
         box.GetComponent<PhotonView>().RPC("SetInformation", RpcTarget.AllBuffered, randW,spawnDelay);
@@ -185,14 +162,14 @@ public class BulletManager : MonoBehaviourPun
 
     private Directions GetHeadingAngle(Vector3 randPos)
     {
-        if (randPos.x == xMin)
+        if (randPos.x == gameField.mapSpec.xMin)
         {
-            if (randPos.y == yMin)
+            if (randPos.y == gameField.mapSpec.yMin)
             {
                 return Directions.NE;
 
             }
-            else if (randPos.y == yMax)
+            else if (randPos.y == gameField.mapSpec.yMax)
             {
                 return Directions.SE;
             }
@@ -201,15 +178,15 @@ public class BulletManager : MonoBehaviourPun
                 return Directions.E;
             }
         }
-        else if (randPos.x == xMax)
+        else if (randPos.x == gameField.mapSpec.xMax)
         {
-            if (randPos.y == yMin)
+            if (randPos.y == gameField.mapSpec.yMin)
             {
                 //shoot 45'
                 return Directions.NW;
 
             }
-            else if (randPos.y == yMax)
+            else if (randPos.y == gameField.mapSpec.yMax)
             {
                 return Directions.SW;
             }
@@ -221,7 +198,7 @@ public class BulletManager : MonoBehaviourPun
         }
         else
         {
-            if (randPos.y == yMin)
+            if (randPos.y == gameField.mapSpec.yMin)
             {
                 return Directions.N;
 
@@ -235,17 +212,17 @@ public class BulletManager : MonoBehaviourPun
 
     private Vector3 GetRandomBoundaryPos()
     {
-        Vector3 randPos = GameSession.GetRandomPosOnMap();
+        Vector3 randPos = gameField.GetRandomPosition();
         float randX = randPos.x;
         float randY = randPos.y;
         bool xClamp = Random.Range(0f, 1f) < 0.5f;
         if (xClamp)
         {
-            randX = (randX < xMid) ? xMin : xMax;
+            randX = (randX < gameField.mapSpec.xMid) ? gameField.mapSpec.xMin : gameField.mapSpec.xMax;
         }
         else
         {
-            randY = (randY < yMid) ? yMin : yMax;
+            randY = (randY < gameField.mapSpec.yMid) ? gameField.mapSpec.yMin : gameField.mapSpec.yMax;
         }
         return new Vector3(randX, randY);// new Vector3(randX, randY);
     }

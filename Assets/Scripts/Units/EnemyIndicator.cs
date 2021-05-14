@@ -10,7 +10,7 @@ public class EnemyIndicator : MonoBehaviour
    public Transform target;
 
     public void SetTargetAsNearestEnemy() {
-        target = PlayerSpawner.GetNearestPlayerFrom(transform.position, player.pv.Owner.UserId);
+        target = GameFieldManager.gameFields[player.fieldNo].playerSpawner.GetNearestPlayerFrom(transform.position, player.pv.Owner.UserId);
         gameObject.SetActive(target != null);
     }
     private void FixedUpdate()

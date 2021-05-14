@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class UI_StatDisplay : MonoBehaviour
 {
     Text displayText;
-    Unit_Player myPlayer;
+    static Unit_Player myPlayer;
     int kills = 0;
     private void Awake()
     {
@@ -26,7 +26,7 @@ public class UI_StatDisplay : MonoBehaviour
         kills = StatisticsManager.GetStat(StatTypes.KILL, PhotonNetwork.LocalPlayer.UserId);
     }
 
-    public void SetPlayer(Unit_Player p) {
+    public static void SetPlayer(Unit_Player p) {
         myPlayer = p;
     }
 

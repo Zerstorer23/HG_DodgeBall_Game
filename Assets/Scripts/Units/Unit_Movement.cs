@@ -1,9 +1,6 @@
 ﻿using Photon.Pun;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static BulletManager;
-using static GameFieldManager;
 
 public class Unit_Movement : MonoBehaviourPunCallbacks
     , IPunObservable
@@ -15,6 +12,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
     public Vector3 oldPosition;
 
     BuffManager buffManager;
+    Unit_Player unitPlayer;
     [SerializeField] internal GameObject directionIndicator;
     Transform networkPosIndicator;
 
@@ -29,11 +27,12 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
      */
     string padXaxis = "RHorizontal";
     string padYaxis = "RVertical";
-
+    public MapSpec mapSpec;
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
         buffManager = GetComponent<BuffManager>();
+        unitPlayer = GetComponent<Unit_Player>();
         PhotonNetwork.SendRate = 60; //60 / 60 on update
         PhotonNetwork.SerializationRate = 60; // 32 32 on fixed
 
@@ -41,6 +40,10 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
             SetAxisNames();
         }
         networkPosIndicator = GameSession.GetInst().networkPos;
+    }
+    private new void OnEnable()
+    {
+        mapSpec = GameFieldManager.gameFields[unitPlayer.fieldNo].mapSpec;
     }
 
     void SetAxisNames() {
@@ -116,10 +119,10 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
 
         var deltaX = lastRandomMove.x;
         var deltaY = lastRandomMove.y;
-        if (networkPos.x >= xMax
-            || networkPos.x <= xMin
-            || networkPos.y >= yMax
-            || networkPos.y <= yMin
+        if (networkPos.x >= mapSpec.xMax
+            || networkPos.x <= mapSpec.xMin
+            || networkPos.y >= mapSpec.yMax
+            || networkPos.y <= mapSpec.yMin
             ) nextRandomTIme = PhotonNetwork.Time;
 
         if (PhotonNetwork.Time >= nextRandomTIme)
@@ -177,8 +180,8 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         networkPosIndicator.position = newPosition;
     }
     Vector3 ClampPosition(Vector3 position) {
-        float newX =  Mathf.Clamp(position.x, xMin, xMax);
-        float newY = Mathf.Clamp(position.y, xMin, xMax);
+        float newX =  Mathf.Clamp(position.x, mapSpec.xMin, mapSpec.xMax);
+        float newY = Mathf.Clamp(position.y, mapSpec.xMin, mapSpec.xMax);
         return new Vector3(newX, newY);
     }
 

@@ -39,6 +39,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         ExitGames.Client.Photon.Hashtable playerHash = new ExitGames.Client.Photon.Hashtable();
         playerHash.Add("TEAM", Team.HOME);
         playerHash.Add("CHARACTER", CharacterType.NONE);
+        playerHash.Add("FIELD", 0);
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerHash);
         Debug.Log("Game started? " + mapOptions.GetGameStarted());
         if (!mapOptions.GetGameStarted())
@@ -50,10 +51,9 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         }
         else {
             //난입유저 바로시작
- 
             ConnectedPlayerManager.CountPlayersInTeam();
             Debug.Log("난입세팅끝");
-            RPC_StartGame();
+            StartGame();
         }
     }
 
@@ -154,9 +154,11 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
                 return;
             }
         Debug.Log("Start requested");
+        GameFieldManager.instance.DistributeRooms(PhotonNetwork.PlayerList);
         //정식유저 룸프로퍼티 대기
         Debug.Log("Mastercleint push setting requested");
         mapOptions.SetGameStarted(true);
+     //   GameSession.PushRoomSetting(HASH_GAME_STARTED,true);
         mapOptions.PushRoomSettings();
         }
     }
@@ -170,21 +172,21 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         {
             ConnectedPlayerManager.CountPlayersInTeam();
             Debug.Log("RPC Start game");
-            RPC_StartGame();
+            StartGame();
         }
     }
-    public void RPC_StartGame()
+    public void StartGame()
     {
         Debug.Log(playerDictionary.Count + " vs " + PhotonNetwork.CurrentRoom.PlayerCount);
-        GameFieldManager.GetInst().InitialiseMapSize(PhotonNetwork.CurrentRoom.PlayerCount);
+        GameFieldManager.SetGameMap(GameSession.gameMode);
         if (localPlayerObject != null) {
             PhotonNetwork.Destroy(localPlayerObject);
             localPlayerObject = null;
         }
-
         EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.InGame });
         EventManager.TriggerEvent(MyEvents.EVENT_GAME_STARTED, null);
     }
+
     #endregion
 
     #region helper

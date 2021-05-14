@@ -5,54 +5,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerSpawner : MonoBehaviourPunCallbacks
+public class PlayerSpawner : MonoBehaviour
 {
     public GameObject myPlayer = null;
-    Dictionary<string, Unit_Player> players = new Dictionary<string, Unit_Player>();
+   internal Dictionary<string, Unit_Player> unitsOnMap = new Dictionary<string, Unit_Player>();
+    internal Dictionary<string, Player> playersOnMap = new Dictionary<string, Player>();
     int maxLives = 1;
     CharacterType myCharacter = CharacterType.NONE;
+    [SerializeField] GameField gameField;
 
-    PhotonView pv;
-    private static PlayerSpawner instance;
-
-
-    private void Awake()
+    private void OnEnable()
     {
         EventManager.StartListening(MyEvents.EVENT_PLAYER_SPAWNED, OnPlayerSpawned);
         EventManager.StartListening(MyEvents.EVENT_PLAYER_DIED, OnPlayerDied);
-        EventManager.StartListening(MyEvents.EVENT_GAME_STARTED, OnGameStart);
-        pv = GetComponent<PhotonView>();
-        instance = this;
     }
-    private void OnDestroy()
+    private void OnDisable()
     {
         EventManager.StopListening(MyEvents.EVENT_PLAYER_SPAWNED, OnPlayerSpawned);
         EventManager.StopListening(MyEvents.EVENT_PLAYER_DIED, OnPlayerDied);
-        EventManager.StopListening(MyEvents.EVENT_GAME_STARTED, OnGameStart);
     }
 
-    public static PlayerSpawner GetInst() => instance;
-    public static Dictionary<string, Unit_Player> GetPlayers() => instance.players;
-
-
-    private void OnGameStart(EventObject arg0)
+    public void StartEngine()
     {
-        players = new Dictionary<string, Unit_Player>();
-        DoSpawn();
+        unitsOnMap = new Dictionary<string, Unit_Player>();
+        playersOnMap = new Dictionary<string, Player>();
+        SpawnLocalPlayer();
         StartCoroutine(WaitAndCheck());
     }
     IEnumerator WaitAndCheck() {
         yield return new WaitForFixedUpdate();
-        if (PhotonNetwork.CurrentRoom.PlayerCount <= 2 && !GameSession.suddenDeathCalled)
-        {
-            GameSession.suddenDeathCalled = true;
-            EventManager.TriggerEvent(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, new EventObject());
-        }
+        CheckFieldConditions();
     }
 
 
-    private void DoSpawn()
+    private void SpawnLocalPlayer()
     {
+        int fieldNo = (int)PhotonNetwork.LocalPlayer.CustomProperties["FIELD"];
+        if (fieldNo != gameField.fieldNo) {
+            return;
+        }
 
         var hash = PhotonNetwork.LocalPlayer.CustomProperties;
         var roomSetting = PhotonNetwork.CurrentRoom.CustomProperties;
@@ -82,81 +73,83 @@ public class PlayerSpawner : MonoBehaviourPunCallbacks
     }
 
 
-    [SerializeField] UI_StatDisplay statDisplay;
     public void SpawnPlayer()
     {
         if (myPlayer != null) return;
         int myIndex = ConnectedPlayerManager.GetMyIndex();
-        Vector3 spawnPos = GameFieldManager.GetInst().GetRandomPlayerSpawnPosition(myIndex);
-        myPlayer = PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0);
-        myPlayer.GetComponent<PhotonView>().RPC("SetInformation", RpcTarget.AllBuffered, new int[] { (int)myCharacter, (int)maxLives });
-        statDisplay.SetPlayer(myPlayer.GetComponent<Unit_Player>());
+        Vector3 spawnPos = GameFieldManager.RequestRandomPositionOnField(myIndex,gameField.fieldNo );
+        myPlayer = PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0, new object[] { myCharacter, maxLives, gameField.fieldNo });
+        UI_StatDisplay.SetPlayer(myPlayer.GetComponent<Unit_Player>());
     }
-
-
-
 
     private void OnPlayerSpawned(EventObject eo)
     {
         string id = eo.stringObj;
         Unit_Player go = eo.goData.GetComponent<Unit_Player>();
-        if (players.ContainsKey(id))
+        if (unitsOnMap.ContainsKey(id))
         {
             Debug.LogWarning("Duplicate add player>");
-            players[id] = go;
+            unitsOnMap[id] = go;
+            playersOnMap[id] = go.pv.Owner;
         }
         else
         {
-            players.Add(id, go);
+            unitsOnMap.Add(id, go);
+            playersOnMap.Add(id, go.pv.Owner);
         }
     }
     private void OnPlayerDied(EventObject eo)
     {
-        players[eo.stringObj] = null;
-        if (GameSession.gameStarted)
+        //No one died in this field
+        if (!unitsOnMap.ContainsKey(eo.stringObj)) return;
+
+        unitsOnMap[eo.stringObj] = null;
+        playersOnMap[eo.stringObj] = null;
+        if (gameField.fieldWinner == null) // Winner did not come out yet.
         {
-            pv.RPC("CheckWinConditions", RpcTarget.AllBuffered);
+            CheckFieldConditions();
         }
     }
-    [PunRPC]
-    public void CheckWinConditions()
+
+    private void CheckFieldConditions()
     {
         GameStatus stat = GetGameStatus();
         Debug.Log("Players alive " + stat.alive);
-        if (stat.alive <= 2 && !GameSession.suddenDeathCalled) {
-            GameSession.suddenDeathCalled = true;
-            EventManager.TriggerEvent(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, new EventObject());
-        }
+        CheckSuddenDeath(stat.alive);
+        bool fieldFinished = true;
         switch (GameSession.gameMode)
         {
             case GameMode.PVP:
-                if (stat.alive > 1) return;
+                fieldFinished = (stat.alive <= 1) ;
                 break;
             case GameMode.TEAM:
-                if (stat.toKill > 0 && stat.alive_ourTeam > 0) return;
+                fieldFinished = (stat.toKill <= 0 || stat.alive_ourTeam <= 0);
                 break;
             case GameMode.PVE:
                 break;
         }
+        if (!fieldFinished) return;
 
+        Player winner = (stat.lastSurvivor == null) ? null : stat.lastSurvivor.pv.Owner;
+        gameField.NotifyFieldWinner(winner);
 
-        if (PhotonNetwork.IsMasterClient) {
-            var hash = new ExitGames.Client.Photon.Hashtable();
-            hash.Add(ConstantStrings.HASH_GAME_STARTED, false);
-            PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+    }
+    public void CheckSuddenDeath(int numAlive) {
+        if (GameSession.gameMode != GameMode.PVP
+            || GameSession.gameMode != GameMode.TEAM
+            ) return;
+        if (numAlive <= 2 && !gameField.suddenDeathCalled)
+        {
+            gameField.suddenDeathCalled = true;
+            EventManager.TriggerEvent(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, new EventObject());
         }
-
-        string id = (stat.lastSurvivor == null) ? null : stat.lastSurvivor.pv.Owner.UserId;
-        EventManager.TriggerEvent(MyEvents.EVENT_GAME_FINISHED, null);
-        EventManager.TriggerEvent(MyEvents.EVENT_POP_UP_PANEL, new EventObject() { objData = ScreenType.GameOver, boolObj = true });
-        GameSession.GetInst().gameOverManager.SetPanel(id);//이거 먼저 호출하고 팝업하세요
     }
 
     public Transform GetTransformOfPlayer(string id)
     {
-        if (players.ContainsKey(id))
+        if (unitsOnMap.ContainsKey(id))
         {
-            return players[id].transform;
+            return unitsOnMap[id].transform;
         }
         else
         {
@@ -165,24 +158,21 @@ public class PlayerSpawner : MonoBehaviourPunCallbacks
     }
     public Unit_Player GetPlayerByOwnerID(string id)
     {
-        if (players.ContainsKey(id))
+        if (unitsOnMap.ContainsKey(id))
         {
-            return players[id];
+            return unitsOnMap[id];
         }
         else
         {
             return null;
         }
     }
-    public static int GetRemainingPlayerNumber() {
-        GameStatus stat = instance.GetGameStatus();
-        return stat.toKill;
-    }
 
-    public static Unit_Player GetLowestScoreActivePlayer() {
+
+    public Unit_Player GetLowestScoreActivePlayer() {
         Unit_Player lowP = null;
         int lowestScore = 0;
-        foreach (var entry in instance.players)
+        foreach (var entry in unitsOnMap)
         {
             if (entry.Value == null)
             { continue; }
@@ -197,32 +187,14 @@ public class PlayerSpawner : MonoBehaviourPunCallbacks
         }
         return lowP;
     }
-    int playerIterator = 0;
-    public static Unit_Player GetNextActivePlayer() {
-        int iteration = 0;
-        List<string> namelist = new List<string>(instance.players.Keys);
-        while (iteration < namelist.Count)
-        {
-            iteration++;
-            instance.playerIterator++;
-            instance.playerIterator %= instance.players.Count;
-            Unit_Player p = instance.players[namelist[instance.playerIterator]];
-            if (p != null && p.gameObject.activeInHierarchy)
-            {
-                return p;
-            }
-        }
-        return null;
-    }
-
-    public static Transform GetNearestPlayerFrom(Vector3 position, string exclusionID = "")
+    
+    public Transform GetNearestPlayerFrom(Vector3 position, string exclusionID = "")
     {
-        Debug.Log("Search nearest " + instance.players.Count);
+        Debug.Log("Search nearest " + unitsOnMap.Count);
         Transform nearest = null;
         float nearestDistance = 0;
         int i = 0;
-        bool isTeamGame = (GameSession.gameMode == GameMode.TEAM);
-        foreach (var entry in instance.players)
+        foreach (var entry in unitsOnMap)
         {
             Debug.Log("Search ... " + i++);
             if (entry.Value == null)
@@ -232,8 +204,6 @@ public class PlayerSpawner : MonoBehaviourPunCallbacks
             if (entry.Value.gameObject.activeInHierarchy)
             {
                 if (entry.Value.pv.Owner.UserId == exclusionID) continue;
-               // if (isTeamGame &&
-              //      (Team)entry.Value.pv.Owner.CustomProperties["TEAM"] == myTeam) continue;
                 Transform trans = entry.Value.gameObject.transform;
                 float dist = Vector3.Distance(position, trans.position);
                 Debug.Log("Found " + trans.position + " at " + dist);
@@ -251,7 +221,7 @@ public class PlayerSpawner : MonoBehaviourPunCallbacks
         GameStatus stat = new GameStatus();
         Team myTeam = (Team)UI_PlayerLobbyManager.GetPlayerProperty("TEAM", Team.HOME);
         bool isTeamGame = GameSession.gameMode == GameMode.TEAM;
-        foreach (Unit_Player p in players.Values)
+        foreach (Unit_Player p in unitsOnMap.Values)
         {
             stat.total++;
             if (p != null && p.gameObject.activeInHierarchy)

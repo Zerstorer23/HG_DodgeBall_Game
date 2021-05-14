@@ -40,7 +40,7 @@ public class MainCamera : MonoBehaviour
 
     private void OnPlayerDied(EventObject obj)
     {
-        Unit_Player player = PlayerSpawner.GetNextActivePlayer();
+        Unit_Player player = GameFieldManager.GetNextActivePlayer();
         if (player == null)
         {
             fieldCam.Follow = fieldTransform;
@@ -80,7 +80,7 @@ public class MainCamera : MonoBehaviour
         if (!instance.isFocusedField || UI_ChatBox.isSelected) return;
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Joystick1Button5) || Input.GetKeyDown(KeyCode.Joystick1Button7))
         {
-            Unit_Player p = PlayerSpawner.GetNextActivePlayer();
+            Unit_Player p = GameFieldManager.GetNextActivePlayer();
             if (p != null)
             {
                 fieldCam.Follow = p.gameObject.transform;// instance.fieldTransform;

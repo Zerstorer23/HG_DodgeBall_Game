@@ -32,13 +32,12 @@ public class GameOverManager : MonoBehaviourPun
     public double timeoutWait = -1;
 
 
-    public void SetPanel(string winnerID)
+    public void SetPanel(Player finalWinner)
     {
         startTime = PhotonNetwork.Time;
         timeoutWait = 5;
-        if (winnerID != null)
+        if (finalWinner != null)
         {
-            finalWinner = ConnectedPlayerManager.GetPlayerByID(winnerID);
             if (GameSession.gameMode == GameMode.TEAM)
             {
                 Team winnerTeam = (Team)finalWinner.CustomProperties["TEAM"];
@@ -49,12 +48,9 @@ public class GameOverManager : MonoBehaviourPun
                     finalWinner = PhotonNetwork.LocalPlayer;
                 }
             }
-            else if (winnerID == PhotonNetwork.LocalPlayer.UserId)
+            else if (finalWinner.UserId == PhotonNetwork.LocalPlayer.UserId)
             {
-
                 StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_WINS, 1);
-
-
             }
 
 

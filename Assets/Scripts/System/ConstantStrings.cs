@@ -64,7 +64,7 @@ public class ConstantStrings : MonoBehaviour
 }
 
 public enum GameMode { 
-    PVP,TEAM,PVE
+    PVP,TEAM,PVE,Tournament
 }
 public enum Team { 
     NONE,HOME,AWAY

@@ -44,13 +44,16 @@ public class SkillManager : MonoBehaviourPun
             }
         }
     }
-    public void SetSkill(CharacterType type) {
-        myCharacter = type;
+    private void OnEnable()
+    {
         ParseSkill();
         if (pv.IsMine)
         {
             GameSession.GetInst().skillPanelUI.SetSkillInfo(this);
         }
+    }
+    public void SetSkill(CharacterType type) {
+        myCharacter = type;
     }
     void ParseSkill()
     {

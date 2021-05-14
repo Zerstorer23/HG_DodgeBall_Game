@@ -31,7 +31,7 @@ public class Projectile : MonoBehaviourPun
     [PunRPC]
     public void SetParentTransform()
     {
-        transform.SetParent(BulletManager.GetInstance().Home_Bullets);
+        transform.SetParent(GameSession.GetInst().Home_Bullets);
     }
 
     [PunRPC]

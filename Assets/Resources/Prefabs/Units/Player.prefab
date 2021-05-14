@@ -1237,6 +1237,7 @@ MonoBehaviour:
   enemyIndicator: {fileID: 1866770683967621202}
   driverIndicator: {fileID: 1240394535119696779}
   myTeam: 0
+  fieldNo: 0
   evasion: 0
 --- !u!95 &8822352236447964830
 Animator:

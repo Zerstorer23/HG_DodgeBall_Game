@@ -22,7 +22,6 @@ public class BoxObstacle : MonoBehaviourPun
     {
         myCollider = GetComponent<BoxCollider2D>();
         pv = GetComponent<PhotonView>();
-        EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameEnd);
     }
 
     private void OnGameEnd(EventObject arg0)
@@ -31,6 +30,7 @@ public class BoxObstacle : MonoBehaviourPun
     }
     private void OnEnable()
     {
+        EventManager.StartListening(MyEvents.EVENT_FIELD_FINISHED, OnGameEnd);
         isDead = false;
         boundarySprite.enabled = true;
         EventManager.TriggerEvent(MyEvents.EVENT_BOX_SPAWNED, new EventObject() { goData = gameObject });
@@ -77,6 +77,7 @@ public class BoxObstacle : MonoBehaviourPun
     private void OnDisable()
     {
         fillSprite.DORewind();
+        EventManager.StopListening(MyEvents.EVENT_FIELD_FINISHED, OnGameEnd);
     }
     private void StartFadeIn()
     {

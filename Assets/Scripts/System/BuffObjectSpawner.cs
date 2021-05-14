@@ -4,25 +4,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuffObjectSpawner : MonoBehaviourPun
+public class BuffObjectSpawner : MonoBehaviour
 {
-    PhotonView pv;
     public float spawnAfter = 6f;
     public float spawnDelay = 6f;
 
     double lastSpawnTime;
     double startTime;
     [SerializeField] GameObject[] buffPrafabs;
+    [SerializeField] GameField gameField;
     string location = "Prefabs/BuffObjects/";
 
-    private void Awake()
-    {
-        pv = GetComponent<PhotonView>();
-        EventManager.StartListening(MyEvents.EVENT_GAME_STARTED, OnGameStarted);
-    }
-
- 
-    private void OnGameStarted(EventObject obj)
+    internal void StartEngine()
     {
         startTime = PhotonNetwork.Time;
     }
@@ -51,14 +44,16 @@ public class BuffObjectSpawner : MonoBehaviourPun
 
     private Vector3 GetRandomPosition()
     {
-        Unit_Player lowestPlayer = PlayerSpawner.GetLowestScoreActivePlayer();
+        Unit_Player lowestPlayer = gameField.playerSpawner.GetLowestScoreActivePlayer();
         if (lowestPlayer != null)
         {
-            return GameSession.GetRandomPosOnMapAround(lowestPlayer.gameObject.transform.position, 10f, 2f);
+            return gameField.GetRandomPositionNear(lowestPlayer.gameObject.transform.position, 10f, 2f);
         }
         else {
-            return GameSession.GetRandomPosOnMap(2f);
+            return gameField.GetRandomPosition(2f);
         }
 
     }
+
+
 }

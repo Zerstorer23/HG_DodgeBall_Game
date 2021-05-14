@@ -10,6 +10,7 @@ public class GameSession : MonoBehaviour
     [SerializeField] Text versionText;
     [SerializeField] public Transform networkPos;
 
+    public Transform Home_Bullets;
     public PlayerSpawner charSpawner;
     public UI_SkillBox skillPanelUI;
     public UI_Leaderboard leaderboardUI;
@@ -53,11 +54,9 @@ public class GameSession : MonoBehaviour
     }
 
     public static bool gameStarted = false;
-  public static  bool suddenDeathCalled = false;
     private void OnGameFinished(EventObject obj)
     {
         gameStarted = false;
-        suddenDeathCalled = false;
     }
 
     private void OnGameStarted(EventObject obj)
@@ -70,24 +69,7 @@ public class GameSession : MonoBehaviour
         Debug.Log("SHow pregame");
         EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.PreGame });
     }
-    public static Vector3 GetRandomPosOnMap(float boundOffset = 0) {
 
-        float randX = Random.Range(xMin+boundOffset, xMax- boundOffset);
-        float randY = Random.Range(yMin+ boundOffset, yMax- boundOffset);
-        return new Vector3(randX, randY,0);
-    }
-    public static Vector3 GetRandomPosOnMapAround(Vector3 center, float window, float boundOffset = 0)
-    {
-
-        float randX = Random.Range(-window, window);
-        float randY = Random.Range(-window, window);
-        if (randX <= (xMin + boundOffset)) randX = xMin + boundOffset;
-        if (randX >= (xMax - boundOffset)) randX = xMax - boundOffset;
-        if (randY <= (yMin + boundOffset)) randY = yMin + boundOffset;
-        if (randY <= (yMin + boundOffset)) randY = yMin + boundOffset;
-
-        return new Vector3(randX, randY, 0);
-    }
     public static Unit_Player GetPlayerByID(string id)
     {
         return instance.charSpawner.GetPlayerByOwnerID(id);
@@ -109,5 +91,10 @@ public class GameSession : MonoBehaviour
         Vector2 diference = vec2 - vec1;
         float sign = (vec2.y < vec1.y) ? -1.0f : 1.0f;
         return Vector2.Angle(Vector2.right, diference) * sign;
+    }
+    public static void PushRoomASetting(string key, object value) {
+        var hash = new ExitGames.Client.Photon.Hashtable();
+        hash.Add(key, value);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
     }
 }

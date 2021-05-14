@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,9 +13,9 @@ public class HUD_UserName : MonoBehaviourPun
     //  public string playerName = "ㅇㅇ";
     // public CharacterType selectedCharacter = CharacterType.HARUHI;
 
-    [SerializeField]Image readySprite;
-    [SerializeField]Text nameText;
-    [SerializeField]Image charPortrait;
+    [SerializeField] Image readySprite;
+    [SerializeField] Text nameText;
+    [SerializeField] Image charPortrait;
     Image teamColorImage;
     string playerName = "ㅇㅇ";
     CharacterType selectedCharacter = CharacterType.HARUHI;
@@ -32,7 +33,7 @@ public class HUD_UserName : MonoBehaviourPun
         playerName = pv.Owner.NickName;
         isReady = false;
         UpdateUI();
-        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_JOINED, new EventObject() { stringObj=pv.Owner.UserId, goData = gameObject });
+        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_JOINED, new EventObject() { stringObj = pv.Owner.UserId, goData = gameObject });
     }
     private void OnDisable()
     {
@@ -54,7 +55,11 @@ public class HUD_UserName : MonoBehaviourPun
     [PunRPC]
     public void SetTeam(int teamNumber)
     {
-        myTeam =(Team)teamNumber;
+        myTeam = (Team)teamNumber;
+        if (pv.IsMine)
+        {
+            PushPlayerSetting(pv.Owner, "TEAM", myTeam);
+        }
         UpdateUI();
     }
     [PunRPC]
@@ -67,6 +72,9 @@ public class HUD_UserName : MonoBehaviourPun
     public void ChangeCharacter(int character)
     {
         selectedCharacter = (CharacterType)character;
+        if (pv.IsMine) {
+            PushPlayerSetting(pv.Owner, "CHARACTER", selectedCharacter);
+        }
         UpdateUI();
     }
 
@@ -74,6 +82,7 @@ public class HUD_UserName : MonoBehaviourPun
     public void ChangeName(string text)
     {
         playerName = text;
+        PhotonNetwork.LocalPlayer.NickName = playerName;
         UpdateUI();
     }
 
@@ -104,15 +113,11 @@ public class HUD_UserName : MonoBehaviourPun
         {
             teamColorImage.enabled = false;
         };
-
-        if (pv.IsMine)
-        {
-            PhotonNetwork.LocalPlayer.NickName = playerName;
-            ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
-            hash.Add("CHARACTER", selectedCharacter);
-            hash.Add("TEAM", myTeam);
-            pv.Owner.SetCustomProperties(hash);
-        }
-
     }
+    public static void PushPlayerSetting(Player p, string key, object value) {
+        ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
+        hash.Add(key, value);
+        p.SetCustomProperties(hash);
+        
+    } 
 }
