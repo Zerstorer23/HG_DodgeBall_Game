@@ -1211,9 +1211,6 @@ MonoBehaviour:
   directionIndicator: {fileID: 3604318559537782419}
   networkExpectedTime: 0
   networkPos: {x: 0, y: 0, z: 0}
-  receivedCount: 0
-  sentCount: 0
-  enqueueCount: 0
   lastSendTime: 0
 --- !u!114 &8822352236447964824
 MonoBehaviour:
@@ -1328,6 +1325,7 @@ MonoBehaviour:
   invincibleFromBullets: 0
   invincibleFromMapBullets: 0
   dontKillByException: 0
+  associatedField: 0
 --- !u!114 &2603996422842996677
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -89,9 +89,7 @@ public class UI_MapOptions : MonoBehaviourPun
         var hash = PhotonNetwork.CurrentRoom.CustomProperties;
         mapDiff = (MapDifficulty)hash[HASH_MAP_DIFF];
         livesIndex= (int)hash[HASH_PLAYER_LIVES];
-        Debug.Log("Found lives " + livesIndex);
         string versionCode = (string)hash[HASH_VERSION_CODE];
-        Debug.Log("Received version " + versionCode);
         if (versionCode != GameSession.GetVersionCode())
         {
             Debug.Log("Received Wrong " + versionCode); 
@@ -139,6 +137,7 @@ public class UI_MapOptions : MonoBehaviourPun
         hash.Add(HASH_GAME_MODE, GameMode.PVP);
         hash.Add(HASH_GAME_STARTED, false);
         hash.Add(HASH_GAME_AUTO, false);
+        hash.Add(HASH_ROOM_RANDOM_SEED, UnityEngine.Random.Range(0,7));
         return hash;
     }
     public void PushRoomSettings()

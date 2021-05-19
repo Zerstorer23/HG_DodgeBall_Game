@@ -39,7 +39,8 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         ExitGames.Client.Photon.Hashtable playerHash = new ExitGames.Client.Photon.Hashtable();
         playerHash.Add("TEAM", Team.HOME);
         playerHash.Add("CHARACTER", CharacterType.NONE);
-        playerHash.Add("FIELD", 0);
+        playerHash.Add("SEED", UnityEngine.Random.Range(0, 133));
+     //   playerHash.Add("FIELD", 0);
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerHash);
         Debug.Log("Game started? " + mapOptions.GetGameStarted());
         if (!mapOptions.GetGameStarted())
@@ -49,9 +50,12 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
             UpdateReadyStatus();
             mapOptions.UpdateSettingsUI();//I join room
         }
-        else {
+        else
+        {
             //난입유저 바로시작
             ConnectedPlayerManager.CountPlayersInTeam();
+            GameFieldManager.SetGameMap(GameSession.gameMode);
+            GameFieldManager.ChangeToSpectator();
             Debug.Log("난입세팅끝");
             StartGame();
         }
@@ -63,10 +67,11 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         if (!PhotonNetwork.IsConnectedAndReady) return;
         mapOptions.SetGameStarted(false);
         Debug.Log("Instantiate after regame");
-        if (PhotonNetwork.IsMasterClient) {
+        if (PhotonNetwork.IsMasterClient)
+        {
             Player randomPlayer = ConnectedPlayerManager.GetRandomPlayerExceptMe();
-            if(randomPlayer != null)
-            PhotonNetwork.SetMasterClient(randomPlayer);
+            if (randomPlayer != null)
+                PhotonNetwork.SetMasterClient(randomPlayer);
         }
 
         InstantiateMyself();
@@ -118,7 +123,8 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     void debugUI()
     {
         foundPlayers = new List<string>();
-        foreach (var entry in playerDictionary.Keys) {
+        foreach (var entry in playerDictionary.Keys)
+        {
             foundPlayers.Add(entry);
         }
 
@@ -135,51 +141,46 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         if (readyPlayers == totalPlayers)
         {
             Debug.Log("Same number. start");
-            pv.RPC("OnClick_ForceStart", RpcTarget.AllBuffered);
+            pv.RPC("OnClick_ForceStart", RpcTarget.MasterClient);
         }
     }
-
-    //Awake Start Update <Coroutine>
-    //1 초
-    //UPdate 1ch 60번 < 지금시간이 1초뒤인지 매번확인
-    //Corooutine ,_ 1초뒤
-    // 1초뒤에 함수
     [PunRPC]
     public void OnClick_ForceStart()
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            if (readyPlayers < (totalPlayers) / 2) {
+            if (readyPlayers < (totalPlayers) / 2 && GameSession.instance.requireHalfAgreement)
+            {
                 ChatManager.SendNotificationMessage(string.Format("절반({0}명) 이상이 준비된 상태에서만 강제시작이 가능합니다. ", (totalPlayers / 2)));
                 return;
             }
-        Debug.Log("Start requested");
-        GameFieldManager.instance.DistributeRooms(PhotonNetwork.PlayerList);
-        //정식유저 룸프로퍼티 대기
-        Debug.Log("Mastercleint push setting requested");
-        mapOptions.SetGameStarted(true);
-     //   GameSession.PushRoomSetting(HASH_GAME_STARTED,true);
-        mapOptions.PushRoomSettings();
+            Debug.Log("Start requested");
+            //정식유저 룸프로퍼티 대기
+            Debug.Log("Mastercleint push setting requested");
+            mapOptions.SetGameStarted(true);
+            mapOptions.PushRoomSettings();
         }
     }
+
+
     public void OnRoomPropertiesChanged()
     {
         var Hash = PhotonNetwork.CurrentRoom.CustomProperties;
         bool gameStarted = (bool)Hash[HASH_GAME_STARTED];
         mapOptions.SetGameStarted(gameStarted);
-      //  Debug.Log("Start requested "+ gameStarted);
+        //  Debug.Log("Start requested "+ gameStarted);
         if (gameStarted)
         {
             ConnectedPlayerManager.CountPlayersInTeam();
+            GameFieldManager.SetGameMap(GameSession.gameMode);
             Debug.Log("RPC Start game");
             StartGame();
         }
     }
     public void StartGame()
     {
-        Debug.Log(playerDictionary.Count + " vs " + PhotonNetwork.CurrentRoom.PlayerCount);
-        GameFieldManager.SetGameMap(GameSession.gameMode);
-        if (localPlayerObject != null) {
+        if (localPlayerObject != null)
+        {
             PhotonNetwork.Destroy(localPlayerObject);
             localPlayerObject = null;
         }

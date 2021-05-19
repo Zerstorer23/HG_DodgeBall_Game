@@ -54,9 +54,11 @@ public class Action_SetProjectileCurves : SkillAction
         if (parent.pv == null) return 0f;
         float direction =(float)GetParam(SkillParams.EulerAngle);
         float moveSpeed = (float)GetParam(SkillParams.MoveSpeed);
+        float rotateSpeed = (float)GetParam(SkillParams.RotateSpeed);
+        float rotateAngle = (float)GetParam(SkillParams.RotateAngle);
         int reaction = (int)GetParam(SkillParams.ReactionType);
         parent.pv.RPC("SetBehaviour", RpcTarget.AllBuffered, (int)MoveType.Curves, reaction, direction);
-        parent.pv.RPC("SetMoveInformation", RpcTarget.AllBuffered, moveSpeed, 0f, 0f);
+        parent.pv.RPC("SetMoveInformation", RpcTarget.AllBuffered, moveSpeed, rotateSpeed, rotateAngle);
         return 0f;
     }
 }

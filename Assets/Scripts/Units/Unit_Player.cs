@@ -40,12 +40,12 @@ public class Unit_Player : MonoBehaviourPun
     {
         if (pv.IsMine)
         {
-            ChatManager.SetInputFieldVisibility(true);
-            EventManager.StartListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
-            EventManager.StartListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, IncrementKill);
-            MainCamera.FocusOnField(true);
+           
+            EventManager.StopListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
+            EventManager.StopListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, IncrementKill);
+            GameFieldManager.ChangeToSpectator();
         }
-        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_DIED, new EventObject() { stringObj = pv.Owner.UserId });
+        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_DIED, new EventObject() { stringObj = pv.Owner.UserId, intObj = fieldNo });
     }
     private void OnEnable()
     {
@@ -62,8 +62,11 @@ public class Unit_Player : MonoBehaviourPun
             EventManager.StartListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, IncrementKill);
             MainCamera.SetFollow(GameSession.GetInst().networkPos);
             MainCamera.FocusOnField(false);
+            UI_StatDisplay.SetPlayer(this);
         }
-        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_SPAWNED, new EventObject() { stringObj = pv.Owner.UserId, goData = gameObject });
+        GameFieldManager.gameFields[fieldNo].playerSpawner.RegisterPlayer(pv.Owner.UserId,this);
+        Debug.LogWarning("Send Player spawned " + pv.Owner + " at " + fieldNo);
+        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_SPAWNED, new EventObject() { stringObj = pv.Owner.UserId, goData = gameObject, intObj = fieldNo });
     }
     void ParseInstantiationData() {
         myCharacter = (CharacterType)pv.InstantiationData[0];
@@ -76,6 +79,9 @@ public class Unit_Player : MonoBehaviourPun
         }
         health.SetMaxLife(maxLife);
         fieldNo = (int)pv.InstantiationData[2];
+        if (fieldNo < GameFieldManager.gameFields.Count) {
+            movement.SetMapSpec(GameFieldManager.gameFields[fieldNo].mapSpec);
+        }
         health.SetAssociatedField(fieldNo);
     }
 

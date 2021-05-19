@@ -13,6 +13,7 @@ public class BoxObstacle : MonoBehaviourPun
     float warnDelay;
     bool isDead = false;
     BoxCollider2D myCollider;
+    int fieldNumber = 0;
     PhotonView pv;
     [SerializeField] SpriteRenderer fillSprite;
     [SerializeField] SpriteRenderer boundarySprite;
@@ -31,6 +32,8 @@ public class BoxObstacle : MonoBehaviourPun
     private void OnEnable()
     {
         EventManager.StartListening(MyEvents.EVENT_FIELD_FINISHED, OnGameEnd);
+        transform.SetParent(GameSession.GetBulletHome());
+        fieldNumber = (int)pv.InstantiationData[0];
         isDead = false;
         boundarySprite.enabled = true;
         EventManager.TriggerEvent(MyEvents.EVENT_BOX_SPAWNED, new EventObject() { goData = gameObject });
@@ -134,7 +137,7 @@ public class BoxObstacle : MonoBehaviourPun
         if (isDead) return;
         isDead = true;
         if (pv.IsMine) {
-            EventManager.TriggerEvent(MyEvents.EVENT_SPAWNER_EXPIRE, null);
+            EventManager.TriggerEvent(MyEvents.EVENT_SPAWNER_EXPIRE, new EventObject() { intObj = fieldNumber});
             PhotonNetwork.Destroy(pv);
         }
 

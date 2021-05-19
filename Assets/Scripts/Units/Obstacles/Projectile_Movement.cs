@@ -12,7 +12,7 @@ public class Projectile_Movement : MonoBehaviourPun
     public bool syncTransform = false;
     TransformSynchronisation transSync;
 
-     public float eulerAngle;
+    public float eulerAngle;
     public float moveSpeed;
 
     //Rotation//
@@ -28,6 +28,11 @@ public class Projectile_Movement : MonoBehaviourPun
     public MoveType moveType;
     public ReactionType reactionType = ReactionType.Bounce;
 
+    internal void SetAssociatedField(int fieldNo)
+    {
+        mapSpec = GameFieldManager.gameFields[fieldNo].mapSpec;
+    }
+
     //Delay Move//
     float delay_enableAfter = 0f;
     float delay_duration;
@@ -37,6 +42,8 @@ public class Projectile_Movement : MonoBehaviourPun
     [SerializeField] SpriteRenderer mySprite;
 
     PhotonView pv;
+    MapSpec mapSpec;
+    HealthPoint hp;
 
     private void Awake()
     {
@@ -44,6 +51,7 @@ public class Projectile_Movement : MonoBehaviourPun
         myColliderC = GetComponent<CircleCollider2D>();
         myColliderB = GetComponent<BoxCollider2D>();
         pv = GetComponent<PhotonView>();
+        hp = GetComponent<HealthPoint>();
         if (syncTransform) {
             transSync = GetComponent<TransformSynchronisation>();
         }
@@ -160,6 +168,12 @@ public class Projectile_Movement : MonoBehaviourPun
             DoMove();
         }
 
+    }
+    private void FixedUpdate()
+    {
+        if (mapSpec.IsOutOfBound(transform.position, 3f)) {
+            hp.Kill_Immediate();
+        };
     }
 
     private void DoMove_Straight()

@@ -84,11 +84,11 @@ public class SkillManager : MonoBehaviourPun
                 break;
             case CharacterType.ASAKURA:
                 mySkillFunction = DoSkillSet_Asakura;
-                skillCool = 4f;
+                skillCool = 4.2f;
                 break;
             case CharacterType.KYOUKO:
                 mySkillFunction = DoSkillSet_Kyouko;
-                skillCool = 3f;
+                skillCool = 3.2f;
                 break;
             case CharacterType.SASAKI:
                 mySkillFunction = DoSkillSet_Sasaki;
@@ -96,7 +96,7 @@ public class SkillManager : MonoBehaviourPun
                 break;
             case CharacterType.KIMIDORI:
                 mySkillFunction = DoSkillSet_Kimidori;
-                skillCool = 1.5f;
+                skillCool = 0.7f;
                 break;
         }
         // pv.RPC("SetCooltime",RpcTarget.All, skillCool);
@@ -140,7 +140,8 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
         mySkill.Enqueue(new Action_InstantiateBulletAt());
-       // mySkill.Enqueue(new Action_SetProjectileExcludePlayer());
+        mySkill.Enqueue(new Action_Player_InvincibleBuff());//
+                                                            // mySkill.Enqueue(new Action_SetProjectileExcludePlayer());
         mySkill.Enqueue(new Action_WaitForSeconds());
         mySkill.Enqueue(new Action_SetProjectileStraight());
         StartCoroutine(mySkill.Activate());
@@ -153,18 +154,14 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 1f });
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Height, paramValue = 1f });
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 0.33f });
-        mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
-        mySkill.Enqueue(new Action_InstantiateBulletAt());
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 0.6f });
+        mySkill.Enqueue(new Action_InstantiateBullet_FollowPlayer());
         mySkill.Enqueue(new Action_SetProjectileScale());
         mySkill.Enqueue(new Action_SetProjectileStatic());
-        mySkill.Enqueue(new Action_Projectile_ParentTransformAsPlayer());
-        //   mySkill.Enqueue(new Action_SetProjectileExcludePlayer());
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 5.5f }); //5.5
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Height, paramValue = 5.5f });
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 6f }); //5.5
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Height, paramValue = 6f });
         mySkill.Enqueue(new Action_DoScaleTween());
         mySkill.Enqueue(new Action_DoDeathAfter());
-       // mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 1f });
         mySkill.Enqueue(new Action_Player_InvincibleBuff());
 
         StartCoroutine(mySkill.Activate());
@@ -206,11 +203,13 @@ public class SkillManager : MonoBehaviourPun
 
         SkillSet mySkill = new SkillSet(gameObject, this);
         mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
-        mySkill.SetParam(SkillParams.MoveSpeed, 30f);
+        mySkill.SetParam(SkillParams.MoveSpeed, 32f);
         mySkill.SetParam(SkillParams.Duration, 0.35f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_MIKURU);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-        for (int n = 0; n < 2; n++)
+        int numBullets = 3;
+        mySkill.Enqueue(new Action_Player_InvincibleBuff());//
+        for (int n = 0; n < numBullets; n++)
         {
             mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
             mySkill.Enqueue(new Action_InstantiateBulletAt());
@@ -238,10 +237,8 @@ public class SkillManager : MonoBehaviourPun
         BuffData buff = new BuffData(BuffType.MoveSpeed, 0.5f, 1.5f);
         mySkill.SetParam(SkillParams.BuffData, buff);
 
-        mySkill.Enqueue(new Action_InstantiateBullet());
-    //    mySkill.Enqueue(new Action_SetProjectileExcludePlayer());
+        mySkill.Enqueue(new Action_InstantiateBullet_FollowPlayer());
         mySkill.Enqueue(new Action_SetProjectileStatic());
-        mySkill.Enqueue(new Action_Projectile_ParentTransformAsPlayer());
         mySkill.Enqueue(new Action_DoDeathAfter());//
         mySkill.Enqueue(new Action_PlayerChangeSpriteColor());;
         mySkill.Enqueue(new Action_Player_AddBuff());//
@@ -267,8 +264,8 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.Vector3, gameObject.transform.position);
         mySkill.SetParam(SkillParams.Duration, 0.25f);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-        mySkill.Enqueue(new Action_InstantiateBulletAt());
-        mySkill.Enqueue(new Action_Projectile_ParentTransformAsPlayer());
+        mySkill.Enqueue(new Action_Player_InvincibleBuff());//
+        mySkill.Enqueue(new Action_InstantiateBullet_FollowPlayer());
         mySkill.Enqueue(new Action_DoDeathAfter());
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
         mySkill.Enqueue(new Action_GunObject_SetAngle());
@@ -283,12 +280,15 @@ public class SkillManager : MonoBehaviourPun
 
         SkillSet mySkill = new SkillSet(gameObject, this);
         mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
-        mySkill.SetParam(SkillParams.MoveSpeed, 12f);
+        mySkill.SetParam(SkillParams.MoveSpeed, 24f);
+        mySkill.SetParam(SkillParams.RotateAngle, 60f);
+        mySkill.SetParam(SkillParams.RotateSpeed, 270f);
         mySkill.SetParam(SkillParams.Duration, 0.033f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_ASAKURA);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.Bounce);
+
         float angleOffset = unitMovement.GetAim();
-        int numStep = 15;
+        int numStep = 18;
         for (int i = 0; i < numStep; i++)
         {
             float angle = angleOffset + (360/ numStep) * i;
@@ -296,7 +296,9 @@ public class SkillManager : MonoBehaviourPun
             mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.EulerAngle, paramValue = angle });
             mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Quarternion, paramValue = Quaternion.Euler(0,0,angle) });
             mySkill.Enqueue(new Action_InstantiateBulletAt());
-            mySkill.Enqueue(new Action_SetProjectileStraight());
+            //  mySkill.Enqueue(new Action_SetProjectileStraight());
+            mySkill.Enqueue(new Action_SetProjectileCurves());
+            mySkill.Enqueue(new Action_Player_InvincibleBuff());//
             mySkill.Enqueue(new Action_WaitForSeconds());
         }
         Debug.Log("Activate skill");
@@ -310,8 +312,7 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KIMIDORI);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.Die);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
-        mySkill.Enqueue(new Action_InstantiateBulletAt());
-        mySkill.Enqueue(new Action_Projectile_ParentTransformAsPlayer());
+        mySkill.Enqueue(new Action_InstantiateBullet_FollowPlayer());
         mySkill.Enqueue(new Action_SetProjectile_Orbit());
         Debug.Log("Activate skill");
         StartCoroutine(mySkill.Activate());
@@ -325,6 +326,8 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.Duration, 0.5f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KYOUKO);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
+        mySkill.SetParam(SkillParams.RotateAngle, 90f);
+        mySkill.SetParam(SkillParams.RotateSpeed, 270f);
         float angleOffset = unitMovement.GetAim();
         int stepSize = 4;
         for (int n = 0; n < 2; n++) {
@@ -345,8 +348,9 @@ public class SkillManager : MonoBehaviourPun
                 mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.EulerAngle, paramValue = angle });
                 mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Quarternion, paramValue = Quaternion.Euler(0, 0, angle) });
                 mySkill.Enqueue(new Action_InstantiateBulletAt());
-                mySkill.Enqueue(new Action_SetProjectileStraight());
+                mySkill.Enqueue(new Action_SetProjectileCurves());
             }
+            mySkill.Enqueue(new Action_Player_InvincibleBuff());//
             mySkill.Enqueue(new Action_WaitForSeconds());
         }
       

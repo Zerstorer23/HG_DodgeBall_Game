@@ -36,6 +36,7 @@ public class ConstantStrings : MonoBehaviour
     public const string HASH_GAME_STARTED = "GameStarted";
     public const string HASH_GAME_MODE = "GameMode";
     public const string HASH_GAME_AUTO = "GameAuto";
+    public const string HASH_ROOM_RANDOM_SEED = "RandomSeed";
 
 
     public const string PREFS_MUTED = "PrefsMuted";
@@ -64,7 +65,7 @@ public class ConstantStrings : MonoBehaviour
 }
 
 public enum GameMode { 
-    PVP,TEAM,PVE,Tournament
+    PVP,TEAM, Tournament, PVE
 }
 public enum Team { 
     NONE,HOME,AWAY

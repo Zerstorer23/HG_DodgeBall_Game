@@ -76,6 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc4d77256f5dec2449b35af201d61d50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fieldNumber: 0
   shootDir: 1
   spawnPos: {fileID: 4004121643269741877}
   rotationSpeed: 0

@@ -13,6 +13,7 @@ public class BUffObject : MonoBehaviourPun
     [SerializeField] BuffConfig buffConfig;
     BoxCollider2D boxCollider;
     string objectName;
+    int fieldNumber = 0;
 
     private void Awake()
     {
@@ -26,6 +27,8 @@ public class BUffObject : MonoBehaviourPun
         buff = buffConfig.Build();
         boxCollider.enabled = true;
         nameText.enabled = true;
+        transform.SetParent(GameSession.GetBulletHome());
+        // fieldNumber = (int)pv.InstantiationData[0];
         EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
 
     }

@@ -6,8 +6,7 @@ using UnityEngine;
 
 public class BuffObjectSpawner : MonoBehaviour
 {
-    public float spawnAfter = 6f;
-    public float spawnDelay = 6f;
+
 
     double lastSpawnTime;
     double startTime;
@@ -23,8 +22,12 @@ public class BuffObjectSpawner : MonoBehaviour
     private void FixedUpdate()
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        if (!GameSession.gameStarted || PhotonNetwork.Time < startTime + spawnAfter) return;
-        if (PhotonNetwork.Time >= lastSpawnTime + spawnDelay) {
+        if (!GameSession.gameStarted || PhotonNetwork.Time < startTime + GameFieldManager.instance.spawnAfter) return;
+        float thisDelay = GameFieldManager.instance.spawnDelay;
+        if (gameField.suddenDeathCalled) {
+            thisDelay /= 2;
+        }
+        if (PhotonNetwork.Time >= lastSpawnTime + thisDelay) {
             InatantiateBuffObject();
             lastSpawnTime = PhotonNetwork.Time;
         }

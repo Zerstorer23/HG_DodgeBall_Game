@@ -42,27 +42,23 @@ public class BulletManager : MonoBehaviour
     {
 
         EventManager.StartListening(MyEvents.EVENT_SPAWNER_EXPIRE, OnSpawnerExpired);
-        EventManager.StartListening(MyEvents.EVENT_SPAWNER_SPAWNED, OnSpawnerSpawned);
+     //   EventManager.StartListening(MyEvents.EVENT_SPAWNER_SPAWNED, OnSpawnerSpawned);
         EventManager.StartListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
     }
     private void OnDisable()
     {
 
         EventManager.StopListening(MyEvents.EVENT_SPAWNER_EXPIRE, OnSpawnerExpired);
-        EventManager.StopListening(MyEvents.EVENT_SPAWNER_SPAWNED, OnSpawnerSpawned);
+    //    EventManager.StopListening(MyEvents.EVENT_SPAWNER_SPAWNED, OnSpawnerSpawned);
         EventManager.StopListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
     }
 
 
-    public void StartEngine()
+    public void StartEngine(MapDifficulty mapDifficulty)
     {
-        Hashtable roomSetting = PhotonNetwork.CurrentRoom.CustomProperties;
-        MapDifficulty mapDiff =(MapDifficulty)roomSetting[ConstantStrings.HASH_MAP_DIFF];
-        currentDifficult = mapDiff;
+        currentDifficult = mapDifficulty;
         float baseNum = mapDifficulties[(int)currentDifficult];
         float modifier = 1+ gameField.playerSpawner.playersOnMap.Count / modPerPerson * modPerStep;
-
-        Debug.Log("Modifier base"+baseNum+" mod " + modifier);
         activeMax =(int)( baseNum * modifier);
         startTime = PhotonNetwork.Time;
     }
@@ -93,9 +89,12 @@ public class BulletManager : MonoBehaviour
         return (ReactionType)Random.Range(0, (int)ReactionType.None);
     }
 
-    private void OnSpawnerExpired(EventObject eo = null)
+    private void OnSpawnerExpired(EventObject eo)
     {
-        currentSpawned--;
+        if (eo.intObj == gameField.fieldNo) {
+
+            currentSpawned--;
+        }
     }
     private void OnSpawnerSpawned(EventObject arg0)
     {
@@ -113,10 +112,9 @@ public class BulletManager : MonoBehaviour
             case MoveType.Curves:
             case MoveType.Straight:
                 Vector3 randPos = GetRandomBoundaryPos();
-                UnityEngine.GameObject spawner = PhotonNetwork.InstantiateRoomObject("Prefabs/Units/BulletSpawner", randPos, Quaternion.identity,0);
+                UnityEngine.GameObject spawner = PhotonNetwork.InstantiateRoomObject("Prefabs/Units/BulletSpawner", randPos, Quaternion.identity,0, new object[] { gameField.fieldNo});
                 SetProjectileInformation(spawner, spawnDir, moveType, reaction);
                 SetProjectileBehaviour(spawner, randPos);
-                spawner.transform.SetParent(transform);
                 break;
         }
 
@@ -129,11 +127,11 @@ public class BulletManager : MonoBehaviour
         float randW = Random.Range(1f, maxWidth);
         Vector3 randPos = gameField.GetRandomPosition();
 
-        UnityEngine.GameObject box = PhotonNetwork.InstantiateRoomObject("Prefabs/Units/BoxObstacle", randPos, Quaternion.identity,0);
+        UnityEngine.GameObject box = PhotonNetwork.InstantiateRoomObject("Prefabs/Units/BoxObstacle", randPos, Quaternion.identity,0, new object[] { gameField.fieldNo });
         box.GetComponent<PhotonView>().RPC("SetInformation", RpcTarget.AllBuffered, randW,spawnDelay);
-        box.transform.SetParent(transform);
+       
     }
-    void SetProjectileInformation(UnityEngine.GameObject spawner, SpawnDirection spawnDir, MoveType moveType, ReactionType reaction)
+    void SetProjectileInformation(GameObject spawner, SpawnDirection spawnDir, MoveType moveType, ReactionType reaction)
     {
         float moveSpeed = Random.Range(5f, maxProjSpeed);
         float rotateSpeed = Random.Range(5f, maxProjRotateSpeed);

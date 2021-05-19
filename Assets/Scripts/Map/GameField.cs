@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameField : MonoBehaviour
+public class GameField : MonoBehaviourPun
 {
     public int fieldNo = 0;
     public MapSpec mapSpec = new MapSpec();
@@ -13,53 +13,123 @@ public class GameField : MonoBehaviour
     [SerializeField] public BuffObjectSpawner buffSpawner;
     Transform mapTransform;
     public Transform[] map_transforms;
-    public Vector3 mapSize;
+    public Vector3 originalMapSize;
     public bool suddenDeathCalled = false;
+    public bool gameFieldFinished = false;
 
- 
+    public int expectedNumPlayer = 0;
+
+    PhotonView pv;
+    private void Awake()
+    {
+        pv = GetComponent<PhotonView>();
+    }
     private void OnEnable()
     {
         EventManager.StartListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeathTriggered);
         EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
 
+        if (suddenDeathTimeoutRoutine != null) {
+            StopCoroutine(suddenDeathTimeoutRoutine);
+        }
+        suddenDeathTimeoutRoutine = WaitAndSuddenDeath();
+        StartCoroutine(suddenDeathTimeoutRoutine);
     }
     private void OnDisable()
     {
         EventManager.StopListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeathTriggered);
         EventManager.StopListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
-        suddenDeathCalled = false;
-        fieldWinner = null;
+
     }
 
+    IEnumerator suddenDeathTimeoutRoutine = null;
+    IEnumerator WaitAndSuddenDeath (){
+        yield return new WaitForSeconds(GameFieldManager.instance.suddenDeathTime);
+        Debug.Log("Time out do suddendeath");
+        if (!suddenDeathCalled) {
+            CheckSuddenDeath(0, true);
+        }
+    }
 
     private void OnGameFinished(EventObject obj)
     {
-        if (suddenDeathNumerator != null)
+        if (resizeNumerator != null)
         {
-            StopCoroutine(suddenDeathNumerator);
+            StopCoroutine(resizeNumerator);
         }
         gameObject.SetActive(false);
     }
+    internal void CheckFieldConditions(GameStatus stat, bool nooneDied)
+    {
+        if (fieldNo != GameSession.LocalPlayer_FieldNumber || gameFieldFinished) return;
+        CheckSuddenDeath(stat.alive);
+        bool fieldFinished = true;
+        switch (GameSession.gameMode)
+        {
+            case GameMode.PVP:
+                fieldFinished = (stat.alive <= 1);
+                Debug.LogWarning("PVP field " + stat.alive + "field finished " + nooneDied);
+                if (fieldFinished && nooneDied) fieldFinished = false;
+                break;
+            case GameMode.TEAM:
+                fieldFinished = (stat.toKill <= 0 || stat.alive_ourTeam <= 0);
+                break;
+            case GameMode.PVE:
+                break;
 
+            case GameMode.Tournament:
+                fieldFinished = (stat.alive <= 1);
+                break;
+        }
+        if (!fieldFinished) return;
+
+
+        Player winner = stat.lastSurvivor;
+        if (winner == null && stat.total == 1) {
+
+            pv.RPC("NotifyFieldWinner", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
+            return;
+        }
+
+        if (winner.IsLocal) {
+            pv.RPC("NotifyFieldWinner", RpcTarget.AllBuffered, winner);
+        }
+    }
+    public void CheckSuddenDeath(int numAlive, bool timeout = false)
+    {
+        if (
+            ! (GameSession.gameMode == GameMode.PVP
+            || GameSession.gameMode == GameMode.TEAM)
+            ) return;
+        if (numAlive <= 2 && !suddenDeathCalled)
+        {
+            suddenDeathCalled = true;
+            if (!timeout) {
+                StopCoroutine(suddenDeathTimeoutRoutine);
+            }
+            EventManager.TriggerEvent(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, new EventObject() { intObj = fieldNo });
+        }
+    }
 
     private void OnSuddenDeathTriggered(EventObject obj)
     {
-        if (suddenDeathNumerator != null)
+        if (obj.intObj != fieldNo) return;
+        if (resizeNumerator != null)
         {
-            StopCoroutine(suddenDeathNumerator);
+            StopCoroutine(resizeNumerator);
         }
         startTime = PhotonNetwork.Time;
         EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = "맵 크기가 줄어듭니다!!" });
-        suddenDeathNumerator = ResizeMapByTime();
-        StartCoroutine(suddenDeathNumerator);
+        resizeNumerator = ResizeMapByTime();
+        StartCoroutine(resizeNumerator);
     }
 
 
-    public float originalSize;
+    float resize_StartSize;
     public double startTime;
     public double resizeOver = 60d;
-    public float minResizeWidth = 10f;
-    IEnumerator suddenDeathNumerator;
+    public float resize_EndSize = 10f;
+    IEnumerator resizeNumerator;
 
     public IEnumerator ResizeMapByTime()
     {
@@ -68,7 +138,7 @@ public class GameField : MonoBehaviour
         double elapsedTime = 0;
         while (doRoutine)
         {
-            float newLength = minResizeWidth + (originalSize - minResizeWidth) * (float)(1 - (elapsedTime / resizeOver));
+            float newLength = resize_EndSize + (resize_StartSize - resize_EndSize) * (float)(1 - (elapsedTime / resizeOver));
             mapTransform.localScale = new Vector3(newLength, newLength);
 
 
@@ -89,8 +159,9 @@ public class GameField : MonoBehaviour
 
 
     public GameMode fieldType;
-    
-    public void InitialiseMap(int id = 0) {
+
+    public void InitialiseMap(int id = 0)
+    {
         fieldNo = id;
         switch (fieldType)
         {
@@ -109,28 +180,46 @@ public class GameField : MonoBehaviour
 
     }
 
-    internal void StartEngine()
+
+
+    internal void StartEngine(MapDifficulty mapDIfficulty)
     {
+        ResetFieldProperties();
         playerSpawner.StartEngine();
-        bulletSpawner.StartEngine();
+        bulletSpawner.StartEngine(mapDIfficulty);
         buffSpawner.StartEngine();
+
+        //EventManager.TriggerEvent(MyEvents.EVENT_FIELD_STARTED, new EventObject(){ });
+    }
+    void ResetFieldProperties() {
+        suddenDeathCalled = false;
+        fieldWinner = null;
+        gameFieldFinished = false;
     }
 
     private void InitialiseMapSize()
     {
         mapTransform = GetComponent<Transform>();
-        mapSize = mapTransform.localScale;
+        if (originalMapSize == Vector3.zero) {
+            originalMapSize = transform.localScale;
+        }
+
         int numPlayer = PhotonNetwork.CurrentRoom.PlayerCount;
         float modifiedLength = GameFieldManager.instance.mapStepsize * (numPlayer / GameFieldManager.instance.mapStepPerPlayer);
-        Vector3 newSize = mapSize + new Vector3(modifiedLength, modifiedLength);
+        if (GameSession.gameMode == GameMode.Tournament)
+        {
+            modifiedLength = 0f;
+        }
+        Vector3 newSize = originalMapSize + new Vector3(modifiedLength, modifiedLength);
         mapTransform.localScale = newSize;
-        originalSize = newSize.x;
+        resize_StartSize = newSize.x;
         mapSpec.xMin = map_transforms[0].position.x;
         mapSpec.xMax = map_transforms[1].position.x;
         mapSpec.yMin = map_transforms[0].position.y;
         mapSpec.yMax = map_transforms[1].position.y;
         mapSpec.xMid = (mapSpec.xMin + mapSpec.xMax) / 2;
         mapSpec.yMid = (mapSpec.yMin + mapSpec.yMax) / 2;
+ 
         ResizePlayerMap(numPlayer);
     }
     int w;
@@ -152,7 +241,6 @@ public class GameField : MonoBehaviour
             }
             multWidth = !multWidth;
         }
-        Debug.Log(w + "," + h + " can store " + numPlayer);
     }
 
 
@@ -160,7 +248,7 @@ public class GameField : MonoBehaviour
     {
         int x = pNumber % w;
         int y = pNumber / w;
-        //  Debug.Log(pNumber+ " Found " + x + "," + y);
+        Debug.Log(pNumber + " Found " + x + "," + y);
         return GetPoissonPositionNear(x, y);
 
     }
@@ -192,20 +280,29 @@ public class GameField : MonoBehaviour
 
         float randX = Random.Range(-width / 4, width / 4);
         float randY = Random.Range(-height / 4, height / 4);
-        //    Debug.Log("Width units " + width + "," + height);
-        // Debug.Log("Offset units " + xOffset + "," + yOffset);
-        //     Debug.Log("rand units " + randX + "," + randY);
-        // Debug.Log("start units " + xMin + "," + yMin);
-        return new Vector3(mapSpec.xMin + xOffset + width * x + randX, mapSpec.yMin + yOffset + height * y + randY);
+        Vector3 location = new Vector3(mapSpec.xMin + xOffset + width * x + randX, mapSpec.yMin + yOffset + height * y + randY);
+/*        Debug.Log("Width units " + width + "," + height);
+        Debug.Log("Offset units " + xOffset + "," + yOffset);
+        Debug.Log("rand units " + randX + "," + randY);
+        Debug.Log("start units " + mapSpec.xMin + "," + mapSpec.yMin);
+        Debug.Log("Indicated location " + location);*/
+        return location;
     }
 
     public Player fieldWinner = null;
 
+    [PunRPC]
     internal void NotifyFieldWinner(Player winner)
     {
+        gameFieldFinished = true;
         fieldWinner = winner;
+        Debug.Log("FIeld " + fieldNo + " finished with winner " + fieldWinner);
+        EventManager.TriggerEvent(MyEvents.EVENT_FIELD_FINISHED, new EventObject() { intObj = fieldNo });
+        gameObject.SetActive(false);
         GameFieldManager.CheckGameFinished();
     }
+
+
     /*    void OnDrawGizmos()
 {
    // Green

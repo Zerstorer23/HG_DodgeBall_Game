@@ -102,7 +102,8 @@ MonoBehaviour:
   currentLife: 0
   invincibleFromBullets: 0
   invincibleFromMapBullets: 1
-  dontKillByException: 0
+  dontKillByException: 1
+  associatedField: 0
 --- !u!114 &6212558457632629342
 MonoBehaviour:
   m_ObjectHideFlags: 0

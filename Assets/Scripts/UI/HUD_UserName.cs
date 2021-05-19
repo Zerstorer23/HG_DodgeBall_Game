@@ -46,7 +46,7 @@ public class HUD_UserName : MonoBehaviourPun
         if (pv.IsMine) {
             GameMode currMode = (GameMode)arg0.objData;
             if (currMode == GameMode.TEAM) {
-                myTeam = (ConnectedPlayerManager.GetMyIndex() % 2 == 0) ? Team.HOME : Team.AWAY;
+                myTeam = (ConnectedPlayerManager.GetMyIndex(PhotonNetwork.PlayerList) % 2 == 0) ? Team.HOME : Team.AWAY;
             }
             pv.RPC("SetTeam", RpcTarget.AllBuffered, (int)myTeam);
         }
@@ -82,7 +82,9 @@ public class HUD_UserName : MonoBehaviourPun
     public void ChangeName(string text)
     {
         playerName = text;
-        PhotonNetwork.LocalPlayer.NickName = playerName;
+        if (pv.IsMine) {
+            PhotonNetwork.LocalPlayer.NickName = playerName;
+        }
         UpdateUI();
     }
 

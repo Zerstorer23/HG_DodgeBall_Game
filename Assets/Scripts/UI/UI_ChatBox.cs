@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class UI_ChatBox : MonoBehaviour
 {
-	internal ChatManager chatManager;
 	public InputField inputField;
 	public Text outputText;
 	public ScrollRect scrollRect;
@@ -53,7 +52,7 @@ public class UI_ChatBox : MonoBehaviour
 		}
 		else
 		{
-			chatManager.SendChatMessage(inputField.text);
+			ChatManager.SendChatMessage(inputField.text);
 			FocusOnField(true);
 		}
 		inputField.text = "";
