@@ -7,9 +7,9 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour
 {
-    internal Dictionary<string, Unit_Player> unitsOnMap = new Dictionary<string, Unit_Player>();
+    internal SortedDictionary<string, Unit_Player> unitsOnMap = new SortedDictionary<string, Unit_Player>();
     public List<Unit_Player> debugUnitList = new List<Unit_Player>();
-    internal Dictionary<string, Player> playersOnMap = new Dictionary<string, Player>();
+    internal SortedDictionary<string, Player> playersOnMap = new SortedDictionary<string, Player>();
     int maxLives = 1;
     CharacterType myCharacter = CharacterType.NONE;
     [SerializeField] GameField gameField;
@@ -32,6 +32,19 @@ public class PlayerSpawner : MonoBehaviour
     {
         Debug.Log("Reset field units map");
         SpawnLocalPlayer();
+        SpawnDesolator();
+    }
+
+    private void SpawnDesolator()
+    {
+        bool useTheMachine = (GameSession.gameMode == GameMode.PVP
+   || GameSession.gameMode == GameMode.TEAM);
+        if (!PhotonNetwork.IsMasterClient || !useTheMachine) return;
+
+        GameObject desolator =
+        PhotonNetwork.Instantiate(ConstantStrings.PREFAB_DESOLATOR, transform.position, Quaternion.identity, 0,
+        new object[] { gameField.fieldNo});
+
     }
 
     private void SpawnLocalPlayer()
@@ -60,7 +73,6 @@ public class PlayerSpawner : MonoBehaviour
             ChatManager.SendNotificationMessage(PhotonNetwork.NickName + " 님이 난입했습니다.");
             MainCamera.FocusOnField(true);
             ChatManager.SetInputFieldVisibility(true);
-            ChatManager.FocusField();
         }
 
     }
@@ -72,40 +84,14 @@ public class PlayerSpawner : MonoBehaviour
         Debug.Log("Spawn player at " + spawnPos);
         PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0, new object[] { myCharacter, maxLives, gameField.fieldNo });
     }
-    /*
-         public void RegisterPlayer(string userID, Unit_Player )
-    {
-        string id = eo.stringObj;
-        int fieldNo = eo.intObj;
-        if (fieldNo != gameField.fieldNo) return;
-        Unit_Player go = eo.goData.GetComponent<Unit_Player>();
-        AddUnitToMap(id, go);
-        if (id == PhotonNetwork.LocalPlayer.UserId)
-        {
-            UI_StatDisplay.SetPlayer(go);
-        }
-        GameFieldManager.AddGlobalPlayer(id, go);
 
-        Debug.LogWarning("Received Player spawned " + go.pv.Owner + " at " + fieldNo);
-        if (unitsOnMap.Count == gameField.expectedNumPlayer)
-        {
-            Debug.LogWarning(fieldNo +" expected " + gameField.expectedNumPlayer + " vs " + unitsOnMap.Count);
-            //Everyone is spawned
-            StartCoroutine(WaitAndCheck());
-           // WaitAndCheck();
-        }
-    }
-
-     */
 
     public void RegisterPlayer(string userID, Unit_Player unit)
     {
         AddUnitToMap(userID, unit);
         GameFieldManager.AddGlobalPlayer(userID, unit);
-        Debug.LogWarning("Received Player spawned " + unit.pv.Owner + " at " + gameField.fieldNo);
         if (unitsOnMap.Count == gameField.expectedNumPlayer)
         {
-            Debug.LogWarning(gameField.fieldNo + " expected " + gameField.expectedNumPlayer + " vs " + unitsOnMap.Count);
             //Everyone is spawned
             if (gameObject.activeInHierarchy)
                 StartCoroutine(WaitAndCheck());
@@ -136,19 +122,12 @@ public class PlayerSpawner : MonoBehaviour
     }
     IEnumerator WaitAndCheck()
     {
+        //Enable되는걸 기다려야함 그래야 event듣고 사망
         yield return new WaitForFixedUpdate();
-        //Enable되는걸 기다려야함 그래야 event듣고 사망
         GameStatus stat = new GameStatus(unitsOnMap);
-        Debug.LogWarning("Survivor " + stat.lastSurvivor);
         gameField.CheckFieldConditions(stat, true);
     }
-    void Check()
-    {
-        //Enable되는걸 기다려야함 그래야 event듣고 사망
-        GameStatus stat = new GameStatus(unitsOnMap);
-        Debug.LogWarning("Survivor " + stat.lastSurvivor);
-        gameField.CheckFieldConditions(stat, true);
-    }
+
     private void OnPlayerDied(EventObject eo)
     {
         //No one died in this field
@@ -157,16 +136,16 @@ public class PlayerSpawner : MonoBehaviour
         {
             //최후의 1인. 맵은 이미 지워져있음
             Debug.Log(gameField.fieldNo + ": null the player last, only global " + eo.stringObj);
-            GameFieldManager.RemoveGlobalPlayer(eo.stringObj);
+            GameFieldManager.RemoveDeadPlayer(eo.stringObj);
             return;
         }
         Debug.Assert(unitsOnMap.ContainsKey(eo.stringObj), eo.stringObj + " is not on field!!");
         //   if (!unitsOnMap.ContainsKey(eo.stringObj)) return;
         unitsOnMap[eo.stringObj] = null;
         playersOnMap[eo.stringObj] = null;
-
+        gameField.AddController(eo.stringObj);
         Debug.Log(gameField.fieldNo + ": null the player " + eo.stringObj);
-        GameFieldManager.RemoveGlobalPlayer(eo.stringObj);
+        GameFieldManager.RemoveDeadPlayer(eo.stringObj);
         GameStatus stat = new GameStatus(unitsOnMap);//마지막 1인은 남아있어야함
         gameField.CheckFieldConditions(stat, false);
 
@@ -252,9 +231,9 @@ public class PlayerSpawner : MonoBehaviour
     public void ResetPlayerMap()
     {
         Debug.Log("Reset player map on ");
-        unitsOnMap = new Dictionary<string, Unit_Player>();
+        unitsOnMap = new SortedDictionary<string, Unit_Player>();
         debugUnitList = new List<Unit_Player>();
-        playersOnMap = new Dictionary<string, Player>();
+        playersOnMap = new SortedDictionary<string, Player>();
     }
 
 
@@ -267,12 +246,12 @@ public class GameStatus
     public int alive_ourTeam;
     public int dead;
     public int toKill;
-    public GameStatus(Dictionary<string, Unit_Player> unitDict)
+    public GameStatus(SortedDictionary<string, Unit_Player> unitDict)
     {
         GetGameStatus(unitDict);
     }
 
-    void GetGameStatus(Dictionary<string, Unit_Player> unitDict)
+    void GetGameStatus(SortedDictionary<string, Unit_Player> unitDict)
     {
         Team myTeam = (Team)UI_PlayerLobbyManager.GetPlayerProperty("TEAM", Team.HOME);
         bool isTeamGame = GameSession.gameMode == GameMode.TEAM;
@@ -311,5 +290,17 @@ public class GameStatus
         {
             lastSurvivor = PhotonNetwork.LocalPlayer;
         }
+    }
+
+    public override string ToString() {
+        string o = "Game mode : " + GameSession.gameMode+"\n";
+         o += "Total Players:" + total+"\n";
+         o += "Total Alive:" + alive+"\n";
+         o += "Total Alive in my team:"+(Team)PhotonNetwork.LocalPlayer.CustomProperties["TEAM"]+" ? " + alive+"\n";
+        o += "Total dead:" + dead + "\n";
+        o += "Total to kill:" + toKill + "\n";
+        o += "Last survivor:" + lastSurvivor + "\n";
+        return o;
+
     }
 }

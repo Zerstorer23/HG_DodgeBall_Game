@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class BuffObjectSpawner : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class BuffObjectSpawner : MonoBehaviour
     double startTime;
     [SerializeField] GameObject[] buffPrafabs;
     [SerializeField] GameField gameField;
-    string location = "Prefabs/BuffObjects/";
+    string prefabName = "Prefabs/BuffObjects/buffObject";
 
     internal void StartEngine()
     {
@@ -36,13 +37,10 @@ public class BuffObjectSpawner : MonoBehaviour
     private void InatantiateBuffObject()
     {
         Vector3 randPos = GetRandomPosition();
-        string prefab = location +  GetRandomBuff();
-        PhotonNetwork.InstantiateRoomObject(prefab, randPos, Quaternion.identity, 0);
-    }
-
-    private string GetRandomBuff()
-    {
-        return buffPrafabs[UnityEngine.Random.Range(0, buffPrafabs.Length)].name;
+        int randIndex = Random.Range(0, GameSession.instance.buffConfigs.Length);
+        PhotonNetwork.InstantiateRoomObject(prefabName, randPos, Quaternion.identity, 0,
+            new object[] {gameField.fieldNo, randIndex }
+            );
     }
 
     private Vector3 GetRandomPosition()

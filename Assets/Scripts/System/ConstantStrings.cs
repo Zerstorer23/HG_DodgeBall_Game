@@ -6,6 +6,7 @@ public class ConstantStrings : MonoBehaviour
 {
 
     public const string PREFAB_BULLET_1 = "Prefabs/Projectiles/Bullet1";
+    public const string PREFAB_BULLET_DESOLATION = "Prefabs/Projectiles/Bullet_desolation";
     public const string PREFAB_BULLET_ASAKURA = "Prefabs/Projectiles/Bullet_asakura";
     public const string PREFAB_BULLET_KIMIDORI = "Prefabs/Projectiles/Bullet_kimidori";
     public const string PREFAB_BULLET_NAGATO = "Prefabs/Projectiles/Bullet_nagato";
@@ -21,6 +22,7 @@ public class ConstantStrings : MonoBehaviour
 
     public const string PREFAB_HEAL_1 = "Prefabs/Units/HealParticle";
     public const string PREFAB_PLAYER = "Prefabs/Units/Player";
+    public const string PREFAB_DESOLATOR = "Prefabs/Units/Desolator";
     public const string PREFAB_BUFF_OBJECT = "Prefabs/Units/BuffObject";
     public const string PREFAB_STARTSCENE_PLAYERNAME = "Prefabs/ConnectedUserName";
     public const string TAG_PROJECTILE = "Projectile";

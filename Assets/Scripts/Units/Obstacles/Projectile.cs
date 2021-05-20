@@ -36,30 +36,11 @@ public class Projectile : MonoBehaviourPun
         }
     }
 
-/*    [PunRPC]
-    public void SetParentPlayer(int fieldNo, string owner)
-    {
-        
-        if (parent != null)
-        {
-            parent.SetMyProjectile(gameObject);
-        }
-    }*/
     [PunRPC]
     public void ResetRotation() {
         gameObject.transform.localRotation = Quaternion.identity;
     }
 
-/*    [PunRPC]
-    public void SetParentTransform()
-    {
-        transform.SetParent(GameSession.GetInst().Home_Bullets);
-    }*/
 
-/*    [PunRPC]
-    public void SetOwnerPlayer(int fieldNo, string ownerID)
-    {
-        player = GameFieldManager.gameFields[fieldNo].playerSpawner.GetPlayerByOwnerID(ownerID);
-    }*/
 
 }

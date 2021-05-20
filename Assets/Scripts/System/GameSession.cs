@@ -21,6 +21,7 @@ public class GameSession : MonoBehaviourPun
     private static GameSession prGameSession;
 
     public UnitConfig[] unitConfigs;
+    public BuffConfig[] buffConfigs;
     public static Dictionary<CharacterType, UnitConfig> unitDictionary;
     public static GameMode gameMode ;
     public static int LocalPlayer_FieldNumber = -1;

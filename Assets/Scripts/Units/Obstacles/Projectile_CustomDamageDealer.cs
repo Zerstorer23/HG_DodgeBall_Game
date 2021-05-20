@@ -7,8 +7,8 @@ public class Projectile_CustomDamageDealer : MonoBehaviour
 {
 
     List<string> playerList;
- //   HashSet<string> foundTargets = new HashSet<string>();
-    Dictionary<string, Unit_Player> playerDict = new Dictionary<string, Unit_Player>();
+    //   HashSet<string> foundTargets = new HashSet<string>();
+    SortedDictionary<string, Unit_Player> playerDict = new SortedDictionary<string, Unit_Player>();
     Projectile_DamageDealer damageDealer;
     Projectile proj;
     PhotonView pv;

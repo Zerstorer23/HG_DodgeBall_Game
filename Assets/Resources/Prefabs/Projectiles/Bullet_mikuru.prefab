@@ -31,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 8629071319047820310}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 6, y: 6, z: 1}
+  m_LocalScale: {x: 24, y: 3, z: 1}
   m_Children:
   - {fileID: 8629071319339072153}
   m_Father: {fileID: 0}
@@ -119,10 +119,8 @@ MonoBehaviour:
   exclusionPlayerID: 
   canKillBullet: 0
   isMapObject: 0
-  customBuffs:
-  - buffType: 1
-    modifier: -0.25
-    duration: 1.25
+  givesDamage: 1
+  customBuffs: []
 --- !u!114 &4556413170392631494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -228,8 +226,8 @@ SpriteRenderer:
   m_SortingLayerID: -252878863
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: ae723fe1485aaa14cb4fee2eb377bcca, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 1f5a3a873d1ebae4b8d083259ae00222, type: 3}
+  m_Color: {r: 1, g: 0.3443396, b: 0.3443396, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1

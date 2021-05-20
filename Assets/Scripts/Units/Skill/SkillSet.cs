@@ -63,7 +63,7 @@ public class SkillSet
                 yield return new WaitForSeconds(delay);
             }
         }
-        skillManager.pv.RPC("SetLastActivated", RpcTarget.AllBuffered,false);
+        skillManager.pv.RPC("SetSkillInUse", RpcTarget.AllBuffered,false);
     }
 
 

@@ -49,21 +49,19 @@ public class ScreenPanel : MonoBehaviour
     public void SetCanvasVisibility(bool isVisible)
     {
        // 
-        if (isVisible != visibility) {
-            visibility = isVisible;
-            if (useTransition)
+        visibility = isVisible;
+        if (useTransition)
+        {
+            if (isVisible)
             {
-                if (isVisible)
-                {
-                    Show();
-                }
-                else {
-                    Hide();
-                }
+                Show();
             }
             else {
-                panelObject.SetActive(isVisible);
+                Hide();
             }
+        }
+        else {
+            panelObject.SetActive(isVisible);
         }
     }
 

@@ -62,10 +62,10 @@ public class Unit_Player : MonoBehaviourPun
             EventManager.StartListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, IncrementKill);
             MainCamera.SetFollow(GameSession.GetInst().networkPos);
             MainCamera.FocusOnField(false);
+            ChatManager.SetInputFieldVisibility(false);
             UI_StatDisplay.SetPlayer(this);
         }
         GameFieldManager.gameFields[fieldNo].playerSpawner.RegisterPlayer(pv.Owner.UserId,this);
-        Debug.LogWarning("Send Player spawned " + pv.Owner + " at " + fieldNo);
         EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_SPAWNED, new EventObject() { stringObj = pv.Owner.UserId, goData = gameObject, intObj = fieldNo });
     }
     void ParseInstantiationData() {

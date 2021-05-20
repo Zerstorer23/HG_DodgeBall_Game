@@ -32,9 +32,9 @@ public class GameFieldManager : MonoBehaviourPun
     public int mapStepPerPlayer = 5;
     //public static float xMin, xMax, yMin, yMax, xMid, yMid;
     private static GameFieldManager prGameFieldManager;
-    private static Dictionary<string, Unit_Player> totalUnitsDictionary = new Dictionary<string, Unit_Player>();
-    private Dictionary<string, Player> totalPlayersDictionary = new Dictionary<string, Player>();
-    private Dictionary<int, List<Player>> playersInFieldsMap = new Dictionary<int, List<Player>>();
+    private static SortedDictionary<string, Unit_Player> totalUnitsDictionary = new SortedDictionary<string, Unit_Player>();
+    private SortedDictionary<string, Player> totalPlayersDictionary = new SortedDictionary<string, Player>();
+    private SortedDictionary<int, List<Player>> playersInFieldsMap = new SortedDictionary<int, List<Player>>();
 
     [SerializeField] GameField pvpField, teamField;
     [SerializeField] GameField[] tournamentFields;
@@ -45,6 +45,8 @@ public class GameFieldManager : MonoBehaviourPun
 
     [Header("GameField")]
     public float suddenDeathTime = 60f;
+    public double resizeOver = 60d;
+    public float resize_EndSize = 10f;
 
     internal static bool CheckSuddenDeathCalled(int fieldNo)
     {
@@ -80,7 +82,7 @@ public class GameFieldManager : MonoBehaviourPun
            // totalPlayersDictionary.Add(id, go.pv.Owner);
         }
     }
-    public static void RemoveGlobalPlayer(string id)
+    public static void RemoveDeadPlayer(string id)
     {
         if (!totalUnitsDictionary.ContainsKey(id)) return;
         totalUnitsDictionary[id] = null;
@@ -147,23 +149,23 @@ public class GameFieldManager : MonoBehaviourPun
     {
         StartGame();
     }
-
+    public List<Player> survivors;
     internal static void CheckGameFinished()
     {
-        List<Player> survivors = new List<Player>();
-        bool finished = instance.CheckOtherFields(survivors);
+        instance.survivors = new List<Player>();
+        bool finished = instance.CheckOtherFields(instance.survivors);
         if (!finished) return;
-        Debug.Log("Found Survivosr " + survivors.Count);
+        Debug.Log("Found Survivosr " + instance.survivors.Count);
         //All Field Finished
-        if (survivors.Count >= 2)
+        if (instance.survivors.Count >= 2)
         {
 
-            instance.StartCoroutine(instance.WaitAndContinueTournament(survivors));
+            instance.StartCoroutine(instance.WaitAndContinueTournament(instance.survivors));
             //Proceed Tournament
         }
         else
         {
-            FinishTheGame(survivors);
+            FinishTheGame(instance.survivors);
         }
     }
     bool CheckOtherFields(List<Player> survivors) {
@@ -197,12 +199,16 @@ public class GameFieldManager : MonoBehaviourPun
     private IEnumerator WaitAndContinueTournament(List<Player> survivors)
     {
         float delay = 3f;
+      //  Debug.Log("Open tourny panel ...");
         GameSession.instance.tournamentPanel.SetPanel(survivors.ToArray(), delay);
         EventManager.TriggerEvent(MyEvents.EVENT_POP_UP_PANEL, new EventObject() { objData = ScreenType.TournamentResult, boolObj = true });
         AssignMyRoom(survivors.ToArray(), 2); 
         GameSession.instance.tournamentPanel.SetNext(playersInFieldsMap);
         yield return new WaitForSeconds(delay);
         StartGame();
+        if (GameSession.LocalPlayer_FieldNumber == -1) {
+            ChangeToSpectator();
+        }
     }
 
     private void StartGame() {
@@ -228,9 +234,9 @@ public class GameFieldManager : MonoBehaviourPun
     int numActiveFields = 1;
     public void AssignMyRoom(Player[] playerList, int maxPlayerPerRoom)
     {
-        totalUnitsDictionary = new Dictionary<string, Unit_Player>();
-        totalPlayersDictionary = new Dictionary<string, Player>();
-        playersInFieldsMap = new Dictionary<int, List<Player>>();
+        totalUnitsDictionary = new SortedDictionary<string, Unit_Player>();
+        totalPlayersDictionary = new SortedDictionary<string, Player>();
+        playersInFieldsMap = new SortedDictionary<int, List<Player>>();
 
         int randomOffset = (int)PhotonNetwork.CurrentRoom.CustomProperties[ConstantStrings.HASH_ROOM_RANDOM_SEED];
         Debug.Log("Server seed : " + randomOffset);
@@ -289,24 +295,31 @@ public class GameFieldManager : MonoBehaviourPun
         playersInFieldsMap[field].Add(player);
     }
 
-    public static Dictionary<string,Unit_Player> GetPlayersInArea(int field = 0) {
+    public static SortedDictionary<string,Unit_Player> GetPlayersInArea(int field = 0) {
         return gameFields[field].playerSpawner.unitsOnMap;
     }
 
     int playerIterator = 0;
-    public static Unit_Player GetNextActivePlayer()
+    public static GameObject GetNextActivePlayer()
     {
         int iteration = 0;
         List<string> namelist = new List<string>(totalUnitsDictionary.Keys);
+        if (GameSession.gameMode == GameMode.PVP || GameSession.gameMode == GameMode.TEAM) {
+            namelist.Add("DESOLATOR");
+        }
         while (iteration < namelist.Count)
         {
             iteration++;
             instance.playerIterator++;
-            instance.playerIterator %= totalUnitsDictionary.Count;
-            Unit_Player p = totalUnitsDictionary[namelist[instance.playerIterator]];
+            instance.playerIterator %= namelist.Count;
+            string name = namelist[instance.playerIterator];
+            if (name == "DESOLATOR") {
+                return gameFields[0].desolator.gameObject;
+            }
+            Unit_Player p = totalUnitsDictionary[name];
             if (p != null && p.gameObject.activeInHierarchy)
             {
-                return p;
+                return p.gameObject;
             }
         }
         return null;

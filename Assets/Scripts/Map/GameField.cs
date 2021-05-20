@@ -16,7 +16,8 @@ public class GameField : MonoBehaviourPun
     public Vector3 originalMapSize;
     public bool suddenDeathCalled = false;
     public bool gameFieldFinished = false;
-
+    public Unit_SharedMovement desolator;
+    internal  Dictionary<string, int> desolator_controllers = new Dictionary<string, int>();
     public int expectedNumPlayer = 0;
 
     PhotonView pv;
@@ -37,6 +38,7 @@ public class GameField : MonoBehaviourPun
     }
     private void OnDisable()
     {
+        desolator_controllers = new Dictionary<string, int>();
         EventManager.StopListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeathTriggered);
         EventManager.StopListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
 
@@ -64,6 +66,7 @@ public class GameField : MonoBehaviourPun
         if (fieldNo != GameSession.LocalPlayer_FieldNumber || gameFieldFinished) return;
         CheckSuddenDeath(stat.alive);
         bool fieldFinished = true;
+        Debug.Log(stat.ToString());
         switch (GameSession.gameMode)
         {
             case GameMode.PVP:
@@ -83,18 +86,35 @@ public class GameField : MonoBehaviourPun
         }
         if (!fieldFinished) return;
 
-
         Player winner = stat.lastSurvivor;
         if (winner == null && stat.total == 1) {
-
-            pv.RPC("NotifyFieldWinner", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
-            return;
+            winner = PhotonNetwork.LocalPlayer;
         }
 
-        if (winner.IsLocal) {
+        Debug.Log("gAME FISNISHED / master: " + (winner == PhotonNetwork.LocalPlayer) + " winner "+winner);
+        if (winner == PhotonNetwork.LocalPlayer)
+        {
+            Debug.Log("notify winner FISNISHED");
             pv.RPC("NotifyFieldWinner", RpcTarget.AllBuffered, winner);
         }
     }
+
+    public Player fieldWinner = null;
+    public string winnerName = null;
+
+    [PunRPC]
+    public void NotifyFieldWinner(Player winner)
+    {
+        Debug.Log("Received notify winner FISNISHED");
+        gameFieldFinished = true;
+        fieldWinner = winner;
+        winnerName = winner.NickName;
+        Debug.Log("FIeld " + fieldNo + " finished with winner " + fieldWinner);
+        EventManager.TriggerEvent(MyEvents.EVENT_FIELD_FINISHED, new EventObject() { intObj = fieldNo });
+        gameObject.SetActive(false);
+        GameFieldManager.CheckGameFinished();
+    }
+
     public void CheckSuddenDeath(int numAlive, bool timeout = false)
     {
         if (
@@ -127,8 +147,6 @@ public class GameField : MonoBehaviourPun
 
     float resize_StartSize;
     public double startTime;
-    public double resizeOver = 60d;
-    public float resize_EndSize = 10f;
     IEnumerator resizeNumerator;
 
     public IEnumerator ResizeMapByTime()
@@ -138,7 +156,9 @@ public class GameField : MonoBehaviourPun
         double elapsedTime = 0;
         while (doRoutine)
         {
-            float newLength = resize_EndSize + (resize_StartSize - resize_EndSize) * (float)(1 - (elapsedTime / resizeOver));
+            float newLength = GameFieldManager.instance.resize_EndSize +
+                (resize_StartSize - GameFieldManager.instance.resize_EndSize) * 
+                (float)(1 - (elapsedTime / GameFieldManager.instance.resizeOver));
             mapTransform.localScale = new Vector3(newLength, newLength);
 
 
@@ -151,7 +171,7 @@ public class GameField : MonoBehaviourPun
             mapSpec.xMid = (mapSpec.xMin + mapSpec.xMax) / 2;
             mapSpec.yMid = (mapSpec.yMin + mapSpec.yMax) / 2;
             elapsedTime = PhotonNetwork.Time - startTime;
-            doRoutine = elapsedTime < resizeOver;
+            doRoutine = elapsedTime < GameFieldManager.instance.resizeOver;
         }
 
     }
@@ -177,7 +197,6 @@ public class GameField : MonoBehaviourPun
                 InitialiseMapSize();
                 break;
         }
-
     }
 
 
@@ -194,6 +213,7 @@ public class GameField : MonoBehaviourPun
     void ResetFieldProperties() {
         suddenDeathCalled = false;
         fieldWinner = null;
+        winnerName = "";
         gameFieldFinished = false;
     }
 
@@ -262,8 +282,8 @@ public class GameField : MonoBehaviourPun
     public Vector3 GetRandomPositionNear(Vector3 center, float window, float boundOffset = 0)
     {
 
-        float randX = Random.Range(-window, window);
-        float randY = Random.Range(-window, window);
+        float randX = center.x +Random.Range(-window, window);
+        float randY = center.y + Random.Range(-window, window);
         if (randX <= (mapSpec.xMin + boundOffset)) randX = mapSpec.xMin + boundOffset;
         if (randX >= (mapSpec.xMax - boundOffset)) randX = mapSpec.xMax - boundOffset;
         if (randY <= (mapSpec.yMin + boundOffset)) randY = mapSpec.yMin + boundOffset;
@@ -281,25 +301,18 @@ public class GameField : MonoBehaviourPun
         float randX = Random.Range(-width / 4, width / 4);
         float randY = Random.Range(-height / 4, height / 4);
         Vector3 location = new Vector3(mapSpec.xMin + xOffset + width * x + randX, mapSpec.yMin + yOffset + height * y + randY);
-/*        Debug.Log("Width units " + width + "," + height);
+       Debug.Log("Width units " + width + "," + height);
         Debug.Log("Offset units " + xOffset + "," + yOffset);
         Debug.Log("rand units " + randX + "," + randY);
         Debug.Log("start units " + mapSpec.xMin + "," + mapSpec.yMin);
-        Debug.Log("Indicated location " + location);*/
+        Debug.Log("Indicated location " + location);
         return location;
     }
-
-    public Player fieldWinner = null;
-
-    [PunRPC]
-    internal void NotifyFieldWinner(Player winner)
+    public void AddController(string userid)
     {
-        gameFieldFinished = true;
-        fieldWinner = winner;
-        Debug.Log("FIeld " + fieldNo + " finished with winner " + fieldWinner);
-        EventManager.TriggerEvent(MyEvents.EVENT_FIELD_FINISHED, new EventObject() { intObj = fieldNo });
-        gameObject.SetActive(false);
-        GameFieldManager.CheckGameFinished();
+        if (desolator == null || !desolator.gameObject.activeInHierarchy) return;
+        Debug.Assert(!desolator_controllers.ContainsKey(userid), "Duplicate player");
+        desolator_controllers.Add(userid, 0);
     }
 
 

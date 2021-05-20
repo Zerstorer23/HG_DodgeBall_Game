@@ -381,10 +381,10 @@ MonoBehaviour:
   originalMapSize: {x: 0, y: 0, z: 0}
   suddenDeathCalled: 0
   gameFieldFinished: 0
+  desolator: {fileID: 0}
   expectedNumPlayer: 0
+  winnerName: 
   startTime: 0
-  resizeOver: 60
-  resize_EndSize: 10
   fieldType: 0
 --- !u!114 &494246592763862440
 MonoBehaviour:

@@ -152,7 +152,7 @@ public class Unit_AutoDrive : MonoBehaviour
             if (distance > range) continue;
             if (go.tag == TAG_PLAYER)
             {
-                if (skillManager.GetRemainingTime() > 0)
+                if (skillManager.currStack > 0)
                 { //스킬사용가능시 접근
                     dir = -dir;
                 }

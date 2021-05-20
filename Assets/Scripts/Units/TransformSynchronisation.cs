@@ -12,6 +12,8 @@ public class TransformSynchronisation : MonoBehaviourPunCallbacks
     public Quaternion networkQuaternion;
     Queue<TimeVector> positionQueue = new Queue<TimeVector>();
     private double lastSendTime;
+
+   public bool syncRotation = true;
     private void Start()
     {
         positionQueue = new Queue<TimeVector>();
@@ -66,7 +68,10 @@ public class TransformSynchronisation : MonoBehaviourPunCallbacks
                 positionQueue.Enqueue(new TimeVector(networkExpectedTime, networkPos));
             }
             stream.SendNext(networkPos);
-            stream.SendNext(networkQuaternion);
+            if (syncRotation) {
+
+                stream.SendNext(networkQuaternion);
+            }
             stream.SendNext(networkExpectedTime);
             lastSendTime = networkExpectedTime;
         }
@@ -76,7 +81,11 @@ public class TransformSynchronisation : MonoBehaviourPunCallbacks
         {
 
             Vector3 position = (Vector3)stream.ReceiveNext();
-            Quaternion rotation = (Quaternion)stream.ReceiveNext();
+            Quaternion rotation = Quaternion.identity;
+            if (syncRotation)
+            {
+                rotation = (Quaternion)stream.ReceiveNext();
+            }
             double netTime = (double)stream.ReceiveNext();
             TimeVector tv = new TimeVector(netTime, position,rotation);
             positionQueue.Enqueue(tv);

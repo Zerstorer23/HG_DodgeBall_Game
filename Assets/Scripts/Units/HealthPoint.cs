@@ -48,7 +48,7 @@ public class HealthPoint : MonoBehaviourPun
         }
     }
 
-    private void FixedUpdate()
+    private void FixedUpdate()  
     {
         if (pv.IsMine && currentLife <= 0) {
             isDead = true;

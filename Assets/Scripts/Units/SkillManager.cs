@@ -17,11 +17,14 @@ public class SkillManager : MonoBehaviourPun
 
     delegate void voidFunc();
     voidFunc mySkillFunction;
+    public int maxStack;
     public float cooltime;
-    public double lastActivatedTime;
     public bool skillInUse = false;
 
+    public float remainingStackTime;
+    public int currStack;
 
+    double lastActivated = 0d;
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
@@ -31,15 +34,17 @@ public class SkillManager : MonoBehaviourPun
     }
     private void CheckSkillActivation()
     {
-        //if ()
+        if (PhotonNetwork.Time < lastActivated + 0.1) return;
         if (Input.GetAxis("Fire1") > 0 || Input.GetKeyDown(KeyCode.Joystick1Button5) || Input.GetKeyDown(KeyCode.Joystick1Button7)
             || MenuManager.auto_drive
             )
         {
-            if (GetRemainingTime() <= 0)
+            if (currStack > 0)
             {
+                lastActivated = PhotonNetwork.Time;
                 player.PlayShootAudio();
-                pv.RPC("SetLastActivated", RpcTarget.All , true);
+                pv.RPC("SetSkillInUse", RpcTarget.All , true);
+                pv.RPC("ChangeStack", RpcTarget.AllBuffered, -1);
                 mySkillFunction();
             }
         }
@@ -57,9 +62,10 @@ public class SkillManager : MonoBehaviourPun
     }
     void ParseSkill()
     {
-        SetLastActivated(false);
+        SetSkillInUse(false);
        // pv.RPC("SetLastActivated", RpcTarget.All, false);
         float skillCool = 1f;
+        maxStack = 3;
         switch (myCharacter)
         {
             case CharacterType.NAGATO:
@@ -72,7 +78,7 @@ public class SkillManager : MonoBehaviourPun
                 break;
             case CharacterType.MIKURU:
                 mySkillFunction = DoSkillSet_Mikuru;
-                skillCool = 3.3f;
+                skillCool = 3.6f;
                 break; 
             case CharacterType.KOIZUMI:
                 mySkillFunction = DoSkillSet_Koizumi;
@@ -84,7 +90,7 @@ public class SkillManager : MonoBehaviourPun
                 break;
             case CharacterType.ASAKURA:
                 mySkillFunction = DoSkillSet_Asakura;
-                skillCool = 4.2f;
+                skillCool = 4.4f;
                 break;
             case CharacterType.KYOUKO:
                 mySkillFunction = DoSkillSet_Kyouko;
@@ -99,49 +105,67 @@ public class SkillManager : MonoBehaviourPun
                 skillCool = 0.7f;
                 break;
         }
-        // pv.RPC("SetCooltime",RpcTarget.All, skillCool);
         SetCooltime(skillCool);
     }
-    [PunRPC]
+
     public void SetCooltime(float a) {
         cooltime = a;
+        remainingStackTime = a;
     }
     [PunRPC]
-    public void SetLastActivated( bool startSkill)
+    public void SetSkillInUse( bool startSkill)
     {
         skillInUse = startSkill;
-        lastActivatedTime = PhotonNetwork.Time;
     }
+    [PunRPC]
+    public void ChangeStack(int a) {
+        currStack += a;
+    }
+
     private void OnDisable()
     {
         skillInUse = false;
     }
     private void Update()
     {
+        CheckSkillStack();
+    }
+    private void FixedUpdate()
+    {
         if (!pv.IsMine) return;
         CheckSkillActivation();
+    }
+
+    private void CheckSkillStack()
+    {
+        if (currStack < maxStack && !skillInUse)
+        {
+            remainingStackTime -= Time.deltaTime;
+        }
+        if (remainingStackTime <= 0) {
+            if (pv.IsMine)
+            {
+                pv.RPC("ChangeStack", RpcTarget.AllBuffered, 1);
+            }
+            remainingStackTime += GetCoolTime();
+        }
+        
     }
 
     public float GetCoolTime() {
         return cooltime * buffManager.GetBuff(BuffType.Cooltime);
     }
-    public double GetRemainingTime()
-    {
-        return (lastActivatedTime + GetCoolTime()) - PhotonNetwork.Time;
-    }
 
     #region skills
     private void DoSkillSet_Nagato() {
         SkillSet mySkill = new SkillSet(gameObject, this);
-
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_NAGATO);
         mySkill.SetParam(SkillParams.Duration, 0.25f);
         mySkill.SetParam(SkillParams.MoveSpeed, 25f);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
         mySkill.Enqueue(new Action_InstantiateBulletAt());
-        mySkill.Enqueue(new Action_Player_InvincibleBuff());//
-                                                            // mySkill.Enqueue(new Action_SetProjectileExcludePlayer());
+        mySkill.Enqueue(new Action_Player_InvincibleBuff());
         mySkill.Enqueue(new Action_WaitForSeconds());
         mySkill.Enqueue(new Action_SetProjectileStraight());
         StartCoroutine(mySkill.Activate());
@@ -203,11 +227,11 @@ public class SkillManager : MonoBehaviourPun
 
         SkillSet mySkill = new SkillSet(gameObject, this);
         mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
-        mySkill.SetParam(SkillParams.MoveSpeed, 32f);
+        mySkill.SetParam(SkillParams.MoveSpeed, 256f);
         mySkill.SetParam(SkillParams.Duration, 0.35f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_MIKURU);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-        int numBullets = 3;
+        int numBullets = 1;
         mySkill.Enqueue(new Action_Player_InvincibleBuff());//
         for (int n = 0; n < numBullets; n++)
         {
@@ -215,7 +239,7 @@ public class SkillManager : MonoBehaviourPun
             mySkill.Enqueue(new Action_InstantiateBulletAt());
            // mySkill.Enqueue(new Action_SetProjectileExcludePlayer());
             mySkill.Enqueue(new Action_SetProjectileStraight());
-            mySkill.Enqueue(new Action_WaitForSeconds());
+           // mySkill.Enqueue(new Action_WaitForSeconds());
         }
 
         Debug.Log("Activate skill");
@@ -280,15 +304,15 @@ public class SkillManager : MonoBehaviourPun
 
         SkillSet mySkill = new SkillSet(gameObject, this);
         mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
-        mySkill.SetParam(SkillParams.MoveSpeed, 24f);
+        mySkill.SetParam(SkillParams.MoveSpeed, 20f);
         mySkill.SetParam(SkillParams.RotateAngle, 60f);
-        mySkill.SetParam(SkillParams.RotateSpeed, 270f);
+        mySkill.SetParam(SkillParams.RotateSpeed, 90f);
         mySkill.SetParam(SkillParams.Duration, 0.033f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_ASAKURA);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.Bounce);
 
         float angleOffset = unitMovement.GetAim();
-        int numStep = 18;
+        int numStep = 15;
         for (int i = 0; i < numStep; i++)
         {
             float angle = angleOffset + (360/ numStep) * i;
@@ -340,6 +364,7 @@ public class SkillManager : MonoBehaviourPun
                 mySkill.Enqueue(new Action_InstantiateBulletAt());
                 mySkill.Enqueue(new Action_SetProjectileStraight());
             }
+            mySkill.Enqueue(new Action_Player_InvincibleBuff());//
             mySkill.Enqueue(new Action_WaitForSeconds());
             for (int i = 0; i < stepSize; i++)
             {

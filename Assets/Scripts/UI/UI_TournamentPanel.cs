@@ -31,7 +31,7 @@ public class UI_TournamentPanel : MonoBehaviour
         }
         winners.text = text;
     }
-    public void SetNext(Dictionary<int, List<Player>> dict) {
+    public void SetNext(SortedDictionary<int, List<Player>> dict) {
         
         nextOpponent.text = "";
         if (GameSession.LocalPlayer_FieldNumber != -1)
@@ -45,7 +45,6 @@ public class UI_TournamentPanel : MonoBehaviour
             
         }
     }
-
     private void FixedUpdate()
     {
         if (timeoutWait <= 0) return;
@@ -54,10 +53,12 @@ public class UI_TournamentPanel : MonoBehaviour
         {
             timeoutWait = -1f;
             gameObject.SetActive(false);
+        //    Debug.Log("Tourny panel out");
         }
         else
         {
             returnText.text = remain.ToString("0") + " 초후 다음 경기가 시작됩니다...";
+          //  Debug.Log(returnText.text);
         }
     }
 }

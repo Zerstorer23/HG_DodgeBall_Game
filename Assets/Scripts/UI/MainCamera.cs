@@ -40,13 +40,13 @@ public class MainCamera : MonoBehaviour
 
     private void OnPlayerDied(EventObject obj)
     {
-        Unit_Player player = GameFieldManager.GetNextActivePlayer();
+        GameObject player = GameFieldManager.GetNextActivePlayer();
         if (player == null)
         {
             fieldCam.Follow = fieldTransform;
         }
         else {
-            fieldCam.Follow = player.gameObject.transform;// instance.fieldTransform;
+            fieldCam.Follow = player.transform;// instance.fieldTransform;
         }
     }
     bool flag = false;
@@ -84,10 +84,10 @@ public class MainCamera : MonoBehaviour
         }
     }
    public void FocusOnAlivePlayer() {
-        Unit_Player p = GameFieldManager.GetNextActivePlayer();
+        GameObject p = GameFieldManager.GetNextActivePlayer();
         if (p != null)
         {
-            instance.fieldCam.Follow = p.gameObject.transform;// instance.fieldTransform;
+            instance.fieldCam.Follow = p.transform;// instance.fieldTransform;
         }
     }
 

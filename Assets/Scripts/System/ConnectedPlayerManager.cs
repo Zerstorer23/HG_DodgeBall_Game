@@ -137,17 +137,13 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
     }
     public static Player GetPlayerByID(string id) {
         if (!init) instance.Init();
-        Debug.Log("Get player id " + id);
         if (id == null) return null;
         if (instance.playerDict.ContainsKey(id))
         {
-            Debug.Log("contains key " + id);
-
             return instance.playerDict[id];
         }
         else
         {
-            Debug.Log("no key " + instance.playerDict.Count);
             return null;
         }
     }
