@@ -14,28 +14,20 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 	public static string currentChannelName;
 	private static ChatManager instance;
 
-	[Header("Pregame Screen")]
-
-	[SerializeField] UI_ChatBox preChat;
-
-	[Header("InGame Screen")]
-	[SerializeField] UI_ChatBox inChat;
-
 	/*	ScrollRect mainScroll;
 		InputField mainInput;*/
-	UI_ChatBox mainChatBox;
+	[SerializeField] UI_ChatBox mainChatBox;
 
 	public static ChatClient chatClient;
 
+	public static Chat_DC_Client dcClient;
 	MinigameManager minigameMachine;
     private void Awake()
     {
 		minigameMachine = GetComponent<MinigameManager>();
+		dcClient = GetComponent<Chat_DC_Client>();
+		dcClient.StartClient();
 		instance = this;
-		//DontDestroyOnLoad(gameObject.transform.parent.gameObject);
-		mainChatBox = preChat;
-		preChat.chatManager = this;
-		inChat.chatManager = this;
 		EventManager.StartListening(MyEvents.EVENT_SHOW_PANEL, OnShowPanel);
     }
     private void OnDestroy()
@@ -49,12 +41,10 @@ public class ChatManager : MonoBehaviour, IChatClientListener
         switch (currentPanel)
         {
             case ScreenType.PreGame:
-				mainChatBox = preChat;
 				mainChatBox.SetInputFieldVisibility(true);
                 break;
 
             case ScreenType.InGame:
-				mainChatBox = inChat;
 				mainChatBox.SetInputFieldVisibility(false);
 				break;
         }
@@ -87,8 +77,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
 	public void AddLine(string lineString)
 	{
-		inChat.AddLine(lineString);
-		preChat.AddLine(lineString);
+		mainChatBox.AddLine(" "+lineString);
 	}
 	void Update()
 	{
@@ -105,14 +94,15 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
 
 
-	public void SendChatMessage(string message)
+	public static void SendChatMessage(string message)
 	{
 		if (chatClient.State == ChatState.ConnectedToFrontEnd)
 		{
 			if (string.IsNullOrEmpty(message)) return;
-			string msg = string.Format("//{0}... {1}", MenuManager.GetLocalName(), message);
+			string msg = string.Format("<color=#ff00ff>[{0}]</color> {1}", MenuManager.GetLocalName(), message);
 			chatClient.PublishMessage(currentChannelName, msg);
-			DetectMinigame(message);
+			dcClient.EnqueueAMessage(message);
+			instance.DetectMinigame(message);
 		}
 	}
 

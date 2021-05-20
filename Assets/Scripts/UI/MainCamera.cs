@@ -40,13 +40,13 @@ public class MainCamera : MonoBehaviour
 
     private void OnPlayerDied(EventObject obj)
     {
-        Unit_Player player = GameFieldManager.GetNextActivePlayer();
+        GameObject player = GameFieldManager.GetNextActivePlayer();
         if (player == null)
         {
             fieldCam.Follow = fieldTransform;
         }
         else {
-            fieldCam.Follow = player.gameObject.transform;// instance.fieldTransform;
+            fieldCam.Follow = player.transform;// instance.fieldTransform;
         }
     }
     bool flag = false;
@@ -80,11 +80,14 @@ public class MainCamera : MonoBehaviour
         if (!instance.isFocusedField || UI_ChatBox.isSelected) return;
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Joystick1Button5) || Input.GetKeyDown(KeyCode.Joystick1Button7))
         {
-            Unit_Player p = GameFieldManager.GetNextActivePlayer();
-            if (p != null)
-            {
-                fieldCam.Follow = p.gameObject.transform;// instance.fieldTransform;
-            }
+            FocusOnAlivePlayer();
+        }
+    }
+   public void FocusOnAlivePlayer() {
+        GameObject p = GameFieldManager.GetNextActivePlayer();
+        if (p != null)
+        {
+            instance.fieldCam.Follow = p.transform;// instance.fieldTransform;
         }
     }
 
@@ -127,6 +130,9 @@ public class MainCamera : MonoBehaviour
         {
             instance.mainVcam.transform.localPosition = new Vector3(0, 0);
             instance.mainVcam.transform.localRotation = Quaternion.identity;
+        }
+        else {
+            instance.FocusOnAlivePlayer();
         }
         instance.gameObject.transform.localPosition = new Vector3(0, 0,-10);
         instance.gameObject.transform.localRotation = Quaternion.identity;

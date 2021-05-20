@@ -10,25 +10,25 @@ public class UI_SkillBox : MonoBehaviour
     [SerializeField] Image portrait;
     [SerializeField] Image fillSprite;
     [SerializeField] Text desc;
+    [SerializeField] Text stackText;
     [SerializeField] Text colltimeText;
-    GameSession session;
     public void SetSkillInfo(SkillManager skm) {
         skill = skm;
         portrait.sprite = GameSession.unitDictionary[skm.myCharacter].portraitImage;
         desc.text = GameSession.unitDictionary[skm.myCharacter].txt_skill_desc;
     
     }
-    private void Update()
+    private void FixedUpdate()
     {
         if (skill == null) return;
         UpdateCooltime();
     }
 
     public void UpdateCooltime() {
-        double remain = Math.Max(skill.GetRemainingTime(), 0);
+        double remain = skill.remainingStackTime;
         double perc = remain / skill.GetCoolTime();
         fillSprite.fillAmount =(float) perc;
-        colltimeText.text = remain.ToString("0.0");
-    
+        colltimeText.text = (skill.currStack == skill.maxStack) ? " " :remain.ToString("0.0");
+        stackText.text = skill.currStack + "/" + skill.maxStack;    
     }
 }

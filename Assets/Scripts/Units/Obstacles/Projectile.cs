@@ -8,36 +8,39 @@ public class Projectile : MonoBehaviourPun
 {
     internal Unit_Player player;
     public PhotonView pv;
+    int fieldNo = 0;
+    HealthPoint health;
+    Projectile_Movement movement;
 
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
-
+        health = GetComponent<HealthPoint>();
+        movement = GetComponent<Projectile_Movement>();
     }
-    [PunRPC]
-    public void SetParentPlayer(string owner)
+    private void OnEnable()
     {
-        Unit_Player parent = GameSession.GetInst().charSpawner.GetPlayerByOwnerID(owner);
-        if (parent != null)
+        if (pv.InstantiationData.Length < 3) return;
+        fieldNo = (int)pv.InstantiationData[0];
+        health.SetAssociatedField(fieldNo);
+        movement.SetAssociatedField(fieldNo);
+        string playerID = (string)pv.InstantiationData[1];
+        bool followPlayer = (bool)pv.InstantiationData[2];
+        player = GameFieldManager.gameFields[fieldNo].playerSpawner.GetPlayerByOwnerID(playerID);
+        if (followPlayer && player != null)
         {
-            parent.SetMyProjectile(gameObject);
+            player.SetMyProjectile(gameObject);
+        }
+        else {
+            transform.SetParent(GameSession.GetBulletHome());
         }
     }
+
     [PunRPC]
     public void ResetRotation() {
         gameObject.transform.localRotation = Quaternion.identity;
     }
 
-    [PunRPC]
-    public void SetParentTransform()
-    {
-        transform.SetParent(GameSession.GetInst().Home_Bullets);
-    }
 
-    [PunRPC]
-    public void SetOwnerPlayer(string ownerID)
-    {
-        player = GameSession.GetPlayerByID(ownerID);
-    }
 
 }

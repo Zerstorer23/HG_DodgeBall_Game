@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameOverManager : MonoBehaviourPun
+public class GameOverManager : MonoBehaviour
 {
     [SerializeField] Text returnMenuText;
     [Header("Winner")]
@@ -21,21 +21,22 @@ public class GameOverManager : MonoBehaviourPun
     [SerializeField] Text miniWinnerName, miniWinnerTitle;
     [SerializeField] Image miniWinnerImage;
     Player finalWinner;
-    public PhotonView pv;
+ //   public PhotonView pv;
 
     private void Awake()
     {
-        pv = GetComponent<PhotonView>();
+   //     pv = GetComponent<PhotonView>();
     }
 
     public double startTime;
     public double timeoutWait = -1;
 
 
-    public void SetPanel(Player finalWinner)
+    public void SetPanel(Player receivedWinner)
     {
         startTime = PhotonNetwork.Time;
         timeoutWait = 5;
+        finalWinner = receivedWinner;
         if (finalWinner != null)
         {
             if (GameSession.gameMode == GameMode.TEAM)
@@ -79,15 +80,11 @@ public class GameOverManager : MonoBehaviourPun
         yield return new WaitForFixedUpdate();
         if (PhotonNetwork.IsMasterClient)
         {
-            pv.RPC("ShowPanel", RpcTarget.All);
+            GameSession.ShowMainMenu();
         }
 
     }
-    [PunRPC]
-    void ShowPanel()
-    {
-        EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.PreGame });
-    }
+
 
 
     public GameObject minigamePanel;
@@ -113,6 +110,7 @@ public class GameOverManager : MonoBehaviourPun
     private void SetSubWinner()
     {
         string winnerUID = StatisticsManager.GetHighestPlayer(StatTypes.SCORE);
+        Debug.Log("Subwinner id " + winnerUID);
         Player player = ConnectedPlayerManager.GetPlayerByID(winnerUID);
         if (player == null)
         {
@@ -149,6 +147,7 @@ public class GameOverManager : MonoBehaviourPun
 
     private void SetWinner()
     {
+        Debug.Log("Received winner " + finalWinner);
         if (finalWinner != null)
         {
 

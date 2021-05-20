@@ -13,6 +13,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     [SerializeField] string exclusionPlayerID;
     [SerializeField] bool canKillBullet = false;
     public bool isMapObject = false;
+    public bool givesDamage = true;
     PhotonView pv;
 
     public List<BuffData> customBuffs = new List<BuffData>();
@@ -133,6 +134,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         if (!CheckValidTarget(otherHP)) return ;
         if (!CheckValidTeam(otherHP)) return ;
         ApplyBuff(otherHP);
+        if (!givesDamage) return;
         GiveDamage(otherHP);
     }
     bool CheckValidTeam(HealthPoint otherHP) {

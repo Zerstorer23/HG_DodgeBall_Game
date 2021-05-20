@@ -44,7 +44,6 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
     public void Init() {
         if (init) return;
         init = true;
-
         playerDict = new Dictionary<string, Player>();
         Player[] players = PhotonNetwork.PlayerList;
         foreach (Player p in players) { 
@@ -59,25 +58,52 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         return instance.playerDict;
     }
 
-    internal static int GetMyIndex()
+
+    internal static int GetMyIndex(Player[] players, bool useRandom = false)
     {
-
-        Player[] players = PhotonNetwork.PlayerList;
-
+        instance.Init();
         SortedSet<string> myList = new SortedSet<string>();
-        foreach (Player p in players) {
-            myList.Add(p.UserId);
+        foreach (Player p in players)
+        {
+            int seed = (p.CustomProperties.ContainsKey("SEED")) ? (int)p.CustomProperties["SEED"]
+                : 0;
+            string id = (useRandom) ? seed + p.UserId : p.UserId;
+            myList.Add(id);
         }
         int i = 0;
-        string myID = PhotonNetwork.LocalPlayer.UserId;
+        int mySeed = (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("SEED")) ? 
+            (int)PhotonNetwork.LocalPlayer.CustomProperties["SEED"]
+                : 0;
+        string myID = (useRandom) ? mySeed + PhotonNetwork.LocalPlayer.UserId : PhotonNetwork.LocalPlayer.UserId;
         foreach (var val in myList)
         {
-            if(val== myID) return i;
+            if (val == myID) return i;
             i++;
         }
         return 0;
     }
-
+    internal static Dictionary<string,int> GetIndexMap(Player[] players, bool useRandom = false)
+    {
+         instance.Init();
+        SortedSet<string> myList = new SortedSet<string>();
+        Dictionary<string, string> decodeMap = new Dictionary<string, string>();
+        foreach (Player p in players)
+        {
+            int seed = (p.CustomProperties.ContainsKey("SEED")) ? (int)p.CustomProperties["SEED"]
+                : 0;
+            string id = (useRandom) ? seed + p.UserId : p.UserId;
+            myList.Add(id);
+            decodeMap.Add(id, p.UserId);
+        }
+        int i = 0;
+        Dictionary<string, int> indexMap = new Dictionary<string, int>();
+        foreach (var val in myList)
+        {
+            string realID = decodeMap[val];
+            indexMap.Add(realID, i++);
+        }
+        return indexMap;
+    }
     internal static Player GetRandomPlayerExceptMe()
     {
         Player[] players = PhotonNetwork.PlayerListOthers;
@@ -110,12 +136,14 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         }
     }
     public static Player GetPlayerByID(string id) {
+        if (!init) instance.Init();
+        if (id == null) return null;
         if (instance.playerDict.ContainsKey(id))
         {
-
             return instance.playerDict[id];
         }
-        else {
+        else
+        {
             return null;
         }
     }

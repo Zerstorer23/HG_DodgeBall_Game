@@ -38,11 +38,6 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    internal static void TriggerEvent(string eVENT_PLAYER_DIED, object onPlayerDied)
-    {
-        throw new NotImplementedException();
-    }
-
     public EventOneArg GetEvent(string eventName) {
 
         EventOneArg thisEvent;

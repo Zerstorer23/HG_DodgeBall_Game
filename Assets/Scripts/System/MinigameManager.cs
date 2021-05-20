@@ -27,17 +27,13 @@ public class MinigameManager : MonoBehaviourPunCallbacks
     {
         string uid = arg0.stringObj;
         if (!players.ContainsKey(uid)) {
-
-            Debug.Log("Add player " + uid);
             players.Add(uid, false);
         }
     }
     public override void OnPlayerLeftRoom(Player newPlayer)
     {
-        Debug.Log("Minigame player left");
         if (players.ContainsKey(newPlayer.UserId))
         {
-            Debug.Log("Remove player " + newPlayer.UserId);
             players.Remove(newPlayer.UserId);
         }
     }

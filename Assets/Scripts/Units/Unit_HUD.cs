@@ -7,13 +7,15 @@ using UnityEngine.UI;
 public class Unit_HUD : MonoBehaviour
 {
     [SerializeField] Image HP_fillSprite;
-   [SerializeField] Image MP_fillSprite;
+   [SerializeField] Image MP_fillCooltime;
+   [SerializeField] Image MP_fillStack;
    [SerializeField] Image teamIndicator;
    [SerializeField] Text hpText;
    [SerializeField] Text nameText;
    [SerializeField] Unit_Player player;
     float cooltime;
     int maxLife;
+    SkillManager skill;
     private void OnEnable()
     {
         bool isTeamGame = GameSession.gameMode == GameMode.TEAM;
@@ -36,8 +38,8 @@ public class Unit_HUD : MonoBehaviour
             teamIndicator.enabled = false;
         }
 
-        cooltime = player.skillManager.GetCoolTime();
-
+        skill = player.skillManager;
+        maxLife = player.health.GetMaxLife();
     }
 
     private void FixedUpdate()
@@ -48,21 +50,15 @@ public class Unit_HUD : MonoBehaviour
 
     private void SetHP()
     {
-        HP_fillSprite.fillAmount = (float)player.health.currentLife / player.health.GetMaxLife();
+        HP_fillSprite.fillAmount = (float)player.health.currentLife / maxLife;
         hpText.text = player.health.currentLife.ToString("0");
     }
 
     private void SetMP()
     {
-        if (player.skillManager.skillInUse)
-        {
-            MP_fillSprite.fillAmount = 0;
-        }
-        else {
-            float remain = (float)player.skillManager.GetRemainingTime();
-            cooltime = player.skillManager.GetCoolTime();
-            //    Debug.Log("remain " + remain + " / " + cooltime + " = " + (Mathf.Max(0, remain) / cooltime));
-            MP_fillSprite.fillAmount = 1 - ((Mathf.Max(0, remain)) / cooltime);
-        }
+        float stackFill = (float)skill.currStack / skill.maxStack;
+        MP_fillStack.fillAmount = stackFill;
+        float coolFill = 1 - (skill.remainingStackTime / skill.GetCoolTime());
+        MP_fillCooltime.fillAmount = stackFill + (1f / player.skillManager.maxStack) * coolFill;
     }
 }

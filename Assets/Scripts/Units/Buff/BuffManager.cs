@@ -50,7 +50,7 @@ public class BuffManager : MonoBehaviourPun
     void AddBuff(int bType, float mod, double _duration)
     {
         BuffData buff = new BuffData((BuffType) bType,  mod,  _duration);
-        buff.PrintContent();
+   //     buff.PrintContent();
         switch (buff.buffType)
         {
             case BuffType.None:

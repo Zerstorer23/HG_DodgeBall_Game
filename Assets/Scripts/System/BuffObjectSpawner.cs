@@ -3,17 +3,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class BuffObjectSpawner : MonoBehaviour
 {
-    public float spawnAfter = 6f;
-    public float spawnDelay = 6f;
+
 
     double lastSpawnTime;
     double startTime;
     [SerializeField] GameObject[] buffPrafabs;
     [SerializeField] GameField gameField;
-    string location = "Prefabs/BuffObjects/";
+    string prefabName = "Prefabs/BuffObjects/buffObject";
 
     internal void StartEngine()
     {
@@ -23,8 +23,12 @@ public class BuffObjectSpawner : MonoBehaviour
     private void FixedUpdate()
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        if (!GameSession.gameStarted || PhotonNetwork.Time < startTime + spawnAfter) return;
-        if (PhotonNetwork.Time >= lastSpawnTime + spawnDelay) {
+        if (!GameSession.gameStarted || PhotonNetwork.Time < startTime + GameFieldManager.instance.spawnAfter) return;
+        float thisDelay = GameFieldManager.instance.spawnDelay;
+        if (gameField.suddenDeathCalled) {
+            thisDelay /= 2;
+        }
+        if (PhotonNetwork.Time >= lastSpawnTime + thisDelay) {
             InatantiateBuffObject();
             lastSpawnTime = PhotonNetwork.Time;
         }
@@ -33,13 +37,10 @@ public class BuffObjectSpawner : MonoBehaviour
     private void InatantiateBuffObject()
     {
         Vector3 randPos = GetRandomPosition();
-        string prefab = location +  GetRandomBuff();
-        PhotonNetwork.InstantiateRoomObject(prefab, randPos, Quaternion.identity, 0);
-    }
-
-    private string GetRandomBuff()
-    {
-        return buffPrafabs[UnityEngine.Random.Range(0, buffPrafabs.Length)].name;
+        int randIndex = Random.Range(0, GameSession.instance.buffConfigs.Length);
+        PhotonNetwork.InstantiateRoomObject(prefabName, randPos, Quaternion.identity, 0,
+            new object[] {gameField.fieldNo, randIndex }
+            );
     }
 
     private Vector3 GetRandomPosition()

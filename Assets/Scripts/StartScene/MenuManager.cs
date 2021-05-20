@@ -27,7 +27,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
     private void Start()
     {
 
-        Debug.Log("Do loading");
         DoLoading();
     }
 
@@ -43,8 +42,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        PhotonNetwork.JoinLobby(TypedLobby.Default);
-        //JoinRoom();
+        //PhotonNetwork.JoinLobby(TypedLobby.Default);
+        JoinRoom();
     }
     public override void OnJoinedLobby()
     {
@@ -67,6 +66,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
     }
     public override void OnJoinedRoom()
     {
+        Debug.Log(PhotonNetwork.CurrentRoom.Name);
+     
         PhotonNetwork.NickName = UI_ChangeName.default_name;
         loadingChuu.SetActive(false);
         foreach (GameObject go in disableInLoading)
@@ -96,6 +97,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
         Debug.Log("Master changed");
+        GameSession.PushRoomASetting(HASH_ROOM_RANDOM_SEED, Random.Range(0, 7));
+        HUD_UserName.PushPlayerSetting(PhotonNetwork.LocalPlayer, "SEED", Random.Range(0, 133));
         mapOptions.UpdateSettingsUI(); //Player Leave room
     }
 

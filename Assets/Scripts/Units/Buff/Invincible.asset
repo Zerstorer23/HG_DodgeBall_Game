@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buffType: 4
   modifier: -1
-  duration: 4
+  duration: 5
   triggerByID: 
-  buff_name: "\uBB34\uC8014\uCD08"
+  buff_name: "\uBB34\uC8015\uCD08"

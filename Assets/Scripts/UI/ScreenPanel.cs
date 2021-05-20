@@ -30,6 +30,7 @@ public class ScreenPanel : MonoBehaviour
         if ((ScreenType)arg0.objData == mType)
         {
             bool enable = arg0.boolObj;
+            Debug.Log("Show " + mType);
             SetCanvasVisibility(enable);
         }
     }
@@ -48,21 +49,19 @@ public class ScreenPanel : MonoBehaviour
     public void SetCanvasVisibility(bool isVisible)
     {
        // 
-        if (isVisible != visibility) {
-            visibility = isVisible;
-            if (useTransition)
+        visibility = isVisible;
+        if (useTransition)
+        {
+            if (isVisible)
             {
-                if (isVisible)
-                {
-                    Show();
-                }
-                else {
-                    Hide();
-                }
+                Show();
             }
             else {
-                panelObject.SetActive(isVisible);
+                Hide();
             }
+        }
+        else {
+            panelObject.SetActive(isVisible);
         }
     }
 
@@ -83,4 +82,10 @@ public class ScreenPanel : MonoBehaviour
     }
     public bool GetVisibility() => visibility;
 
+}
+
+[System.Serializable]
+public enum ScreenType
+{
+    PreGame, InGame, GameOver, Settings, TournamentResult
 }

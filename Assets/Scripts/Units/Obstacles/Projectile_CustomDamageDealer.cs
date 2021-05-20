@@ -7,21 +7,24 @@ public class Projectile_CustomDamageDealer : MonoBehaviour
 {
 
     List<string> playerList;
- //   HashSet<string> foundTargets = new HashSet<string>();
-    Dictionary<string, Unit_Player> playerDict = new Dictionary<string, Unit_Player>();
+    //   HashSet<string> foundTargets = new HashSet<string>();
+    SortedDictionary<string, Unit_Player> playerDict = new SortedDictionary<string, Unit_Player>();
     Projectile_DamageDealer damageDealer;
     Projectile proj;
-
+    PhotonView pv;
     public float colliderRadius;
     private void Awake()
     {
         damageDealer = GetComponent<Projectile_DamageDealer>();
         proj = GetComponent<Projectile>();
+        pv = GetComponent<PhotonView>();
     }
     private void OnEnable()
     {
+        int fieldNo = (int)pv.InstantiationData[0];
+
         //  foundTargets = new HashSet<string>();
-        playerDict = GameFieldManager.GetPlayersInArea(proj.player.fieldNo);
+        playerDict = GameFieldManager.GetPlayersInArea(fieldNo);
         playerList = new List<string>(playerDict.Keys);
         Debug.Assert(playerDict.Count == playerList.Count, " player dict mismatch");
     }

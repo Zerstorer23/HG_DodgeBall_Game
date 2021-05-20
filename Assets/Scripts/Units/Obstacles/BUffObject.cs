@@ -13,25 +13,34 @@ public class BUffObject : MonoBehaviourPun
     [SerializeField] BuffConfig buffConfig;
     BoxCollider2D boxCollider;
     string objectName;
-
+    int fieldNumber = 0;
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
         boxCollider = GetComponent<BoxCollider2D>();
-        objectName = buffConfig.buff_name;
-        nameText.text = objectName;
     }
     private void OnEnable()
     {
-        buff = buffConfig.Build();
+        fieldNumber = (int)pv.InstantiationData[0];
+        int index = (int)pv.InstantiationData[1];
+        ParseBuffConfig(index);
         boxCollider.enabled = true;
         nameText.enabled = true;
-        EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
+        transform.SetParent(GameSession.GetBulletHome());
+        // fieldNumber = (int)pv.InstantiationData[0];
+        EventManager.StartListening(MyEvents.EVENT_FIELD_FINISHED, OnFieldFinished);
 
     }
+    void ParseBuffConfig(int index) {
+        buffConfig = GameSession.instance.buffConfigs[index];
+        buff = buffConfig.Build();
+        objectName = buffConfig.buff_name;
+        nameText.text = objectName;
+    }
 
-    private void OnGameFinished(EventObject obj)
+    private void OnFieldFinished(EventObject obj)
     {
+        if (obj.intObj != fieldNumber) return;
         if (pv.IsMine)
         {
             if (deathRoutine != null) StopCoroutine(deathRoutine);            
@@ -41,7 +50,7 @@ public class BUffObject : MonoBehaviourPun
 
     private void OnDisable()
     {
-        EventManager.StopListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
+        EventManager.StopListening(MyEvents.EVENT_GAME_FINISHED, OnFieldFinished);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

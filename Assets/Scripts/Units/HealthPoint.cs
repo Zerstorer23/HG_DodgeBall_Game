@@ -22,7 +22,7 @@ public class HealthPoint : MonoBehaviourPun
     internal Unit_Player unitPlayer;
     internal Projectile_DamageDealer damageDealer;
     internal Team myTeam = Team.HOME;
-    internal int associatedField = 0;
+    public int associatedField = 0;
 
 
     private void Awake()
@@ -39,10 +39,6 @@ public class HealthPoint : MonoBehaviourPun
         
         }
     }
-    private void Start()
-    {
-
-    }
 
     private void OnFieldFinish(EventObject obj)
     {
@@ -52,7 +48,7 @@ public class HealthPoint : MonoBehaviourPun
         }
     }
 
-    private void FixedUpdate()
+    private void FixedUpdate()  
     {
         if (pv.IsMine && currentLife <= 0) {
             isDead = true;
@@ -85,8 +81,8 @@ public class HealthPoint : MonoBehaviourPun
 
     private void OnDisable()
     {
-        EventManager.StopListening(MyEvents.EVENT_FIELD_FINISHED, OnFieldFinish);
         isDead = true;
+        EventManager.StopListening(MyEvents.EVENT_FIELD_FINISHED, OnFieldFinish);
     }
 
     internal void HealHP(int amount)

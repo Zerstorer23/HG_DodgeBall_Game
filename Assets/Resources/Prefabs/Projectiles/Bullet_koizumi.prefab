@@ -152,6 +152,7 @@ MonoBehaviour:
   invincibleFromBullets: 1
   invincibleFromMapBullets: 0
   dontKillByException: 1
+  associatedField: 0
 --- !u!114 &6212558457632629342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -167,6 +168,7 @@ MonoBehaviour:
   exclusionPlayerID: 
   canKillBullet: 1
   isMapObject: 0
+  givesDamage: 1
   customBuffs: []
 --- !u!114 &187803789871181374
 MonoBehaviour:

@@ -128,7 +128,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2891261233988274746
 Transform:
   m_ObjectHideFlags: 0
@@ -150,7 +150,7 @@ EdgeCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2891261233988274747}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
@@ -159,11 +159,11 @@ EdgeCollider2D:
   m_Offset: {x: 0, y: 0}
   m_EdgeRadius: 0
   m_Points:
-  - {x: -1, y: 1}
-  - {x: 1, y: 1}
-  - {x: 1, y: -1}
-  - {x: -1, y: -1}
-  - {x: -1.0101501, y: 1.002124}
+  - {x: -0.8, y: 0.8}
+  - {x: 0.8, y: 0.8}
+  - {x: 0.8, y: -0.8}
+  - {x: -0.8, y: -0.8}
+  - {x: -0.85, y: 0.85}
 --- !u!114 &2891261233988274741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,6 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83d20a2b74430104baeae669e04147e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameField: {fileID: 3883915271577235293}
 --- !u!1 &2891261234141444657
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,8 +348,8 @@ SpriteRenderer:
   m_SortingLayerID: 230199475
   m_SortingLayer: -1
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 1f5a3a873d1ebae4b8d083259ae00222, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 2fb8f6292096c27409d703472c03f933, type: 3}
+  m_Color: {r: 0.9433962, g: 0.9433962, b: 0.9433962, a: 0.5176471}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -377,12 +378,13 @@ MonoBehaviour:
   map_transforms:
   - {fileID: 2891261233808467133}
   - {fileID: 2891261234141444656}
-  mapSize: {x: 0, y: 0, z: 0}
+  originalMapSize: {x: 0, y: 0, z: 0}
   suddenDeathCalled: 0
-  originalSize: 0
+  gameFieldFinished: 0
+  desolator: {fileID: 0}
+  expectedNumPlayer: 0
+  winnerName: 
   startTime: 0
-  resizeOver: 60
-  minResizeWidth: 10
   fieldType: 0
 --- !u!114 &494246592763862440
 MonoBehaviour:

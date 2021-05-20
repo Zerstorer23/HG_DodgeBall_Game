@@ -41,11 +41,9 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         }
         networkPosIndicator = GameSession.GetInst().networkPos;
     }
-    private new void OnEnable()
-    {
-        mapSpec = GameFieldManager.gameFields[unitPlayer.fieldNo].mapSpec;
+    public void SetMapSpec(MapSpec spec) {
+        mapSpec = spec;
     }
-
     void SetAxisNames() {
         switch (UI_GamePadOptions.padType)
         {
@@ -161,7 +159,6 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
     }
     void EnqueuePosition(Vector3 newPosition)
     {
-        enqueueCount++;
         if (newPosition != oldPosition)
         {
             lastVector = newPosition - oldPosition;
@@ -181,7 +178,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
     }
     Vector3 ClampPosition(Vector3 position) {
         float newX =  Mathf.Clamp(position.x, mapSpec.xMin, mapSpec.xMax);
-        float newY = Mathf.Clamp(position.y, mapSpec.xMin, mapSpec.xMax);
+        float newY = Mathf.Clamp(position.y, mapSpec.yMin, mapSpec.yMax);
         return new Vector3(newX, newY);
     }
 
@@ -237,12 +234,6 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
     }
     public double networkExpectedTime;
     public Vector3 networkPos;
-
-
-    public uint receivedCount = 0;
-    public uint sentCount = 0;
-    public uint enqueueCount = 0;
-
     public double lastSendTime;
 
     // private Quaternion currRot;
@@ -258,7 +249,6 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
             stream.SendNext(networkPos);
             stream.SendNext(networkExpectedTime);
             lastSendTime = networkExpectedTime;
-            sentCount++;
         }
 
         //클론이 통신을 받는 
@@ -270,10 +260,6 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
             double netTime = (double)stream.ReceiveNext();
             TimeVector tv = new TimeVector(netTime, position);
             positionQueue.Enqueue(tv);
-            receivedCount++;
-         //   Debug.Log(receivedCount + " 받음 " + tv.ToString());
-            //만료되기 전에 받아야함
-            //미리 쌓아놔야 스무싱이 가능하고 못쌓은건 텔레포트해야함
         }
     }
 }

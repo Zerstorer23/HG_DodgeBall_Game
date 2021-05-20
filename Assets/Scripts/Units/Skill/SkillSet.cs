@@ -63,7 +63,7 @@ public class SkillSet
                 yield return new WaitForSeconds(delay);
             }
         }
-        skillManager.pv.RPC("SetLastActivated", RpcTarget.AllBuffered,false);
+        skillManager.pv.RPC("SetSkillInUse", RpcTarget.AllBuffered,false);
     }
 
 
@@ -88,8 +88,10 @@ public class SkillSet
 public enum SkillParams { 
     Width,Height,PrefabName,Transform,Duration,GameObject,Quarternion,Vector3
         ,MoveSpeed,EulerAngle,UserID,Modifier,Color,Enable,AnimationTag,ReactionType
-        ,BuffData
-
+        ,BuffData,
+    FieldNumber,
+    RotateAngle,
+    RotateSpeed
 }
 
 /*
