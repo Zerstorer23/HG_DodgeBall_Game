@@ -10,8 +10,10 @@ public class Unit_ProjectileFInder : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         HealthPoint proj = collision.gameObject.GetComponent<HealthPoint>();
+        Debug.Log(proj.gameObject.name);
         if (proj != null) {
             bool valid;
+            if (proj.damageDealer == null) return;
             if (proj.damageDealer.isMapObject) {
                 valid = true;
             }else if (GameSession.gameMode == GameMode.TEAM)

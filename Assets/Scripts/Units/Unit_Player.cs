@@ -166,7 +166,7 @@ public class Unit_Player : MonoBehaviourPun
             StatisticsManager.RPC_AddToStat(StatTypes.EVADE, pv.Owner.UserId, 1);
             StatisticsManager.RPC_AddToStat(StatTypes.SCORE, pv.Owner.UserId, 1);
             StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_EVADES, 1);
-            pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.MoveSpeed, 0.2f, 3d);
+            pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.MoveSpeed, 0.1f, 3d);
             pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.Cooltime, 0.2f, 3d);
                 //(int bType, float mod, double _duration)
         }
