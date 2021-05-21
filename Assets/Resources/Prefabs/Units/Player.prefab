@@ -1453,6 +1453,7 @@ MonoBehaviour:
   invincibleFromMapBullets: 0
   dontKillByException: 0
   associatedField: 0
+  killerUID: 
 --- !u!114 &2603996422842996677
 MonoBehaviour:
   m_ObjectHideFlags: 0
