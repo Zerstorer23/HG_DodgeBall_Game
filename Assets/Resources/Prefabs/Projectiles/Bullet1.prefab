@@ -141,6 +141,7 @@ MonoBehaviour:
   exclusionPlayerID: 
   canKillBullet: 0
   isMapObject: 1
+  givesDamage: 1
   customBuffs: []
 --- !u!114 &4556413170392631494
 MonoBehaviour:

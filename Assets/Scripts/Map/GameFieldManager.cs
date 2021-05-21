@@ -305,7 +305,7 @@ public class GameFieldManager : MonoBehaviourPun
         int iteration = 0;
         List<string> namelist = new List<string>(totalUnitsDictionary.Keys);
         if (GameSession.gameMode == GameMode.PVP || GameSession.gameMode == GameMode.TEAM) {
-            namelist.Add("DESOLATOR");
+          if(gameFields[0].desolator!=null)  namelist.Add("DESOLATOR");
         }
         while (iteration < namelist.Count)
         {
