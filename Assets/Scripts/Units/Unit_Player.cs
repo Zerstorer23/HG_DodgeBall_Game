@@ -15,6 +15,7 @@ public class Unit_Player : MonoBehaviourPun
     internal HealthPoint health;
     internal SkillManager skillManager;
     internal Unit_Movement movement;
+    internal BuffManager buffManager;
     public Transform gunTransform;
     [SerializeField]Animator gunAnimator;
     [SerializeField]EnemyIndicator enemyIndicator;
@@ -34,6 +35,7 @@ public class Unit_Player : MonoBehaviourPun
         health = GetComponent<HealthPoint>();
         skillManager = GetComponent<SkillManager>();
         movement = GetComponent<Unit_Movement>();
+        buffManager = GetComponent<BuffManager>();
 
     }
     private void OnDisable()
@@ -102,17 +104,6 @@ public class Unit_Player : MonoBehaviourPun
 
     }  // Update is called once per frame
 
-/*    [PunRPC]
-    public void SetInformation(int[] array) {
-        myCharacter = (CharacterType)array[0];
-        skillManager.SetSkill(myCharacter);
-        myPortrait.sprite = GameSession.unitDictionary[myCharacter].portraitImage;
-        int maxLife = array[1];
-        if (GameSession.gameMode == GameMode.TEAM) {
-            maxLife += GetTeamBalancedLife((Team)pv.Owner.CustomProperties["TEAM"], maxLife);
-        }
-        health.SetMaxLife(maxLife);
-    }*/
     private int GetTeamBalancedLife(Team myTeam, int maxLife) {
         int numMyTeam = ConnectedPlayerManager.GetNumberInTeam(myTeam);
         int otherTeam = ConnectedPlayerManager.GetNumberInTeam((myTeam == Team.HOME) ? Team.AWAY : Team.HOME);
@@ -171,9 +162,13 @@ public class Unit_Player : MonoBehaviourPun
     {
         if (pv.IsMine)
         {
+            Debug.Log("Evaded!");
             StatisticsManager.RPC_AddToStat(StatTypes.EVADE, pv.Owner.UserId, 1);
             StatisticsManager.RPC_AddToStat(StatTypes.SCORE, pv.Owner.UserId, 1);
             StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_EVADES, 1);
+            pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.MoveSpeed, 0.2f, 3d);
+            pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.Cooltime, 0.2f, 3d);
+                //(int bType, float mod, double _duration)
         }
         evasion++;
     }

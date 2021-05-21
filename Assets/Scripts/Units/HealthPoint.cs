@@ -24,6 +24,7 @@ public class HealthPoint : MonoBehaviourPun
     internal Team myTeam = Team.HOME;
     public int associatedField = 0;
 
+    public string killerUID=null;
 
     private void Awake()
     {
@@ -73,6 +74,7 @@ public class HealthPoint : MonoBehaviourPun
         currentLife = maxLife;
         //    unitType = DetermineType();
         isDead = false;
+        killerUID = null;
         if (unitType == UnitType.Projectile) currentLife = 1;
     }
     public void SetAssociatedField(int no) {
@@ -178,10 +180,12 @@ public class HealthPoint : MonoBehaviourPun
     private void NotifySourceOfDeath(string attackerUserID)
     {
         if (attackerUserID == null) return;
+        if (killerUID != null) return;
         if (PhotonNetwork.LocalPlayer.UserId == attackerUserID)
         {
             if (unitType == UnitType.Player)
             {
+                killerUID = attackerUserID;
                 EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID });
             }
         }

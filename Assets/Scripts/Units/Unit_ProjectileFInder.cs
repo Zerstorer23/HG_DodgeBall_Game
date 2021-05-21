@@ -9,10 +9,19 @@ public class Unit_ProjectileFInder : MonoBehaviour
     
     private void OnTriggerExit2D(Collider2D collision)
     {
-        Projectile proj = collision.gameObject.GetComponent<Projectile>();
+        HealthPoint proj = collision.gameObject.GetComponent<HealthPoint>();
         if (proj != null) {
-            if (proj.pv.CreatorActorNr != PhotonNetwork.LocalPlayer.ActorNumber) {
-
+            bool valid;
+            if (proj.damageDealer.isMapObject) {
+                valid = true;
+            }else if (GameSession.gameMode == GameMode.TEAM)
+            {
+                valid = (proj.myTeam == player.myTeam);
+            }
+            else {
+                valid = (!proj.pv.AmOwner);
+            }
+            if (valid) {
                 player.IncrementEvasion();
             }
 
