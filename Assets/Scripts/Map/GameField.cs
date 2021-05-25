@@ -71,7 +71,7 @@ public class GameField : MonoBehaviourPun
         {
             case GameMode.PVP:
                 fieldFinished = (stat.alive <= 1);
-                Debug.LogWarning("PVP field " + stat.alive + "field finished " + nooneDied);
+               // Debug.Log("PVP field " + stat.alive + "field finished " + nooneDied);
                 if (fieldFinished && nooneDied) fieldFinished = false;
                 break;
             case GameMode.TEAM:
@@ -94,7 +94,6 @@ public class GameField : MonoBehaviourPun
         Debug.Log("gAME FISNISHED / master: " + (winner == PhotonNetwork.LocalPlayer) + " winner "+winner);
         if (winner == PhotonNetwork.LocalPlayer)
         {
-            Debug.Log("notify winner FISNISHED");
             pv.RPC("NotifyFieldWinner", RpcTarget.AllBuffered, winner);
         }
     }
@@ -105,11 +104,10 @@ public class GameField : MonoBehaviourPun
     [PunRPC]
     public void NotifyFieldWinner(Player winner)
     {
-        Debug.Log("Received notify winner FISNISHED");
         gameFieldFinished = true;
         fieldWinner = winner;
         winnerName = winner.NickName;
-        Debug.Log("FIeld " + fieldNo + " finished with winner " + fieldWinner);
+      //  Debug.Log("FIeld " + fieldNo + " finished with winner " + fieldWinner);
         EventManager.TriggerEvent(MyEvents.EVENT_FIELD_FINISHED, new EventObject() { intObj = fieldNo });
         gameObject.SetActive(false);
         GameFieldManager.CheckGameFinished();
@@ -301,11 +299,11 @@ public class GameField : MonoBehaviourPun
         float randX = Random.Range(-width / 4, width / 4);
         float randY = Random.Range(-height / 4, height / 4);
         Vector3 location = new Vector3(mapSpec.xMin + xOffset + width * x + randX, mapSpec.yMin + yOffset + height * y + randY);
-       Debug.Log("Width units " + width + "," + height);
+      /* Debug.Log("Width units " + width + "," + height);
         Debug.Log("Offset units " + xOffset + "," + yOffset);
         Debug.Log("rand units " + randX + "," + randY);
         Debug.Log("start units " + mapSpec.xMin + "," + mapSpec.yMin);
-        Debug.Log("Indicated location " + location);
+        Debug.Log("Indicated location " + location);*/
         return location;
     }
     public void AddController(string userid)

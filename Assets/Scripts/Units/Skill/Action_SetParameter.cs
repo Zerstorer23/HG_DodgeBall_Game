@@ -12,3 +12,13 @@ public class Action_SetParameter : SkillAction
         return 0f;
     }
 }
+public class Action_SetAngle : SkillAction
+{
+
+    public override float Activate()
+    {
+        parent.SetParam(SkillParams.EulerAngle, paramValue);
+        parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, (float)paramValue));
+        return 0f;
+    }
+}

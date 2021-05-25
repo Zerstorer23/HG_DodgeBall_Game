@@ -89,15 +89,35 @@ public class Action_GetCurrentPlayerPosition : SkillAction
         parent.SetParam(SkillParams.Vector3, parent.caster.transform.position);
         return 0;
     }
-
 }
-public class Action_GetCurrentPlayerVector3 : SkillAction
+public class Action_GetCurrentPlayerPosition_AngledOffset : SkillAction
 {
 
     public override float Activate()
     {
-        parent.SetParam(SkillParams.Vector3, parent.caster.transform.position);
+        float angle = parent.caster.GetComponent<Unit_Movement>().GetAim();
+        float distance = (float)parent.GetParam(SkillParams.Distance, 1.4f);
+        float rad = angle / 180 * Mathf.PI;
+        float dX = Mathf.Cos(rad) * distance;
+        float dY = Mathf.Sin(rad) * distance;
+        parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, angle));
+        parent.SetParam(SkillParams.EulerAngle, angle);
+        parent.SetParam(SkillParams.Vector3, parent.caster.transform.position + new Vector3(dX, dY));
         return 0;
     }
 
+}
+public class Action_GetCurrentPlayerVector3_AngledOffset : SkillAction
+{
+
+    public override float Activate()
+    {
+        float angle =(float) parent.GetParam(SkillParams.EulerAngle);
+        float distance = (float)parent.GetParam(SkillParams.Distance, 1.4f);
+        float rad = angle / 180 * Mathf.PI;
+        float dX = Mathf.Cos(rad) * distance;
+        float dY = Mathf.Sin(rad) * distance;
+        parent.SetParam(SkillParams.Vector3, parent.caster.transform.position + new Vector3(dX,dY));
+        return 0;
+    }
 }

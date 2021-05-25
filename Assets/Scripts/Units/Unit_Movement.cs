@@ -192,14 +192,30 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
             tv = positionQueue.Dequeue();
             skip++;
         }
-        if (tv != null) {
+        if (tv != null)
+        {
+            FlipBody( tv.position.x - transform.position.x);
             transform.position = tv.position;
-          //  lastDequeueTime = PhotonNetwork.Time;
-           // lastDequeuedPosition = tv.position;
+            //  lastDequeueTime = PhotonNetwork.Time;
+            // lastDequeuedPosition = tv.position;
+        }
+        else {
+            transform.position = ClampPosition(transform.position);
         }
 
     }
-
+    void FlipBody(float xDelta) {
+        Vector3 localScale = unitPlayer.charBody.transform.localScale;
+        float x = localScale.x;
+        if (
+            (xDelta < 0 && x > 0)
+            ||
+             (xDelta > 0 && x < 0)
+            )
+        {
+            unitPlayer.charBody.transform.localScale = new Vector3(-localScale.x, localScale.y, localScale.z);
+        }
+    }
 
     float indicatorLength = 1f;
     void UpdateDirection()

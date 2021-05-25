@@ -77,7 +77,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
 	public void AddLine(string lineString)
 	{
-		mainChatBox.AddLine(" "+lineString);
+		mainChatBox.AddLine(lineString);
 	}
 	void Update()
 	{

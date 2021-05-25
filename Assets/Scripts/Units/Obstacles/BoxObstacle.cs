@@ -108,6 +108,7 @@ public class BoxObstacle : MonoBehaviourPun
            if (healthPoint == null) return;
                switch (c.gameObject.tag) {
                   case ConstantStrings.TAG_PLAYER:
+
                     healthPoint.Kill_Immediate();
                       break;
                   case ConstantStrings.TAG_PROJECTILE:

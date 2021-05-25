@@ -26,7 +26,7 @@ public class BuffObjectSpawner : MonoBehaviour
         if (!GameSession.gameStarted || PhotonNetwork.Time < startTime + GameFieldManager.instance.spawnAfter) return;
         float thisDelay = GameFieldManager.instance.spawnDelay;
         if (gameField.suddenDeathCalled) {
-            thisDelay /= 2;
+            thisDelay *= 0.75f;
         }
         if (PhotonNetwork.Time >= lastSpawnTime + thisDelay) {
             InatantiateBuffObject();

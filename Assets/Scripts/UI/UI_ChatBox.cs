@@ -11,10 +11,19 @@ public class UI_ChatBox : MonoBehaviour
 	public Text outputText;
 	public ScrollRect scrollRect;
 	public UnityEngine.GameObject inputBox;
+	[SerializeField] RectTransform contentTrans;
 
 	List<string> chatQueue = new List<string>();
+    private void Awake()
+    {
+		EventManager.StartListening(MyEvents.EVENT_SHOW_PANEL, ScrollToBottom);
+    }
+    private void OnDestroy()
+	{
+		EventManager.StopListening(MyEvents.EVENT_SHOW_PANEL, ScrollToBottom);
 
-	public void SetInputFieldVisibility(bool enable)
+	}
+    public void SetInputFieldVisibility(bool enable)
 	{
 		inputBox.SetActive(enable);
 	}
@@ -112,18 +121,8 @@ public class UI_ChatBox : MonoBehaviour
 	}
 
 	IEnumerator scrollRoutine;
-    private void OnEnable()
-    {
-		ScrollToBottom();
-	}
-    private void OnDisable()
-    {
-		if (scrollRoutine != null) {
-			StopCoroutine(scrollRoutine);
-		}
-    }
 
-    public void ScrollToBottom()
+    public void ScrollToBottom(EventObject eo = null)
 	{
 		if (scrollRoutine != null)
 		{
@@ -134,6 +133,7 @@ public class UI_ChatBox : MonoBehaviour
 	}
 	IEnumerator WaitAndScroll()
 	{
+		yield return new WaitForFixedUpdate();
 		yield return new WaitForFixedUpdate();
 		scrollRect.normalizedPosition = new Vector2(0, 0);
 

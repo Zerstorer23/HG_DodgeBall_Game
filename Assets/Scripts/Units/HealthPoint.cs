@@ -101,30 +101,50 @@ public class HealthPoint : MonoBehaviourPun
         return (invincibleFromBullets || buffManager.GetTrigger(BuffType.InvincibleFromBullets));    
     }
     int expectedlife;
+
    [PunRPC]
     internal void DoDamage(string attackerUserID, bool instaDeath)
     {
-        if (isDead || IsInvincible()) return;
-        expectedlife = currentLife - 1;
-
-        if (pv.IsMine) {
+        if (isDead) return;
+        CheckMirrorDamage(attackerUserID);
+        if (IsInvincible()) return;
+        if (pv.IsMine)
+        {
             pv.RPC("ChangeHP", RpcTarget.AllBuffered, -1);
         }
-//        ChangeHP(-1);
-
-        if (unitType == UnitType.Player && pv.IsMine)
+        if (unitType == UnitType.Player)
         {
-            PhotonNetwork.Instantiate(ConstantStrings.PREFAB_HEAL_1, transform.position, Quaternion.identity, 0);
-            MainCamera.instance.DoShake();
-            unitPlayer.PlayHitAudio();
-        }
-        NotifySourceOfDamage(attackerUserID);
-        if (expectedlife <= 0 || instaDeath)
-        {
-            NotifySourceOfDeath(attackerUserID);
+            expectedlife = currentLife - 1;
+            if (pv.IsMine)
+            {
+                PhotonNetwork.Instantiate(ConstantStrings.PREFAB_HEAL_1, transform.position, Quaternion.identity, 0);
+                MainCamera.instance.DoShake();
+                unitPlayer.PlayHitAudio();
+            }
+            bool targetIsDead = (expectedlife <= 0 || instaDeath);
+            NotifySourceOfDamage(attackerUserID, targetIsDead);
         }
     }
 
+    private void CheckMirrorDamage(string attackerUserID)
+    {
+        if (!pv.IsMine) return;
+        if (IsMirrorDamage())
+        {
+            Unit_Player unit= GameFieldManager.gameFields[associatedField].playerSpawner.GetPlayerByOwnerID(attackerUserID);
+            if (unit == null) return;
+            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = unit.pv.Owner.NickName + "님에게 피해 반사" });
+            unit.pv.RPC("TriggerMessage", RpcTarget.AllBuffered, "피해가 반사되었습니다!");
+            buffManager.AddStat(BuffType.NumDamageReceivedWhileBuff,1);
+            unit.pv.RPC("ChangeHP", RpcTarget.AllBuffered, -1);
+//            damageDealer.DoPlayerCollision(unit.gameObject);
+        }
+    }
+
+    private bool IsMirrorDamage()
+    {
+        return buffManager.GetTrigger(BuffType.MirrorDamage);
+    }
 
     public void Kill_Immediate() {
         //Kill not called by RPC
@@ -140,55 +160,43 @@ public class HealthPoint : MonoBehaviourPun
         }
     }
 
-    void NotifySourceOfDamage(string attackerUserID)
+    void NotifySourceOfDamage(string attackerUserID , bool targetIsDead)
     {
-        if (unitType != UnitType.Player) return;
+        Player p = ConnectedPlayerManager.GetPlayerByID(attackerUserID);
+        string attackerNickname = (p == null) ? "???" : p.NickName;
         if (pv.IsMine)
         {
             if (attackerUserID == null)
-            {
-                Debug.Log("Am attacked!");
+            { //AttackedByMapObject
+                
                 EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = "회피실패" });
-                if (expectedlife <= 0)
+                if (targetIsDead)
                 {
                     ChatManager.SendNotificationMessage(PhotonNetwork.NickName + "님이 사망했습니다.", "#FF0000");
                 }
             }
             else
             {
-                Player p = ConnectedPlayerManager.GetPlayerByID(attackerUserID);
-                string attackerNickname = "???";
-                if (p != null)
-                {
-                    attackerNickname = p.NickName;
-                }
+               
                 EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = string.Format("{0}에게 피격", attackerNickname) });
-                if (expectedlife <= 0)
-                {
-                    ChatManager.SendNotificationMessage(attackerNickname + " 님이 " + PhotonNetwork.NickName + "님을 살해했습니다.", "#FF0000");
-                }
-
             }
 
         }
         else if (PhotonNetwork.LocalPlayer.UserId == attackerUserID)
         {
             EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = string.Format("{0}를 타격..!", pv.Owner.NickName) });
-        }
-
-    }
-    private void NotifySourceOfDeath(string attackerUserID)
-    {
-        if (attackerUserID == null) return;
-        if (killerUID != null) return;
-        if (PhotonNetwork.LocalPlayer.UserId == attackerUserID)
-        {
-            if (unitType == UnitType.Player)
+            if (targetIsDead)
             {
-                killerUID = attackerUserID;
-                EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID });
+                if (killerUID == null)
+                {
+                    killerUID = attackerUserID;
+                    Debug.Log("send id " + attackerUserID);
+                    EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID });
+                    ChatManager.SendNotificationMessage(attackerNickname + " 님이 " + PhotonNetwork.NickName + "님을 살해했습니다.", "#FF0000");
+                }
             }
         }
+
     }
 
    // IEnumerator deathCoroutine;
@@ -210,6 +218,8 @@ public class HealthPoint : MonoBehaviourPun
     {
         currentLife += a;
     }
+
+
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

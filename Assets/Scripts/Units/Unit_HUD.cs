@@ -56,9 +56,13 @@ public class Unit_HUD : MonoBehaviour
 
     private void SetMP()
     {
-        float stackFill = (float)skill.currStack / skill.maxStack;
+        if (!player.pv.IsMine && player.myCharacter == CharacterType.YASUMI) {
+            MP_fillStack.fillAmount = 1;
+            return;
+        }
+            float stackFill = (float)skill.currStack / skill.maxStack;
         MP_fillStack.fillAmount = stackFill;
-        float coolFill = 1 - (skill.remainingStackTime / skill.GetCoolTime());
+        float coolFill = 1 - (skill.remainingStackTime / skill.cooltime);
         MP_fillCooltime.fillAmount = stackFill + (1f / player.skillManager.maxStack) * coolFill;
     }
 }

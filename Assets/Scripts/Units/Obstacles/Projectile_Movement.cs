@@ -9,7 +9,7 @@ using static ConstantStrings;
 
 public class Projectile_Movement : MonoBehaviourPun
 {
-    public bool syncTransform = false;
+    bool syncTransform = false;
     TransformSynchronisation transSync;
 
     public float eulerAngle;
@@ -36,9 +36,6 @@ public class Projectile_Movement : MonoBehaviourPun
     //Delay Move//
     float delay_enableAfter = 0f;
     float delay_duration;
-    PolygonCollider2D myColliderP;
-    CircleCollider2D myColliderC;
-    BoxCollider2D myColliderB;
     [SerializeField] SpriteRenderer mySprite;
 
     PhotonView pv;
@@ -47,16 +44,13 @@ public class Projectile_Movement : MonoBehaviourPun
 
     private void Awake()
     {
-        myColliderP = GetComponent<PolygonCollider2D>();
-        myColliderC = GetComponent<CircleCollider2D>();
-        myColliderB = GetComponent<BoxCollider2D>();
         pv = GetComponent<PhotonView>();
         hp = GetComponent<HealthPoint>();
-        if (syncTransform) {
-            transSync = GetComponent<TransformSynchronisation>();
-        }
+        transSync = GetComponent<TransformSynchronisation>();
+        syncTransform = transSync != null;
 
     }
+
     private void OnEnable()
     {
         distanceMoved = 0;
@@ -96,20 +90,29 @@ public class Projectile_Movement : MonoBehaviourPun
         angleClockBound = rotateBound;
         angleAntiClockBound =  -rotateBound;
     }
-    [PunRPC]
+/*    [PunRPC]
     public void SetDelay(float delay) {
         delay_enableAfter = delay;
-        EnableColliders(false);
-    }
+        myCollider.enabled =false;
+    }*/
     [PunRPC]
     public void SetScale(float w, float h) {
         gameObject.transform.localScale = new Vector3(w, h, 1);
     }
-
+    public bool tweenEase = false;
     [PunRPC]
     public void DoTweenScale(float delay, float maxScale)
     {
-        gameObject.transform.DOScale(new Vector3(maxScale, maxScale, 1), delay);
+        if (tweenEase)
+        {
+
+            gameObject.transform.DOScale(new Vector3(maxScale, maxScale, 1), delay).SetEase(Ease.InQuint);
+        }
+        else
+        {
+            gameObject.transform.DOScale(new Vector3(maxScale, maxScale, 1), delay);
+
+        }
     }
     [PunRPC]
     public void SetDuration(float delay)
@@ -121,41 +124,26 @@ public class Projectile_Movement : MonoBehaviourPun
     {
         delay_enableAfter = 0f;
         delay_duration = 0f;
-        EnableColliders(true);
         mySprite.DORewind();
         gameObject.transform.DORewind();
     }
 
-    private void Start()
+/*    private void Start()
     {
         if(delay_enableAfter > 0)
         {
-            EnableColliders(false);
+            myCollider.enabled = false;
             StartCoroutine(WaitAndEnable());
             mySprite.DOFade(1f, delay_enableAfter);
         }
-    }
-    private void EnableColliders(bool enable) {
-        if (myColliderP != null)
-        {
-            myColliderP.enabled = enable;
-        }
-        if (myColliderB != null)
-        {
-            myColliderB.enabled = enable;
-        }
-        if (myColliderC != null)
-        {
-            myColliderC.enabled = enable;
-        }
-
-    }
+    }*/
+/*
     private IEnumerator WaitAndEnable()
     {
         yield return new WaitForSeconds(delay_enableAfter);
-        EnableColliders(true);
+        myCollider.enabled = true;
     }
-  
+  */
 
     private void Update()
     {
@@ -248,9 +236,11 @@ public class Projectile_Movement : MonoBehaviourPun
     }
 
     void ChangeTransform(Vector3 newDirection, float newEulerAngle) {
-        if (syncTransform && pv.IsMine)
+        if (syncTransform )
         {
-            transSync.EnqueueLocalPosition(transSync.networkPos + newDirection, Quaternion.Euler(0, 0, newEulerAngle));
+            if (pv.IsMine) {
+                transSync.EnqueueLocalPosition(transSync.networkPos + newDirection, Quaternion.Euler(0, 0, newEulerAngle));
+            }
         }
         else
         {

@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8629071319047820309}
   - component: {fileID: 552312920787736881}
-  - component: {fileID: 7542767159321037511}
   - component: {fileID: 8629071319047820330}
   - component: {fileID: -8895642817908627982}
   - component: {fileID: 6212558457632629342}
@@ -64,27 +63,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.3287589, y: 0.092283785}
   m_EdgeRadius: 0
---- !u!50 &7542767159321037511
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8629071319047820310}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4
 --- !u!114 &8629071319047820330
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97,9 +75,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b05d870a9944fe841b7eb6c0dca26845, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncTransform: 0
   eulerAngle: 90
-  moveSpeed: 16
+  moveSpeed: 20
   rotateScale: 0
   angleClockBound: 0
   angleAntiClockBound: 0
@@ -108,6 +85,7 @@ MonoBehaviour:
   moveType: 2
   reactionType: 2
   mySprite: {fileID: 0}
+  tweenEase: 0
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,6 +104,7 @@ MonoBehaviour:
   invincibleFromMapBullets: 0
   dontKillByException: 0
   associatedField: 0
+  killerUID: 
 --- !u!114 &6212558457632629342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,6 +125,7 @@ MonoBehaviour:
   - buffType: 1
     modifier: -0.33
     duration: 1.66
+  myCollider: {fileID: 0}
 --- !u!114 &4556413170392631494
 MonoBehaviour:
   m_ObjectHideFlags: 0

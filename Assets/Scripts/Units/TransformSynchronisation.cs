@@ -52,7 +52,9 @@ public class TransformSynchronisation : MonoBehaviourPunCallbacks
         if (tv != null)
         {
             transform.localPosition = tv.position;
-            transform.rotation = tv.quaternion;
+            if (syncRotation) {
+                transform.rotation = tv.quaternion;
+            }
         }
 
     }
@@ -63,16 +65,16 @@ public class TransformSynchronisation : MonoBehaviourPunCallbacks
         //통신을 보내는 
         if (stream.IsWriting)
         {
-            if (networkExpectedTime != lastSendTime)
-            {
-                positionQueue.Enqueue(new TimeVector(networkExpectedTime, networkPos));
-            }
+
             stream.SendNext(networkPos);
             if (syncRotation) {
-
                 stream.SendNext(networkQuaternion);
             }
             stream.SendNext(networkExpectedTime);
+            if (networkExpectedTime != lastSendTime)
+            {
+                positionQueue.Enqueue(new TimeVector(networkExpectedTime, networkPos,networkQuaternion));
+            }
             lastSendTime = networkExpectedTime;
         }
 
@@ -81,7 +83,7 @@ public class TransformSynchronisation : MonoBehaviourPunCallbacks
         {
 
             Vector3 position = (Vector3)stream.ReceiveNext();
-            Quaternion rotation = Quaternion.identity;
+            Quaternion rotation = transform.rotation;
             if (syncRotation)
             {
                 rotation = (Quaternion)stream.ReceiveNext();

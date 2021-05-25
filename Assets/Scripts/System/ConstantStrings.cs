@@ -8,6 +8,7 @@ public class ConstantStrings : MonoBehaviour
     public const string PREFAB_BULLET_1 = "Prefabs/Projectiles/Bullet1";
     public const string PREFAB_BULLET_DESOLATION = "Prefabs/Projectiles/Bullet_desolation";
     public const string PREFAB_BULLET_ASAKURA = "Prefabs/Projectiles/Bullet_asakura";
+    public const string PREFAB_BULLET_TSURUYA = "Prefabs/Projectiles/Bullet_tsuruya";
     public const string PREFAB_BULLET_KIMIDORI = "Prefabs/Projectiles/Bullet_kimidori";
     public const string PREFAB_BULLET_NAGATO = "Prefabs/Projectiles/Bullet_nagato";
     public const string PREFAB_BULLET_SASAKI = "Prefabs/Projectiles/Bullet_sasaki";

@@ -24,7 +24,13 @@ public class SkillSet
         Debug.Assert(parameters.ContainsKey(key), " missing param : "+key);
         return parameters[key];
     }
-
+    internal object GetParam(SkillParams key, object defaultVal)
+    {
+        if (!parameters.ContainsKey(key)) {
+            parameters.Add(key, defaultVal);
+        }
+        return parameters[key];
+    }
 
     public SkillSet(UnityEngine.GameObject casterObj, SkillManager skm)
     {
@@ -91,7 +97,8 @@ public enum SkillParams {
         ,BuffData,
     FieldNumber,
     RotateAngle,
-    RotateSpeed
+    RotateSpeed,
+    Distance
 }
 
 /*

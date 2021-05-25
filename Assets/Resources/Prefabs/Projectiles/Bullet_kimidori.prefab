@@ -49,7 +49,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b05d870a9944fe841b7eb6c0dca26845, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncTransform: 0
   eulerAngle: 0
   moveSpeed: 10
   rotateScale: 0
@@ -60,6 +59,7 @@ MonoBehaviour:
   moveType: 3
   reactionType: 0
   mySprite: {fileID: 2534975670834146036}
+  tweenEase: 0
 --- !u!61 &8692175640842045467
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -104,6 +104,7 @@ MonoBehaviour:
   invincibleFromMapBullets: 1
   dontKillByException: 1
   associatedField: 0
+  killerUID: 
 --- !u!114 &6212558457632629342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119,7 +120,9 @@ MonoBehaviour:
   exclusionPlayerID: 
   canKillBullet: 1
   isMapObject: 0
+  givesDamage: 1
   customBuffs: []
+  myCollider: {fileID: 0}
 --- !u!114 &4556413170392631494
 MonoBehaviour:
   m_ObjectHideFlags: 0

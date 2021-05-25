@@ -12,12 +12,15 @@ public class BuffManager : MonoBehaviourPun
     //COMMON
     [SerializeField] List<BuffData> Buffs_active = new List<BuffData>();
     [SerializeField] SpriteRenderer mySprite;
+    Unit_Player unitPlayer;
     Dictionary<BuffType, float> buffDictionary = new Dictionary<BuffType, float>();
     Dictionary<BuffType, int> buffTriggers = new Dictionary<BuffType, int>();
+    Dictionary<BuffType, int> stats = new Dictionary<BuffType, int>();
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
         healthPoint = GetComponent<HealthPoint>();
+        unitPlayer = GetComponent<Unit_Player>();
     }
     private void Update()
     {
@@ -61,6 +64,10 @@ public class BuffManager : MonoBehaviourPun
             case BuffType.InvincibleFromBullets:
                 SetTrigger(buff.buffType, true);
                 break;
+            case BuffType.MirrorDamage:
+                SetTrigger(buff.buffType, true);
+                ToggleStat(BuffType.NumDamageReceivedWhileBuff, true);
+                break;
             default:
                 SetBuff(buff.buffType, buff.modifier, true);
                 break;
@@ -81,11 +88,29 @@ public class BuffManager : MonoBehaviourPun
             case BuffType.InvincibleFromBullets:
                 SetTrigger(buff.buffType, false);
                 break;
+            case BuffType.MirrorDamage:
+                HandleMirroringBuff(buff);
+                break;
             default:
                 SetBuff(buff.buffType, buff.modifier, false);
                 break;
         }
     }
+
+    private void HandleMirroringBuff(BuffData buff)
+    {
+        SetTrigger(buff.buffType, false);
+        if (pv.IsMine) {
+            int numDamage = GetStat(BuffType.NumDamageReceivedWhileBuff);
+            if (numDamage <= 0)
+            {
+                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj =" 반사 실패 패널티 -1" });
+                healthPoint.pv.RPC("ChangeHP", RpcTarget.AllBuffered, -1);
+            }
+        }
+        ToggleStat(BuffType.NumDamageReceivedWhileBuff, false);
+    }
+
     private void SetTrigger(BuffType type, bool enable)
     {
         if (buffTriggers.ContainsKey(type))
@@ -103,6 +128,44 @@ public class BuffManager : MonoBehaviourPun
         {
             buffTriggers.Add(type, (enable)?1:0);
         }
+    }
+    public void ToggleStat(BuffType type, bool enable = true)
+    {
+        if (enable)
+        {
+            if (stats.ContainsKey(type))
+            {
+                stats[type] = 0;
+            }
+            else
+            {
+                stats.Add(type, 0);
+            }
+        }
+        else {
+            if (stats.ContainsKey(type))
+            {
+                stats.Remove(type);
+            }
+        }
+
+    }
+    public void AddStat(BuffType type, int amount)
+    {
+        if (stats.ContainsKey(type))
+        {
+            stats[type] += amount;
+            Debug.Log("야스미 추가 " + stats[type]);
+        }
+        
+    }
+
+    private int GetStat(BuffType type) {
+        if (!stats.ContainsKey(type))
+        {
+            stats.Add(type, 0);
+        }
+        return stats[type];
     }
 
     private void SetBuff(BuffType type, float amount, bool enable) {
@@ -133,6 +196,10 @@ public class BuffManager : MonoBehaviourPun
     }
 
     void UpdateBuffIndicator() {
+        if (!pv.IsMine && unitPlayer!= null && unitPlayer.myCharacter == CharacterType.YASUMI)
+        {
+            return;
+        }
         mySprite.color = (Buffs_active.Count > 0) ? Color.red : Color.white;    
     }
 

@@ -26,7 +26,7 @@ public class UI_SkillBox : MonoBehaviour
 
     public void UpdateCooltime() {
         double remain = skill.remainingStackTime;
-        double perc = remain / skill.GetCoolTime();
+        double perc = remain / skill.cooltime;
         fillSprite.fillAmount =(float) perc;
         colltimeText.text = (skill.currStack == skill.maxStack) ? " " :remain.ToString("0.0");
         stackText.text = skill.currStack + "/" + skill.maxStack;    

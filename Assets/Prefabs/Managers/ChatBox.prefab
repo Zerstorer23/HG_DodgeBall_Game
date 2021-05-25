@@ -536,13 +536,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 10
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
   m_Spacing: 0
-  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 1
@@ -695,7 +695,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 0
+  sceneViewId: 5
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &3131896234738749098
@@ -714,6 +714,7 @@ MonoBehaviour:
   outputText: {fileID: 4018366476604516147}
   scrollRect: {fileID: 4018366476546787362}
   inputBox: {fileID: 1313684183028669249}
+  contentTrans: {fileID: 4018366476810983404}
 --- !u!1 &4018366477706042487
 GameObject:
   m_ObjectHideFlags: 0
@@ -955,7 +956,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 437.91937, y: 0}
+  m_SizeDelta: {x: 305.1999, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &5640424904698326983
 CanvasRenderer:

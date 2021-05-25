@@ -296,7 +296,7 @@ public class GameStatus
         string o = "Game mode : " + GameSession.gameMode+"\n";
          o += "Total Players:" + total+"\n";
          o += "Total Alive:" + alive+"\n";
-         o += "Total Alive in my team:"+(Team)PhotonNetwork.LocalPlayer.CustomProperties["TEAM"]+" ? " + alive+"\n";
+         o += "Total Alive in my team:"+UI_PlayerLobbyManager.GetPlayerProperty("TEAM",Team.HOME)+" ? " + alive+"\n";
         o += "Total dead:" + dead + "\n";
         o += "Total to kill:" + toKill + "\n";
         o += "Last survivor:" + lastSurvivor + "\n";

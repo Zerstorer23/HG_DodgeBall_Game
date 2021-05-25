@@ -17,11 +17,13 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     PhotonView pv;
 
     public List<BuffData> customBuffs = new List<BuffData>();
-   // [SerializeField] bool nonRecyclableDamage = false;
+    // [SerializeField] bool nonRecyclableDamage = false;
 
+    public Collider2D myCollider;
     bool hasCustomCollider = false;
     private void Awake()
     {
+        FindCollider();
         projectile = GetComponent<Projectile>();
         movement = GetComponent<Projectile_Movement>();
         myHealth = GetComponent<HealthPoint>();
@@ -33,23 +35,40 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     private void OnDisable()
     {
         exclusionPlayerID = "";
+        myCollider.enabled = false;
     }
     private void OnEnable()
     {
         if (!isMapObject) {
             exclusionPlayerID = pv.Owner.UserId;
         }
+        myCollider.enabled = true;
         attackedIDs = new Dictionary<string, double>();
     }
     Dictionary<string,double> attackedIDs = new Dictionary<string, double>();
+    void FindCollider()
+    {
+        myCollider = GetComponent<PolygonCollider2D>();
+        if (myCollider == null)
+        {
+            myCollider = GetComponent<CircleCollider2D>();
+        }
+        if (myCollider == null)
+        {
+            myCollider = GetComponent<BoxCollider2D>();
+        }
+        if (myCollider == null)
+        {
+            myCollider = GetComponent<CapsuleCollider2D>();
+        }
+    }
 
+    /*
+        [PunRPC]
+        public void SetExclusionPlayer(string playerID) {
+            exclusionPlayerID = playerID;
+        }*/
 
-/*
-    [PunRPC]
-    public void SetExclusionPlayer(string playerID) {
-        exclusionPlayerID = playerID;
-    }*/
- 
     // Start is called before the first frame update
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -120,7 +139,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         return true;
     }
 
-    private void DoProjectileCollision(GameObject targetObj)
+    public void DoProjectileCollision(GameObject targetObj)
     {
         HealthPoint otherHP = targetObj.GetComponent<HealthPoint>();
         if (!CheckValidTeam(otherHP)) return;
@@ -144,8 +163,21 @@ public class Projectile_DamageDealer : MonoBehaviourPun
             if (otherHP.unitType == UnitType.Projectile)
             {
                 if (otherHP.damageDealer.isMapObject) return true; //아무거나 -> 맵 무조건 딜
-            } 
+            }
             return (otherHP.myTeam != myHealth.myTeam); //그외 팀구분
+        }
+        else {
+            //개인전
+/*            if (otherHP.unitType == UnitType.Projectile)
+            {
+                if (otherHP.damageDealer.isMapObject)
+                {
+                    return true; //맵오브젝트 딜
+                }
+                else {
+                    return !(otherHP.pv.IsMine);
+                }
+            }*/
         }
         return true;
     
@@ -193,12 +225,14 @@ public class Projectile_DamageDealer : MonoBehaviourPun
 
             if (otherHP.pv.Owner.UserId == exclusionPlayerID) return;
             string sourceID = (isMapObject) ? null : pv.Owner.UserId;
-
+            Debug.Log("Damage player");
             otherHP.pv.RPC("DoDamage", RpcTarget.AllBuffered, sourceID, false);
             if (isMapObject) myHealth.Kill_Immediate();
         }
         else if(canKillBullet){
-            if (otherHP.damageDealer.isMapObject ) {
+            if (otherHP.damageDealer.isMapObject )
+            {
+                Debug.Log("Damage Map Proj");
                 otherHP.Kill_Immediate();
             }
             if (movement.reactionType == ReactionType.Die)

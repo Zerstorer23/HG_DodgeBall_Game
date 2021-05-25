@@ -40,6 +40,15 @@ public class Action_PlayerDoGunAnimation : SkillAction
         return 0f;
     }
 }
+public class Action_Player_SetColliderSize : SkillAction
+{
+    public override float Activate()
+    {
+        float size = (float)GetParam(SkillParams.Width);
+        parent.casterPV.RPC("SetBodySize", RpcTarget.AllBuffered, size);
+        return 0f;
+    }
+}
 public class Action_GunObject_SetAngle : SkillAction
 {
     public override float Activate()

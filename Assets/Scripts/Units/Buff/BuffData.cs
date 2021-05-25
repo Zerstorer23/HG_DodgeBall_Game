@@ -52,7 +52,7 @@ public class BuffData
 [System.Serializable]
 public enum BuffType
 { 
-    None,MoveSpeed,Cooltime,HealthPoint,InvincibleFromBullets
+    None,MoveSpeed,Cooltime,HealthPoint,InvincibleFromBullets, MirrorDamage,NumDamageReceivedWhileBuff
 }
 
 
