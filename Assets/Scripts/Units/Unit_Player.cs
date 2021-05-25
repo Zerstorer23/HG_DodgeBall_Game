@@ -26,10 +26,6 @@ public class Unit_Player : MonoBehaviourPun
     public Team myTeam = Team.HOME;
     public int fieldNo = 0;
 
-    internal GameObject charBody;
-    [SerializeField] CharacterBodyManager characterBodymanager;
-
-    CircleCollider2D circleCollider;
     // Start is called before the first frame update
     public int evasion = 0;
     private void Awake()
@@ -40,7 +36,6 @@ public class Unit_Player : MonoBehaviourPun
         skillManager = GetComponent<SkillManager>();
         movement = GetComponent<Unit_Movement>();
         buffManager = GetComponent<BuffManager>();
-        circleCollider = GetComponent<CircleCollider2D>();
 
     }
     private void OnDisable()
@@ -52,7 +47,6 @@ public class Unit_Player : MonoBehaviourPun
             EventManager.StopListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, IncrementKill);
             GameFieldManager.ChangeToSpectator();
         }
-        circleCollider.radius = 0.33f;
         EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_DIED, new EventObject() { stringObj = pv.Owner.UserId, intObj = fieldNo });
     }
     private void OnEnable()
@@ -80,7 +74,6 @@ public class Unit_Player : MonoBehaviourPun
         myCharacter = (CharacterType)pv.InstantiationData[0];
         skillManager.SetSkill(myCharacter);
         myPortrait.sprite = GameSession.unitDictionary[myCharacter].portraitImage;
-        CheckCustomCharacter();
         int maxLife = (int)pv.InstantiationData[1];
         if (GameSession.gameMode == GameMode.TEAM)
         {
@@ -93,25 +86,6 @@ public class Unit_Player : MonoBehaviourPun
         }
         health.SetAssociatedField(fieldNo);
     }
-    void CheckCustomCharacter() {
-        if (!(myCharacter == CharacterType.YASUMI
-            || myCharacter == CharacterType.TSURUYA)
-            ) {
-            charBody = myPortrait.gameObject;
-            characterBodymanager.gameObject.SetActive(false);
-            charBody.SetActive(true);
-            return;
-        }
-        charBody = characterBodymanager.gameObject;
-        myPortrait.gameObject.SetActive(false);
-        charBody.SetActive(true);
-        characterBodymanager.SetCharacterSkin(myCharacter);
-
-
-
-
-    }
-
 
 
     private void OnSuddenDeath(EventObject obj)
@@ -154,19 +128,6 @@ public class Unit_Player : MonoBehaviourPun
     {
         gunAnimator.transform.rotation = Quaternion.Euler(0, 0, eulerAngle);
     }
-    [PunRPC]
-    public void SetBodySize(float radius)
-    {
-       circleCollider.radius = radius;
-    }
-    [PunRPC]
-    public void TriggerMessage(string msg)
-    {
-        if (!pv.IsMine) return;
-        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = msg });
-    }
-
-
     public void SetMyProjectile(GameObject obj) {
         myUnderlings.Add(obj);
         obj.transform.SetParent(gunTransform,false);
@@ -205,10 +166,11 @@ public class Unit_Player : MonoBehaviourPun
             StatisticsManager.RPC_AddToStat(StatTypes.EVADE, pv.Owner.UserId, 1);
             StatisticsManager.RPC_AddToStat(StatTypes.SCORE, pv.Owner.UserId, 1);
             StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_EVADES, 1);
-            pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.Cooltime, 0.2f, 5d);
-            evasion++;
-            //(int bType, float mod, double _duration)
+            pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.MoveSpeed, 0.1f, 3d);
+            pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.Cooltime, 0.2f, 3d);
+                //(int bType, float mod, double _duration)
         }
+        evasion++;
     }
 
     public void KillUnderlings() {
