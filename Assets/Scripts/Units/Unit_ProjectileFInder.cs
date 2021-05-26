@@ -6,17 +6,22 @@ using UnityEngine;
 public class Unit_ProjectileFInder : MonoBehaviour
 {
     [SerializeField] Unit_Player player;
-    
+    private void OnEnable()
+    {
+        gameObject.SetActive(player.pv.IsMine);
+    }
     private void OnTriggerExit2D(Collider2D collision)
     {
         HealthPoint proj = collision.gameObject.GetComponent<HealthPoint>();
-        Debug.Log(proj.gameObject.name);
+      //  Debug.Log(proj.gameObject.name);
         if (proj != null) {
-            bool valid;
+         //   bool valid;
             if (proj.damageDealer == null) return;
-            if (proj.damageDealer.isMapObject) {
-                valid = true;
-            }else if (GameSession.gameMode == GameMode.TEAM)
+            if (proj.damageDealer.isMapObject)
+            {
+                player.IncrementEvasion();
+            }
+            /*else if (GameSession.gameMode == GameMode.TEAM)
             {
                 valid = (proj.myTeam == player.myTeam);
             }
@@ -25,7 +30,7 @@ public class Unit_ProjectileFInder : MonoBehaviour
             }
             if (valid) {
                 player.IncrementEvasion();
-            }
+            }*/
 
         }
     }
