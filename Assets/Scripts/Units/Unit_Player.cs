@@ -94,6 +94,8 @@ public class Unit_Player : MonoBehaviourPun
         health.SetAssociatedField(fieldNo);
     }
 
+
+    public SpriteRenderer mainSprite;
     void CheckCustomCharacter()
     {
         if (!(myCharacter == CharacterType.YASUMI
@@ -103,16 +105,14 @@ public class Unit_Player : MonoBehaviourPun
             charBody = myPortrait.gameObject;
             characterBodymanager.gameObject.SetActive(false);
             charBody.SetActive(true);
+            mainSprite = myPortrait;
             return;
         }
         charBody = characterBodymanager.gameObject;
         myPortrait.gameObject.SetActive(false);
         charBody.SetActive(true);
         characterBodymanager.SetCharacterSkin(myCharacter);
-
-
-
-
+        mainSprite = characterBodymanager.mainSprite;
     }
 
     private void OnSuddenDeath(EventObject obj)

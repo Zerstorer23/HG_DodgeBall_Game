@@ -9,7 +9,7 @@ public class CharacterBodyManager : MonoBehaviour
 
     [SerializeField] SpriteResolver hairFront;
     [SerializeField] SpriteResolver hairRear;
-
+   public SpriteRenderer mainSprite;
     Animator characterAnimator;
     CharacterType myCharacter;
     float lastChangeTime = 0f;

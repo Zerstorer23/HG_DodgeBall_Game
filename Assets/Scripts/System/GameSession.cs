@@ -26,7 +26,7 @@ public class GameSession : MonoBehaviourPun
     public static GameMode gameMode ;
     public static int LocalPlayer_FieldNumber = -1;
     PhotonView pv;
-    
+
     public static GameSession instance
     {
         get
@@ -110,4 +110,12 @@ public class GameSession : MonoBehaviourPun
     {
         EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.PreGame });
     }
+    void OnApplicationFocus(bool focused)
+    {
+        if (!focused)
+        {
+            Application.Quit();
+        }
+    }
+
 }

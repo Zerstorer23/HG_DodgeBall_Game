@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Heal
   m_EditorClassIdentifier: 
   buffType: 3
-  buffTyapplyType: 1
   modifier: 1
   duration: -1
   triggerByID: 
   buff_name: "\uCCB4\uB825\uD68C\uBCF5"
+  spriteImage: {fileID: 21300000, guid: c1f64945ee135e249b50b92302cf52c4, type: 3}

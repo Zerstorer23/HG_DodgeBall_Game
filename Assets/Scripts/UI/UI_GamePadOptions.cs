@@ -31,6 +31,10 @@ public class UI_GamePadOptions : MonoBehaviour
     {
         InitInfo();
     }
+    private void OnEnable()
+    {
+        InitInfo();
+    }
     public void InitInfo() {
         useGamepad = (Input.GetJoystickNames().Length > 0);
         optionPanel.SetActive(useGamepad);

@@ -36,7 +36,8 @@ public class HealthPoint : MonoBehaviourPun
         {
             myTeam = (Team)pv.Owner.CustomProperties["TEAM"];//TODO
         }
-        catch (Exception e) { 
+        catch (Exception)
+        { 
         
         }
     }

@@ -154,7 +154,6 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
                 ChatManager.SendNotificationMessage(string.Format("절반({0}명) 이상이 준비된 상태에서만 강제시작이 가능합니다. ", (totalPlayers / 2)));
                 return;
             }
-            Debug.Log("Start requested");
             //정식유저 룸프로퍼티 대기
             Debug.Log("Mastercleint push setting requested");
             mapOptions.SetGameStarted(true);

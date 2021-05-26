@@ -16,4 +16,4 @@ MonoBehaviour:
   txt_name: "\uCFE0\uC694\uC6B0"
   colorHex: 
   txt_skill_desc: "\uBE73\uB530"
-  portraitImage: {fileID: 21300000, guid: 7426301d1620da44eba9b56a0614e219, type: 3}
+  portraitImage: {fileID: 21300000, guid: f8f4be4d9f1b44a44a9860fb56b9b8e3, type: 3}

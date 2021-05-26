@@ -66,6 +66,10 @@ public class HUD_UserName : MonoBehaviourPun
     public void ToggleTeam()
     {
         myTeam = (myTeam == Team.HOME) ? Team.AWAY : Team.HOME;
+        if (pv.IsMine)
+        {
+            PushPlayerSetting(pv.Owner, "TEAM", myTeam);
+        }
         UpdateUI();
     }
     [PunRPC]

@@ -25,6 +25,10 @@ public class MyEvents {
     public const string EVENT_SEND_MESSAGE = "SendMessage";
     public const string EVENT_SHOW_PANEL = "ShowPanel";
     public const string EVENT_POP_UP_PANEL = "PopUpPanel";
+
+
+    public const string EVENT_SCREEN_TOUCH = "ScreenTouched";
+
 }
 
 public class EventOneArg: UnityEvent<EventObject>

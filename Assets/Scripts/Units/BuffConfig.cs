@@ -12,9 +12,11 @@ public class BuffConfig : ScriptableObject
     public float duration;
     public string triggerByID;
     public string buff_name;
+    public Sprite spriteImage;
 
     internal BuffData Build()
     {
         return new BuffData(buffType, modifier, duration);
     }
+    
 }

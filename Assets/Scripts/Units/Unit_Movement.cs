@@ -28,6 +28,14 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
     string padXaxis = "RHorizontal";
     string padYaxis = "RVertical";
     public MapSpec mapSpec;
+
+    delegate float FloatFunction();
+    FloatFunction GetInputVertical;
+    FloatFunction GetInputHorizontal;
+
+    delegate Vector3 Vector3Function();
+    Vector3Function GetTargetVector;
+
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
@@ -36,11 +44,38 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         PhotonNetwork.SendRate = 60; //60 / 60 on update
         PhotonNetwork.SerializationRate = 60; // 32 32 on fixed
 
+        SetInputFunctions();
         if (UI_GamePadOptions.useGamepad) {
             SetAxisNames();
         }
         networkPosIndicator = GameSession.GetInst().networkPos;
     }
+
+    void SetInputFunctions() {
+        if (Application.platform == RuntimePlatform.Android) {
+            GetInputHorizontal = Control_MobileStick.GetInputHorizontal;
+            GetInputVertical = Control_MobileStick.GetInputVertical;
+            GetTargetVector = GetTouchPosition;
+
+
+        }
+        else {
+            GetInputHorizontal = GetKeyInputHorizontal;
+            GetInputVertical = GetKeyInputVertical;
+            GetTargetVector = GetMousePosition;
+        }
+
+        Debug.Log("Do something special here");
+
+    }
+    Vector3 GetMousePosition()
+    {
+        return Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    }
+    Vector3 GetTouchPosition() {
+        return Camera.main.ScreenToWorldPoint(UI_TouchPanel.touchVector);
+    }
+
     public void SetMapSpec(MapSpec spec) {
         mapSpec = spec;
     }
@@ -150,12 +185,19 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
 
     private void MoveByInput(float moveSpeedFinal)
     {
-        var deltaX = Input.GetAxis("Horizontal") * moveSpeedFinal;
-        var deltaY = Input.GetAxis("Vertical") * moveSpeedFinal;
+        var deltaX = GetInputHorizontal() * moveSpeedFinal;
+        var deltaY = GetInputVertical() * moveSpeedFinal;
 
         Vector3 newPosition = ClampPosition(new Vector3(networkPos.x +  deltaX, networkPos.y + deltaY, 0f));
         EnqueuePosition(newPosition);
 
+    }
+    float GetKeyInputHorizontal() {
+        return Input.GetAxis("Horizontal");
+    }
+    float GetKeyInputVertical()
+    {
+        return Input.GetAxis("Vertical");
     }
     void EnqueuePosition(Vector3 newPosition)
     {
@@ -230,8 +272,8 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
                 aimAngle = GameSession.GetAngle(Vector3.zero, aimDir); //벡터 곱 비교
             }
             else {
-                Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                aimAngle = GameSession.GetAngle(gameObject.transform.position, mousePos); //벡터 곱 비교
+                Vector3 target = GetTargetVector();
+                aimAngle = GameSession.GetAngle(gameObject.transform.position, target); //벡터 곱 비교
             }
         }
         else {

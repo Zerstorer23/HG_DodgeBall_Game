@@ -120,7 +120,7 @@ MonoBehaviour:
   exclusionPlayerID: 
   canKillBullet: 0
   isMapObject: 1
-  givesDamage: 0
+  givesDamage: 1
   customBuffs:
   - buffType: 1
     modifier: -0.33

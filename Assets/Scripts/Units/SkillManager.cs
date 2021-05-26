@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using static BulletManager;
 using static ConstantStrings;
 using Random = UnityEngine.Random;
@@ -17,7 +18,9 @@ public class SkillManager : MonoBehaviourPun
     public CharacterType myCharacter;
 
     delegate void voidFunc();
+    delegate bool skillFireFunc();
     voidFunc mySkillFunction;
+    skillFireFunc skillKeyFired;
     public int maxStack;
     public float cooltime;
     public bool skillInUse = false;
@@ -32,13 +35,38 @@ public class SkillManager : MonoBehaviourPun
         unitMovement = GetComponent<Unit_Movement>();
         player = GetComponent<Unit_Player>();
         buffManager = GetComponent<BuffManager>();
+        SetSkillKey();
     }
+
+    private void SetSkillKey()
+    {
+        if (Application.platform == RuntimePlatform.Android)
+        {
+
+            skillKeyFired = FireButtonDown_Mobile;
+        }
+        else {
+            skillKeyFired = FireButtonDown_PC;
+        }
+    }
+    private bool FireButtonDown_PC() {
+        return Input.GetAxis("Fire1") > 0 
+            || Input.GetKeyDown(KeyCode.Joystick1Button5) 
+            || Input.GetKeyDown(KeyCode.Joystick1Button7)
+            || MenuManager.auto_drive;
+    }
+    private bool FireButtonDown_Mobile() {
+        return UI_TouchPanel.isTouching;
+    }
+
     private void CheckSkillActivation()
     {
         if (PhotonNetwork.Time < lastActivated + 0.4) return;
-        if (Input.GetAxis("Fire1") > 0 || Input.GetKeyDown(KeyCode.Joystick1Button5) || Input.GetKeyDown(KeyCode.Joystick1Button7)
-            || MenuManager.auto_drive
-            )
+/*        if (Input.GetMouseButton(0) && EventSystem.current.IsPointerOverGameObject()){
+            return;
+        }*/
+
+        if (skillKeyFired())
         {
             if (currStack > 0)
             {
@@ -398,15 +426,15 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_TSURUYA);
         mySkill.SetParam(SkillParams.Quarternion, Quaternion.identity);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-        float radius = 5f; //5
+        float radius = 10f; //5
         float timeStep = 0.25f; //0.25
-        int numStep = 50; //33
-        int shootAtOnce = 5;
+        int numStep = 10; //33
+        int shootAtOnce = 10;
         mySkill.SetParam(SkillParams.Duration, timeStep);
-        BuffData buff = new BuffData(BuffType.MoveSpeed, -0.1f, timeStep * (numStep / shootAtOnce));
+        BuffData buff = new BuffData(BuffType.MoveSpeed, -0.5f, timeStep * (numStep));
         mySkill.SetParam(SkillParams.BuffData, buff);
         mySkill.Enqueue(new Action_Player_AddBuff());
-        for (int i = 0; i < numStep; i++)
+        for (int i = 0; i < numStep * shootAtOnce; i++)
         {
 
             float randAngle = Random.Range(0f, 360f);
@@ -453,5 +481,5 @@ public class SkillManager : MonoBehaviourPun
 }
 public enum CharacterType
 {
-    NONE, NAGATO, HARUHI, MIKURU, KOIZUMI, KUYOU, ASAKURA, KYOUKO, KIMIDORI, KYONMOUTO, SASAKI, TSURUYA , KOIHIME , YASUMI
+    NONE, NAGATO, HARUHI, MIKURU, KOIZUMI, KUYOU, ASAKURA, KYOUKO, KIMIDORI, KYONMOUTO, SASAKI, TSURUYA, KOIHIME, YASUMI
 }

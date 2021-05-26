@@ -112,6 +112,7 @@ MonoBehaviour:
   isMapObject: 0
   givesDamage: 1
   customBuffs: []
+  myCollider: {fileID: 0}
 --- !u!114 &4556413170392631494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,7 +219,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 4acf7c1cdad46e14aa8e928ff4f313b4, type: 3}
-  m_Color: {r: 1, g: 0.6794044, b: 0.25943398, a: 1}
+  m_Color: {r: 0.764151, g: 0.697468, b: 0.630785, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

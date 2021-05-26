@@ -17,3 +17,4 @@ MonoBehaviour:
   duration: 8
   triggerByID: 
   buff_name: "\uC774\uB3D9\uC18D\uB3C4!"
+  spriteImage: {fileID: 21300000, guid: 8fcc49352a9d53844820a68e4ac6b193, type: 3}

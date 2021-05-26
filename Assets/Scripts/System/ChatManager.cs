@@ -26,7 +26,15 @@ public class ChatManager : MonoBehaviour, IChatClientListener
     {
 		minigameMachine = GetComponent<MinigameManager>();
 		dcClient = GetComponent<Chat_DC_Client>();
-		dcClient.StartClient();
+		if (Application.platform == RuntimePlatform.Android)
+		{
+
+			dcClient.enabled = false;
+		}
+		else {
+
+			dcClient.StartClient();
+		}
 		instance = this;
 		EventManager.StartListening(MyEvents.EVENT_SHOW_PANEL, OnShowPanel);
     }

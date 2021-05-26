@@ -8,10 +8,11 @@ public class BuffManager : MonoBehaviourPun
     public UnitType unitType;
     public PhotonView pv;
     HealthPoint healthPoint;
+    [SerializeField] BuffIndicator buffIndicator;
+
 
     //COMMON
     [SerializeField] List<BuffData> Buffs_active = new List<BuffData>();
-    [SerializeField] SpriteRenderer mySprite;
     Unit_Player unitPlayer;
     Dictionary<BuffType, float> buffDictionary = new Dictionary<BuffType, float>();
     Dictionary<BuffType, int> buffTriggers = new Dictionary<BuffType, int>();
@@ -41,9 +42,9 @@ public class BuffManager : MonoBehaviourPun
             if ((Buffs_active[i]).IsBuffFinished())
             {
                 RemoveBuff(Buffs_active[i]);
+                UpdateBuffIndicator(Buffs_active[i].buffType,false);
                 Buffs_active.RemoveAt(i);
                 i--;
-                UpdateBuffIndicator();
             }
 
         }
@@ -76,7 +77,7 @@ public class BuffManager : MonoBehaviourPun
         if (buff.duration > 0) {
             buff.StartTimer();
             Buffs_active.Add(buff);
-            UpdateBuffIndicator();
+            UpdateBuffIndicator(buff.buffType, true);
         }
     }
     public void RemoveBuff(BuffData buff)
@@ -155,7 +156,6 @@ public class BuffManager : MonoBehaviourPun
         if (stats.ContainsKey(type))
         {
             stats[type] += amount;
-            Debug.Log("야스미 추가 " + stats[type]);
         }
         
     }
@@ -179,6 +179,14 @@ public class BuffManager : MonoBehaviourPun
             buffDictionary.Add(type, buffAmount);        
         }
     }
+    public float HasBuff(BuffType type) {
+        if (!buffDictionary.ContainsKey(type))
+        {
+            return 0;
+        }
+        return (buffDictionary[type] - 1f);
+    }
+ 
     public float GetBuff(BuffType type) {
         if (!buffDictionary.ContainsKey(type))
         {
@@ -195,12 +203,12 @@ public class BuffManager : MonoBehaviourPun
         return buffTriggers[type] > 0;
     }
 
-    void UpdateBuffIndicator() {
+    void UpdateBuffIndicator(BuffType changedBuff, bool enable) {
         if (!pv.IsMine && unitPlayer!= null && unitPlayer.myCharacter == CharacterType.YASUMI)
         {
             return;
         }
-        mySprite.color = (Buffs_active.Count > 0) ? Color.red : Color.white;    
+        buffIndicator.UpdateUI(changedBuff, enable);   
     }
 
     private void RemoveAllBuff()
@@ -210,7 +218,7 @@ public class BuffManager : MonoBehaviourPun
             RemoveBuff(Buffs_active[i]);
         }
         Buffs_active.Clear();
-        UpdateBuffIndicator();
+        buffIndicator.ClearBuffs();
     }
 
 
