@@ -21,10 +21,10 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 	public static ChatClient chatClient;
 
 	public static Chat_DC_Client dcClient;
-	MinigameManager minigameMachine;
+	//MinigameManager minigameMachine;
     private void Awake()
     {
-		minigameMachine = GetComponent<MinigameManager>();
+	//	minigameMachine = GetComponent<MinigameManager>();
 		dcClient = GetComponent<Chat_DC_Client>();
 		if (Application.platform == RuntimePlatform.Android)
 		{
@@ -110,7 +110,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 			string msg = string.Format("<color=#ff00ff>[{0}]</color> {1}", MenuManager.GetLocalName(), message);
 			chatClient.PublishMessage(currentChannelName, msg);
 			dcClient.EnqueueAMessage(message);
-			instance.DetectMinigame(message);
+		//	instance.DetectMinigame(message);
 		}
 	}
 
@@ -133,7 +133,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 	{
 		instance.mainChatBox.SetInputFieldVisibility(enable);
 	}
-
+	/*
 	private void DetectMinigame(string msg)
 	{
 
@@ -170,7 +170,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 				SendNotificationMessage(string.Format("{0}: {1}! ", nick, number.ToString()));
 				break;
 		}
-	}
+	}*/
 	#region photonChat
 	public void OnApplicationQuit()
 	{

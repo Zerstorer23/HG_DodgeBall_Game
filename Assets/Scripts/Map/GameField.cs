@@ -61,37 +61,16 @@ public class GameField : MonoBehaviourPun
         }
         gameObject.SetActive(false);
     }
-    internal void CheckFieldConditions(GameStatus stat, bool nooneDied)
+    internal void CheckFieldConditions(GameStatus stat)
     {
         if (fieldNo != GameSession.LocalPlayer_FieldNumber || gameFieldFinished) return;
         CheckSuddenDeath(stat.alive);
-        bool fieldFinished = true;
         Debug.Log(stat.ToString());
-        switch (GameSession.gameMode)
-        {
-            case GameMode.PVP:
-                fieldFinished = (stat.alive <= 1);
-               // Debug.Log("PVP field " + stat.alive + "field finished " + nooneDied);
-                if (fieldFinished && nooneDied) fieldFinished = false;
-                break;
-            case GameMode.TEAM:
-                fieldFinished = (stat.toKill <= 0 || stat.alive_ourTeam <= 0);
-                break;
-            case GameMode.PVE:
-                break;
-
-            case GameMode.Tournament:
-                fieldFinished = (stat.alive <= 1);
-                break;
-        }
+        bool fieldFinished = GameSession.gameModeInfo.IsFieldFinished(stat);
         if (!fieldFinished) return;
 
         Player winner = stat.lastSurvivor;
-        if (winner == null && stat.total == 1) {
-            winner = PhotonNetwork.LocalPlayer;
-        }
-
-        Debug.Log("gAME FISNISHED / master: " + (winner == PhotonNetwork.LocalPlayer) + " winner "+winner);
+        Debug.Log("GAME FISNISHED / master: " + (winner == PhotonNetwork.LocalPlayer) + " winner "+winner); 
         if (winner == PhotonNetwork.LocalPlayer)
         {
             pv.RPC("NotifyFieldWinner", RpcTarget.AllBuffered, winner);
@@ -115,10 +94,7 @@ public class GameField : MonoBehaviourPun
 
     public void CheckSuddenDeath(int numAlive, bool timeout = false)
     {
-        if (
-            ! (GameSession.gameMode == GameMode.PVP
-            || GameSession.gameMode == GameMode.TEAM)
-            ) return;
+        if (!GameSession.gameModeInfo.callSuddenDeath) return;
         if (numAlive <= 2 && !suddenDeathCalled)
         {
             suddenDeathCalled = true;
@@ -181,20 +157,7 @@ public class GameField : MonoBehaviourPun
     public void InitialiseMap(int id = 0)
     {
         fieldNo = id;
-        switch (fieldType)
-        {
-            case GameMode.PVP:
-                InitialiseMapSize();
-                break;
-            case GameMode.TEAM:
-                InitialiseMapSize();
-                break;
-            case GameMode.PVE:
-                break;
-            case GameMode.Tournament:
-                InitialiseMapSize();
-                break;
-        }
+        InitialiseMapSize();
     }
 
 
@@ -223,10 +186,13 @@ public class GameField : MonoBehaviourPun
         }
 
         int numPlayer = PhotonNetwork.CurrentRoom.PlayerCount;
-        float modifiedLength = GameFieldManager.instance.mapStepsize * (numPlayer / GameFieldManager.instance.mapStepPerPlayer);
-        if (GameSession.gameMode == GameMode.Tournament)
+        float modifiedLength;
+        if (!GameSession.gameModeInfo.scaleMapByPlayerNum)
         {
             modifiedLength = 0f;
+        }
+        else {
+             modifiedLength = GameFieldManager.instance.mapStepsize * (numPlayer / GameFieldManager.instance.mapStepPerPlayer);
         }
         Vector3 newSize = originalMapSize + new Vector3(modifiedLength, modifiedLength);
         mapTransform.localScale = newSize;
@@ -238,11 +204,11 @@ public class GameField : MonoBehaviourPun
         mapSpec.xMid = (mapSpec.xMin + mapSpec.xMax) / 2;
         mapSpec.yMid = (mapSpec.yMin + mapSpec.yMax) / 2;
  
-        ResizePlayerMap(numPlayer);
+        DivideSpawningArea(numPlayer);
     }
     int w;
     int h;
-    void ResizePlayerMap(int numPlayer)
+    void DivideSpawningArea(int numPlayer)
     {
         w = 1;
         h = 1;

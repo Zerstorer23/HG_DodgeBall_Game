@@ -150,14 +150,14 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     {
         HealthPoint otherHP = targetObj.GetComponent<HealthPoint>();
         if(!CheckValidDamageEvaluation(otherHP)) return ;
-        if (!CheckValidTarget(otherHP)) return ;
+        if (!CheckManifoldDamage(otherHP)) return ;
         if (!CheckValidTeam(otherHP)) return ;
         ApplyBuff(otherHP);
         if (!givesDamage) return;
         GiveDamage(otherHP);
     }
     bool CheckValidTeam(HealthPoint otherHP) {
-        if (GameSession.gameMode == GameMode.TEAM)
+        if (GameSession.gameModeInfo.isCoop)
         {
             if (isMapObject) return true;//맵 ->아무거나 무조건 딜
             if (otherHP.unitType == UnitType.Projectile)
@@ -166,24 +166,11 @@ public class Projectile_DamageDealer : MonoBehaviourPun
             }
             return (otherHP.myTeam != myHealth.myTeam); //그외 팀구분
         }
-        else {
-            //개인전
-/*            if (otherHP.unitType == UnitType.Projectile)
-            {
-                if (otherHP.damageDealer.isMapObject)
-                {
-                    return true; //맵오브젝트 딜
-                }
-                else {
-                    return !(otherHP.pv.IsMine);
-                }
-            }*/
-        }
         return true;
     
     
     }
-    bool CheckValidTarget(HealthPoint otherHP) {
+    bool CheckManifoldDamage(HealthPoint otherHP) {
         string uid = otherHP.pv.Owner.UserId;
         double curr = PhotonNetwork.Time;
         if (attackedIDs.ContainsKey(uid))
@@ -225,14 +212,14 @@ public class Projectile_DamageDealer : MonoBehaviourPun
 
             if (otherHP.pv.Owner.UserId == exclusionPlayerID) return;
             string sourceID = (isMapObject) ? null : pv.Owner.UserId;
-            Debug.Log("Damage player");
+      //      Debug.Log("Damage player");
             otherHP.pv.RPC("DoDamage", RpcTarget.AllBuffered, sourceID, false);
             if (isMapObject) myHealth.Kill_Immediate();
         }
         else if(canKillBullet){
             if (otherHP.damageDealer.isMapObject )
             {
-                Debug.Log("Damage Map Proj");
+//                Debug.Log("Damage Map Proj");
                 otherHP.Kill_Immediate();
             }
             if (movement.reactionType == ReactionType.Die)

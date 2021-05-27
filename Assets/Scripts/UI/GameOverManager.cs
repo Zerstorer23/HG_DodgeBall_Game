@@ -18,15 +18,10 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] Image subWinnerImage;
 
     [Header("Minigame")]
-    [SerializeField] Text miniWinnerName, miniWinnerTitle;
-    [SerializeField] Image miniWinnerImage;
-    Player finalWinner;
- //   public PhotonView pv;
+    [SerializeField] Text miniWinnerName;
 
-    private void Awake()
-    {
-   //     pv = GetComponent<PhotonView>();
-    }
+    Player finalWinner;
+
 
     public double startTime;
     public double timeoutWait = -1;
@@ -39,7 +34,7 @@ public class GameOverManager : MonoBehaviour
         finalWinner = receivedWinner;
         if (finalWinner != null)
         {
-            if (GameSession.gameMode == GameMode.TEAM)
+            if (GameSession.gameModeInfo.isTeamGame)
             {
                 Team winnerTeam = (Team)finalWinner.CustomProperties["TEAM"];
                 Team myTeam = (Team)PhotonNetwork.LocalPlayer.CustomProperties["TEAM"];
@@ -56,9 +51,9 @@ public class GameOverManager : MonoBehaviour
 
 
         }
-        SetWinner();
-        SetSubWinner();
-        SetMiniWinner();
+        SetWinnerInfo();
+        SetScoreInfo();
+        SetGameInfo();
     }
     private void Update()
     {
@@ -86,11 +81,21 @@ public class GameOverManager : MonoBehaviour
     }
 
 
-
-    public GameObject minigamePanel;
-    private void SetMiniWinner()
+    private void SetGameInfo()
     {
-        string winnerUID = StatisticsManager.GetHighestPlayer(StatTypes.MINIGAME);
+        float gameTime =(float) (PhotonNetwork.Time - UI_Timer.startTime);
+        miniWinnerName.text = string.Format("{0}초", gameTime.ToString("0.0"));
+        if (GameSession.gameModeInfo.gameMode == GameMode.PVE) { 
+            float prevScore = PlayerPrefs.GetFloat(ConstantStrings.PREFS_TIME_RECORD, 0f);
+            if (gameTime > prevScore) {
+                miniWinnerName.text = string.Format("<color=#ff00ff>[신기록]{0}초</color>", gameTime.ToString("0.0"));
+                PlayerPrefs.SetFloat(ConstantStrings.PREFS_TIME_RECORD, prevScore);
+            }
+        }
+    }
+
+    /*
+           string winnerUID = StatisticsManager.GetHighestPlayer(StatTypes.MINIGAME);
         if (winnerUID == null)
         {
             minigamePanel.SetActive(false);
@@ -102,12 +107,11 @@ public class GameOverManager : MonoBehaviour
             Player player = ConnectedPlayerManager.GetPlayerByID(winnerUID);
             CharacterType character = GetPlayerCharacter(player);
             miniWinnerName.text = player.NickName;
-            miniWinnerImage.sprite = GameSession.unitDictionary[character].portraitImage;
+            miniWinnerImage.sprite = ConfigsManager.unitDictionary[character].portraitImage;
             miniWinnerTitle.text = string.Format("눈치병신: {0}패", score.ToString());
         }
-    }
-
-    private void SetSubWinner()
+     */
+    private void SetScoreInfo()
     {
         string winnerUID = StatisticsManager.GetHighestPlayer(StatTypes.SCORE);
         Debug.Log("Subwinner id " + winnerUID);
@@ -122,7 +126,7 @@ public class GameOverManager : MonoBehaviour
             subWinnerPanel.SetActive(true);
             CharacterType character = GetPlayerCharacter(player);
             subWinnerName.text = player.NickName;
-            subWinnerImage.sprite = GameSession.unitDictionary[character].portraitImage;
+            subWinnerImage.sprite = ConfigsManager.unitDictionary[character].portraitImage;
 
 
             int score = StatisticsManager.GetStat(StatTypes.SCORE, winnerUID);
@@ -145,7 +149,7 @@ public class GameOverManager : MonoBehaviour
         return character;
     }
 
-    private void SetWinner()
+    private void SetWinnerInfo()
     {
         Debug.Log("Received winner " + finalWinner);
         if (finalWinner != null)
@@ -153,8 +157,8 @@ public class GameOverManager : MonoBehaviour
 
             CharacterType character = GetPlayerCharacter(finalWinner);
             winnerName.text = finalWinner.NickName;
-            winnerImage.sprite = GameSession.unitDictionary[character].portraitImage;
-            if (GameSession.gameMode == GameMode.TEAM)
+            winnerImage.sprite = ConfigsManager.unitDictionary[character].portraitImage;
+            if (GameSession.gameModeInfo.isTeamGame)
             {
                 if (!finalWinner.CustomProperties.ContainsKey("TEAM")) return ;
                 Team winnerTeam = (Team)finalWinner.CustomProperties["TEAM"];

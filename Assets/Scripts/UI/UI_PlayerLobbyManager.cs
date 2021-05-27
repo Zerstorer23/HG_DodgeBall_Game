@@ -54,7 +54,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         {
             //난입유저 바로시작
             ConnectedPlayerManager.CountPlayersInTeam();
-            GameFieldManager.SetGameMap(GameSession.gameMode);
+            GameFieldManager.SetGameMap(GameSession.gameModeInfo.gameMode);
             GameFieldManager.ChangeToSpectator();
             Debug.Log("난입세팅끝");
             StartGame();
@@ -149,18 +149,37 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            if (readyPlayers < (totalPlayers) / 2 && GameSession.instance.requireHalfAgreement)
-            {
-                ChatManager.SendNotificationMessage(string.Format("절반({0}명) 이상이 준비된 상태에서만 강제시작이 가능합니다. ", (totalPlayers / 2)));
-                return;
-            }
+            if (!CheckHalfAgreement()) return;
+            if (!CheckTeamValidity()) return;
             //정식유저 룸프로퍼티 대기
             Debug.Log("Mastercleint push setting requested");
             mapOptions.SetGameStarted(true);
             mapOptions.PushRoomSettings();
         }
     }
-
+    public bool CheckTeamValidity() {
+        if (!GameSession.gameModeInfo.isTeamGame) return true;
+        Team masterTeam = (Team)PhotonNetwork.LocalPlayer.CustomProperties["TEAM"];
+        Player[] players = PhotonNetwork.PlayerList;
+        foreach (Player p in players)
+        {
+            Team away = (Team)p.CustomProperties["TEAM"];
+            if (masterTeam != away) {
+                return true;
+            }
+        }
+        ChatManager.SendNotificationMessage("최소 한명은 팀이 달라야합니다 장애인들아");
+        return false;
+    }
+    public bool CheckHalfAgreement()
+    {
+        if (readyPlayers < (totalPlayers) / 2 && GameSession.instance.requireHalfAgreement)
+        {
+            ChatManager.SendNotificationMessage(string.Format("{0}님이 강제시작을 하려다 실패하였습니다. 요구인원 :{1}", PhotonNetwork.MasterClient.NickName, (totalPlayers / 2)));
+            return false;
+        }
+        return true;
+    }
 
     public void OnRoomPropertiesChanged()
     {
@@ -171,7 +190,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         if (gameStarted)
         {
             ConnectedPlayerManager.CountPlayersInTeam();
-            GameFieldManager.SetGameMap(GameSession.gameMode);
+            GameFieldManager.SetGameMap(GameSession.gameModeInfo.gameMode);
             Debug.Log("RPC Start game");
             StartGame();
         }

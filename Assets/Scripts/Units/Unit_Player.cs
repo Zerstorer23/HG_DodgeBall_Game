@@ -79,10 +79,10 @@ public class Unit_Player : MonoBehaviourPun
     void ParseInstantiationData() {
         myCharacter = (CharacterType)pv.InstantiationData[0];
         skillManager.SetSkill(myCharacter);
-        myPortrait.sprite = GameSession.unitDictionary[myCharacter].portraitImage;
+        myPortrait.sprite = ConfigsManager.unitDictionary[myCharacter].portraitImage;
         CheckCustomCharacter();
         int maxLife = (int)pv.InstantiationData[1];
-        if (GameSession.gameMode == GameMode.TEAM)
+        if (GameSession.gameModeInfo.isTeamGame)
         {
             maxLife += GetTeamBalancedLife((Team)pv.Owner.CustomProperties["TEAM"], maxLife);
         }

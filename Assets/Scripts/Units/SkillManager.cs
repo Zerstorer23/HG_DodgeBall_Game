@@ -138,7 +138,8 @@ public class SkillManager : MonoBehaviourPun
                 break;
             case CharacterType.TSURUYA:
                 mySkillFunction = DoSkillSet_Tsuruya;
-                skillCool = 8f;
+                skillCool = 3f;
+                maxStack = 3;
                 break;
             case CharacterType.YASUMI:
                 mySkillFunction = DoSkillSet_Yasumi;
@@ -426,10 +427,10 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_TSURUYA);
         mySkill.SetParam(SkillParams.Quarternion, Quaternion.identity);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-        float radius = 10f; //5
+        float radius = 9f; //5
         float timeStep = 0.25f; //0.25
-        int numStep = 10; //33
-        int shootAtOnce = 10;
+        int numStep = 3; //10
+        int shootAtOnce = 3;//10
         mySkill.SetParam(SkillParams.Duration, timeStep);
         BuffData buff = new BuffData(BuffType.MoveSpeed, -0.5f, timeStep * (numStep));
         mySkill.SetParam(SkillParams.BuffData, buff);

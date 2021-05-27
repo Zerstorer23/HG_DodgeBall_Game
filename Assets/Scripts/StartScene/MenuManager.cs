@@ -112,5 +112,5 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
 public enum MapDifficulty
 {
-    None = 0, BoxOnly, Standard, Hard
+    None = 0, BoxOnly,Easy, Standard, Hard
 }

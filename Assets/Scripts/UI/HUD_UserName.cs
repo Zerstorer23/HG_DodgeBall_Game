@@ -44,8 +44,8 @@ public class HUD_UserName : MonoBehaviourPun
     private void OnGamemodeChanged(EventObject arg0)
     {
         if (pv.IsMine) {
-            GameMode currMode = (GameMode)arg0.objData;
-            if (currMode == GameMode.TEAM) {
+            GameModeConfig currMode = (GameModeConfig)arg0.objData;
+            if (currMode.isTeamGame) {
                 myTeam = (ConnectedPlayerManager.GetMyIndex(PhotonNetwork.PlayerList) % 2 == 0) ? Team.HOME : Team.AWAY;
             }
             pv.RPC("SetTeam", RpcTarget.AllBuffered, (int)myTeam);
@@ -108,9 +108,9 @@ public class HUD_UserName : MonoBehaviourPun
     {
         nameText.text = playerName;
         readySprite.color = (isReady) ? Color.green : Color.black;
-        charPortrait.sprite = GameSession.unitDictionary[selectedCharacter].portraitImage;
+        charPortrait.sprite = ConfigsManager.unitDictionary[selectedCharacter].portraitImage;
 
-        if (GameSession.gameMode == GameMode.TEAM)
+        if (GameSession.gameModeInfo.isTeamGame)
         {
             teamColorImage.enabled = true;
             teamColorImage.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[myTeam == Team.HOME ? 0 : 1]);

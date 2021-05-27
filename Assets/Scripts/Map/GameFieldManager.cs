@@ -36,7 +36,7 @@ public class GameFieldManager : MonoBehaviourPun
     private SortedDictionary<string, Player> totalPlayersDictionary = new SortedDictionary<string, Player>();
     private SortedDictionary<int, List<Player>> playersInFieldsMap = new SortedDictionary<int, List<Player>>();
 
-    [SerializeField] GameField pvpField, teamField;
+    [SerializeField] GameField singleField;
     [SerializeField] GameField[] tournamentFields;
 
     [Header("BuffSpawner")]
@@ -47,7 +47,8 @@ public class GameFieldManager : MonoBehaviourPun
     public float suddenDeathTime = 60f;
     public double resizeOver = 60d;
     public float resize_EndSize = 10f;
-
+    [Header("PVE settings")]
+    public double incrementEverySeconds = 4d;
     internal static bool CheckSuddenDeathCalled(int fieldNo)
     {
         return gameFields[fieldNo].suddenDeathCalled;
@@ -57,10 +58,8 @@ public class GameFieldManager : MonoBehaviourPun
 
     internal static int GetRemainingPlayerNumber()
     {
-
-            GameStatus stat = new GameStatus(totalUnitsDictionary);
-            return stat.toKill;
-        
+        GameStatus stat = new GameStatus(totalUnitsDictionary,null);
+        return stat.toKill;
     }
 
     private void Awake()
@@ -120,18 +119,13 @@ public class GameFieldManager : MonoBehaviourPun
         switch (mode)
         {
             case GameMode.PVP:
-                gameFields.Add(instance.pvpField);
-                gameFields[0].InitialiseMap(0);
-                break;
             case GameMode.TEAM:
-                gameFields.Add(instance.teamField);
-                gameFields[0].InitialiseMap(0);
+            case GameMode.PVE:
+                SetUpSingleField();
                 break;
             case GameMode.Tournament:
                 SetUpTournament();
                 numRooms = 2;
-                break;
-            case GameMode.PVE:
                 break;
         }
         instance.AssignMyRoom(PhotonNetwork.PlayerList, numRooms);
@@ -144,6 +138,11 @@ public class GameFieldManager : MonoBehaviourPun
             gameFields.Add(field);
             field.InitialiseMap(i++);
         }
+    }
+    private static void SetUpSingleField()
+    {
+        gameFields.Add(instance.singleField);
+        gameFields[0].InitialiseMap(0);
     }
     private void OnGameStartRequested(EventObject arg0)
     {
@@ -304,7 +303,7 @@ public class GameFieldManager : MonoBehaviourPun
     {
         int iteration = 0;
         List<string> namelist = new List<string>(totalUnitsDictionary.Keys);
-        if (GameSession.gameMode == GameMode.PVP || GameSession.gameMode == GameMode.TEAM) {
+        if (GameSession.gameModeInfo.useDesolator) {
           if(gameFields[0].desolator!=null)  namelist.Add("DESOLATOR");
         }
         while (iteration < namelist.Count)

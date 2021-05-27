@@ -166,6 +166,7 @@ MonoBehaviour:
   isMapObject: 0
   givesDamage: 1
   customBuffs: []
+  myCollider: {fileID: 0}
 --- !u!114 &4556413170392631494
 MonoBehaviour:
   m_ObjectHideFlags: 0

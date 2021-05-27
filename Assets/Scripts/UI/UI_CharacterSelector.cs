@@ -29,7 +29,7 @@ public class UI_CharacterSelector : MonoBehaviour
 
     internal void SetInformation(CharacterType character)
     {
-        UnitConfig u = GameSession.unitDictionary[character];
+        UnitConfig u = ConfigsManager.unitDictionary[character];
         myCharName.text = u.txt_name;
         myCharImage.sprite = u.portraitImage;
     }

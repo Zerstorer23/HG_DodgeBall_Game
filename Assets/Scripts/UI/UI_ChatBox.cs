@@ -62,7 +62,9 @@ public class UI_ChatBox : MonoBehaviour
 		else
 		{
 			ChatManager.SendChatMessage(inputField.text);
-			FocusOnField(true);
+			if (Application.platform != RuntimePlatform.Android) {
+				FocusOnField(true);
+			}
 		}
 		inputField.text = "";
 

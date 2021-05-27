@@ -48,6 +48,7 @@ public class ConstantStrings : MonoBehaviour
     public const string PREFS_WINS = "myTotalWins";
     public const string PREFS_MY_PAD = "myPad";
     public const string PREFS_MANUAL_AIM = "manualAim";
+    public const string PREFS_TIME_RECORD = "timeRecord";
 
     public static string[] team_color = { "#0080FF", "#FF8000" };
     public static string[] team_name = { "파랑", "주황" };

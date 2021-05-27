@@ -14,8 +14,8 @@ public class UI_SkillBox : MonoBehaviour
     [SerializeField] Text colltimeText;
     public void SetSkillInfo(SkillManager skm) {
         skill = skm;
-        portrait.sprite = GameSession.unitDictionary[skm.myCharacter].portraitImage;
-        desc.text = GameSession.unitDictionary[skm.myCharacter].txt_skill_desc;
+        portrait.sprite = ConfigsManager.unitDictionary[skm.myCharacter].portraitImage;
+        desc.text = ConfigsManager.unitDictionary[skm.myCharacter].txt_skill_desc;
     
     }
     private void FixedUpdate()

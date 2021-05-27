@@ -25,16 +25,8 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
     standardping이 커질수록 받는오차가 적어짐
     해석오차는 update속도에 달려있음
      */
-    string padXaxis = "RHorizontal";
-    string padYaxis = "RVertical";
     public MapSpec mapSpec;
 
-    delegate float FloatFunction();
-    FloatFunction GetInputVertical;
-    FloatFunction GetInputHorizontal;
-
-    delegate Vector3 Vector3Function();
-    Vector3Function GetTargetVector;
 
     private void Awake()
     {
@@ -44,55 +36,21 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         PhotonNetwork.SendRate = 60; //60 / 60 on update
         PhotonNetwork.SerializationRate = 60; // 32 32 on fixed
 
-        SetInputFunctions();
-        if (UI_GamePadOptions.useGamepad) {
-            SetAxisNames();
-        }
         networkPosIndicator = GameSession.GetInst().networkPos;
     }
-
-    void SetInputFunctions() {
-        if (Application.platform == RuntimePlatform.Android) {
-            GetInputHorizontal = Control_MobileStick.GetInputHorizontal;
-            GetInputVertical = Control_MobileStick.GetInputVertical;
-            GetTargetVector = GetTouchPosition;
-
-
-        }
-        else {
-            GetInputHorizontal = GetKeyInputHorizontal;
-            GetInputVertical = GetKeyInputVertical;
-            GetTargetVector = GetMousePosition;
-        }
-
-        Debug.Log("Do something special here");
-
-    }
-    Vector3 GetMousePosition()
+    private new void OnEnable()
     {
-        return Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if (UI_GamePadOptions.useGamepad)
+        {
+            InputHelper.SetAxisNames();
+        }
     }
-    Vector3 GetTouchPosition() {
-        return Camera.main.ScreenToWorldPoint(UI_TouchPanel.touchVector);
-    }
+
 
     public void SetMapSpec(MapSpec spec) {
         mapSpec = spec;
     }
-    void SetAxisNames() {
-        switch (UI_GamePadOptions.padType)
-        {
-            case PadType.PS4:
-                padXaxis = "RHorizontal";
-                padYaxis = "RVertical";
-                break;
-            case PadType.XBOX:
-                padXaxis = "RHorizontalXbox";
-                padYaxis = "RVerticalXbox";
-                break;
-        }
 
-    }
    internal Unit_AutoDrive autoDriver;
 
     private void Start()
@@ -104,7 +62,6 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
             positionQueue = new Queue<TimeVector>();
             networkPos = transform.position;
         }
-        //   StartCoroutine(UpdateWithSend(60));
     }
     // Update is called once per frame
     private void Update()
@@ -113,14 +70,6 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         DequeuePositions();
         UpdateDirection();
     }
-    void FixedUpdate()
-    {
-      // Move(Time.fixedDeltaTime);
-    }
-    //0 1 2 3 4 5 = 5
-    // [12] [345]
-    //0   2     5
-    // 1
 
     private void Move(float delta)
     {
@@ -185,20 +134,14 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
 
     private void MoveByInput(float moveSpeedFinal)
     {
-        var deltaX = GetInputHorizontal() * moveSpeedFinal;
-        var deltaY = GetInputVertical() * moveSpeedFinal;
+        var deltaX = InputHelper.GetInputHorizontal() * moveSpeedFinal;
+        var deltaY = InputHelper.GetInputVertical() * moveSpeedFinal;
 
         Vector3 newPosition = ClampPosition(new Vector3(networkPos.x +  deltaX, networkPos.y + deltaY, 0f));
         EnqueuePosition(newPosition);
 
     }
-    float GetKeyInputHorizontal() {
-        return Input.GetAxis("Horizontal");
-    }
-    float GetKeyInputVertical()
-    {
-        return Input.GetAxis("Vertical");
-    }
+
     void EnqueuePosition(Vector3 newPosition)
     {
         if (newPosition != oldPosition)
@@ -265,14 +208,14 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         if (UI_AimOption.aimManual)
         {
             if (UI_GamePadOptions.useGamepad) { 
-                var deltaX = Input.GetAxis(padXaxis) ;
-                var deltaY = Input.GetAxis(padYaxis) ;
+                var deltaX = Input.GetAxis(InputHelper.padXaxis) ;
+                var deltaY = Input.GetAxis(InputHelper.padYaxis) ;
                 if (Mathf.Abs(deltaX) <Mathf.Epsilon && Mathf.Abs(deltaY) < Mathf.Epsilon) return;
                 Vector3 aimDir = new Vector3(deltaX, deltaY, 0f);
                 aimAngle = GameSession.GetAngle(Vector3.zero, aimDir); //벡터 곱 비교
             }
             else {
-                Vector3 target = GetTargetVector();
+                Vector3 target = InputHelper.GetTargetVector();
                 aimAngle = GameSession.GetAngle(gameObject.transform.position, target); //벡터 곱 비교
             }
         }

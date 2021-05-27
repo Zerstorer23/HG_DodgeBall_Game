@@ -14,16 +14,14 @@ public class GameSession : MonoBehaviourPun
     public UI_SkillBox skillPanelUI;
     public UI_Leaderboard leaderboardUI;
     public GameOverManager gameOverManager;
-    public string versionCode = "0428.1";
+    public static ConfigsManager configsManager;
+    public string versionCode;
     public static double STANDARD_PING = 0.08d;//0.075d;//자연스럽게 보이는 한 가장 크게
     public bool requireHalfAgreement = true;
 
     private static GameSession prGameSession;
 
-    public UnitConfig[] unitConfigs;
-    public BuffConfig[] buffConfigs;
-    public static Dictionary<CharacterType, UnitConfig> unitDictionary;
-    public static GameMode gameMode ;
+    public static GameModeConfig gameModeInfo ;
     public static int LocalPlayer_FieldNumber = -1;
     PhotonView pv;
 
@@ -49,12 +47,8 @@ public class GameSession : MonoBehaviourPun
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
+        configsManager = GetComponent<ConfigsManager>();
         versionText.text = versionCode+" 버전";
-        unitDictionary = new Dictionary<CharacterType, UnitConfig>();
-        foreach (UnitConfig u in unitConfigs)
-        {
-            unitDictionary.Add(u.characterID, u);
-        }
         EventManager.StartListening(MyEvents.EVENT_GAME_STARTED, OnGameStarted);
         EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
     }
@@ -74,11 +68,7 @@ public class GameSession : MonoBehaviourPun
     {
         EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.PreGame });
     }
-    public static CharacterType GetRandomCharacter()
-    {
-        int rand = Random.Range(1, instance.unitConfigs.Length);
-        return instance.unitConfigs[rand].characterID;
-    }
+
 
     internal static string GetVersionCode()
     {
@@ -110,11 +100,14 @@ public class GameSession : MonoBehaviourPun
     {
         EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.PreGame });
     }
-    void OnApplicationFocus(bool focused)
+    void OnApplicationPause(bool paused)
     {
-        if (!focused)
-        {
-            Application.Quit();
+        if (Application.platform == RuntimePlatform.Android) {
+
+            if (paused)
+            {
+                Application.Quit();
+            }
         }
     }
 

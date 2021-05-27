@@ -193,7 +193,7 @@ public class HealthPoint : MonoBehaviourPun
                     killerUID = attackerUserID;
                     Debug.Log("send id " + attackerUserID);
                     EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID });
-                    ChatManager.SendNotificationMessage(attackerNickname + " 님이 " + PhotonNetwork.NickName + "님을 살해했습니다.", "#FF0000");
+                    ChatManager.SendNotificationMessage(attackerNickname + " 님이 " + pv.Owner.NickName + "님을 살해했습니다.", "#FF0000");
                 }
             }
         }

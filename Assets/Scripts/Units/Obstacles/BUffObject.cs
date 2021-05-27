@@ -34,7 +34,7 @@ public class BUffObject : MonoBehaviourPun
 
     }
     void ParseBuffConfig(int index) {
-        buffConfig = GameSession.instance.buffConfigs[index];
+        buffConfig = ConfigsManager.instance.buffConfigs[index];
         buff = buffConfig.Build();
         objectName = buffConfig.buff_name;
         nameText.text = objectName;

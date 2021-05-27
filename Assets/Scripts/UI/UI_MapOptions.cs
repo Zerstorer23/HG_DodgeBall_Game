@@ -81,7 +81,11 @@ public class UI_MapOptions : MonoBehaviourPun
         forceStart.SetActive(isMaster);
         mapDiffDropdown.SetValueWithoutNotify((int)mapDiff);
         livesDropdown.SetValueWithoutNotify((int)livesIndex);
-        gamemodeDropdown.SetValueWithoutNotify((int)GameSession.gameMode);
+        int gmode = 0;
+        if (GameSession.gameModeInfo != null) {
+            gmode = (int)GameSession.gameModeInfo.gameMode;
+        }
+        gamemodeDropdown.SetValueWithoutNotify(gmode);
     }
 
     internal void LoadRoomSettings()
@@ -98,7 +102,7 @@ public class UI_MapOptions : MonoBehaviourPun
              versionCode);
         }
         gameStarted = (bool)hash[HASH_GAME_STARTED];
-        GameSession.gameMode = (GameMode)hash[HASH_GAME_MODE];
+        GameSession.gameModeInfo = ConfigsManager.gameModeDictionary[(GameMode)hash[HASH_GAME_MODE]];
         Debug.Log("난입유저 룸세팅 동기화 끝");
         UpdateSettingsUI();
     }
@@ -106,7 +110,7 @@ public class UI_MapOptions : MonoBehaviourPun
     public void OnClick_ChangeTeam()
     {
         if (UI_PlayerLobbyManager.localPlayerInfo == null) return;
-        if (GameSession.gameMode != GameMode.TEAM) return;
+        if (!GameSession.gameModeInfo.isTeamGame) return;
         UI_PlayerLobbyManager.localPlayerInfo.pv.RPC("ToggleTeam", RpcTarget.AllBuffered);
     }
     [PunRPC]
@@ -124,8 +128,8 @@ public class UI_MapOptions : MonoBehaviourPun
     [PunRPC]
     public void SetGameMode(int index)
     {
-        GameSession.gameMode = (GameMode)index;
-        EventManager.TriggerEvent(MyEvents.EVENT_GAMEMODE_CHANGED, new EventObject() { objData = GameSession.gameMode });
+        GameSession.gameModeInfo = ConfigsManager.gameModeDictionary[(GameMode)index];
+        EventManager.TriggerEvent(MyEvents.EVENT_GAMEMODE_CHANGED, new EventObject() { objData = GameSession.gameModeInfo });
         UpdateSettingsUI();
     }
     public static ExitGames.Client.Photon.Hashtable GetInitOptions()
@@ -147,7 +151,7 @@ public class UI_MapOptions : MonoBehaviourPun
         hash.Add(HASH_PLAYER_LIVES, livesIndex);
         hash.Add(HASH_VERSION_CODE, GameSession.GetVersionCode());
         hash.Add(HASH_GAME_STARTED, gameStarted);
-        hash.Add(HASH_GAME_MODE, GameSession.gameMode);
+        hash.Add(HASH_GAME_MODE, GameSession.gameModeInfo.gameMode);
         PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
     }
 

@@ -11,7 +11,7 @@ public class UI_Timer : MonoBehaviour
     {
         timeText = GetComponent<Text>();
     }
-    double startTime;
+    public static double startTime;
     private void OnEnable()
     {
         startTime = PhotonNetwork.Time;

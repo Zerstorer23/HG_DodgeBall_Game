@@ -30,18 +30,14 @@ public class PlayerSpawner : MonoBehaviour
 
     public void StartEngine()
     {
-        Debug.Log("Reset field units map");
         SpawnLocalPlayer();
         SpawnDesolator();
     }
 
     private void SpawnDesolator()
     {
-        bool useTheMachine = (GameSession.gameMode == GameMode.PVP
-   || GameSession.gameMode == GameMode.TEAM);
-        if (!PhotonNetwork.IsMasterClient || !useTheMachine) return;
+        if (!PhotonNetwork.IsMasterClient || !GameSession.gameModeInfo.useDesolator) return;
 
-        GameObject desolator =
         PhotonNetwork.Instantiate(ConstantStrings.PREFAB_DESOLATOR, transform.position, Quaternion.identity, 0,
         new object[] { gameField.fieldNo});
 
@@ -62,7 +58,7 @@ public class PlayerSpawner : MonoBehaviour
             myCharacter = (CharacterType)hash["CHARACTER"];
             if (myCharacter == CharacterType.NONE)
             {
-                myCharacter = GameSession.GetRandomCharacter();
+                myCharacter = ConfigsManager.GetRandomCharacter();
                 HUD_UserName.PushPlayerSetting(PhotonNetwork.LocalPlayer, "ACTUAL_CHARACTER", myCharacter);
             }
             SpawnPlayer();
@@ -81,7 +77,6 @@ public class PlayerSpawner : MonoBehaviour
     public void SpawnPlayer()
     {
         Vector3 spawnPos = GetAdjustedPosition();
-        Debug.Log("Spawn player at " + spawnPos);
         PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0, new object[] { myCharacter, maxLives, gameField.fieldNo });
     }
 
@@ -108,7 +103,6 @@ public class PlayerSpawner : MonoBehaviour
         }
         else
         {
-            Debug.Log(gameField.fieldNo + ": add player at field dictionary " + id);
             debugUnitList.Add(go);
             unitsOnMap.Add(id, go);
             playersOnMap.Add(id, go.pv.Owner);
@@ -124,8 +118,8 @@ public class PlayerSpawner : MonoBehaviour
     {
         //Enable되는걸 기다려야함 그래야 event듣고 사망
         yield return new WaitForFixedUpdate();
-        GameStatus stat = new GameStatus(unitsOnMap);
-        gameField.CheckFieldConditions(stat, true);
+        GameStatus stat = new GameStatus(unitsOnMap, null);
+        gameField.CheckFieldConditions(stat);
     }
 
     private void OnPlayerDied(EventObject eo)
@@ -141,13 +135,14 @@ public class PlayerSpawner : MonoBehaviour
         }
         Debug.Assert(unitsOnMap.ContainsKey(eo.stringObj), eo.stringObj + " is not on field!!");
         //   if (!unitsOnMap.ContainsKey(eo.stringObj)) return;
+        Player lastDiedPlayer = playersOnMap[eo.stringObj];
         unitsOnMap[eo.stringObj] = null;
         playersOnMap[eo.stringObj] = null;
         gameField.AddController(eo.stringObj);
         Debug.Log(gameField.fieldNo + ": null the player " + eo.stringObj);
         GameFieldManager.RemoveDeadPlayer(eo.stringObj);
-        GameStatus stat = new GameStatus(unitsOnMap);//마지막 1인은 남아있어야함
-        gameField.CheckFieldConditions(stat, false);
+        GameStatus stat = new GameStatus(unitsOnMap , lastDiedPlayer);//마지막 1인은 남아있어야함
+        gameField.CheckFieldConditions(stat);
 
     }
 
@@ -166,7 +161,8 @@ public class PlayerSpawner : MonoBehaviour
     }
     public Unit_Player GetPlayerByOwnerID(string id)
     {
-        if (unitsOnMap.ContainsKey(id))
+        if (id == null) return null;
+        if (unitsOnMap.ContainsKey(id))//check null id
         {
             return unitsOnMap[id];
         }
@@ -237,70 +233,4 @@ public class PlayerSpawner : MonoBehaviour
     }
 
 
-}
-public class GameStatus
-{
-    public Player lastSurvivor;
-    public int total;
-    public int alive;
-    public int alive_ourTeam;
-    public int dead;
-    public int toKill;
-    public GameStatus(SortedDictionary<string, Unit_Player> unitDict)
-    {
-        GetGameStatus(unitDict);
-    }
-
-    void GetGameStatus(SortedDictionary<string, Unit_Player> unitDict)
-    {
-        Team myTeam = (Team)UI_PlayerLobbyManager.GetPlayerProperty("TEAM", Team.HOME);
-        bool isTeamGame = GameSession.gameMode == GameMode.TEAM;
-        foreach (Unit_Player p in unitDict.Values)
-        {
-            total++;
-            if (p != null && p.gameObject.activeInHierarchy)
-            {
-                lastSurvivor = p.pv.Owner;
-                alive++;
-                if (isTeamGame)
-                {
-                    if (p.myTeam != myTeam)
-                    {
-                        toKill++;
-                    }
-                    else
-                    {
-                        alive_ourTeam++;
-                    }
-                }
-                else
-                {
-                    if (p.pv.Owner.UserId != PhotonNetwork.LocalPlayer.UserId)
-                    {
-                        toKill++;
-                    }
-                }
-            }
-            else
-            {
-                dead++;
-            }
-        }
-        if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
-        {
-            lastSurvivor = PhotonNetwork.LocalPlayer;
-        }
-    }
-
-    public override string ToString() {
-        string o = "Game mode : " + GameSession.gameMode+"\n";
-         o += "Total Players:" + total+"\n";
-         o += "Total Alive:" + alive+"\n";
-         o += "Total Alive in my team:"+UI_PlayerLobbyManager.GetPlayerProperty("TEAM",Team.HOME)+" ? " + alive+"\n";
-        o += "Total dead:" + dead + "\n";
-        o += "Total to kill:" + toKill + "\n";
-        o += "Last survivor:" + lastSurvivor + "\n";
-        return o;
-
-    }
 }

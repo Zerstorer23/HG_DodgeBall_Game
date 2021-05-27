@@ -13,12 +13,11 @@ public class Unit_HUD : MonoBehaviour
    [SerializeField] Text hpText;
    [SerializeField] Text nameText;
    [SerializeField] Unit_Player player;
-    float cooltime;
     int maxLife;
     SkillManager skill;
     private void OnEnable()
     {
-        bool isTeamGame = GameSession.gameMode == GameMode.TEAM;
+       
         if (player.pv.IsMine)
         {
             nameText.enabled = false;
@@ -28,7 +27,7 @@ public class Unit_HUD : MonoBehaviour
             nameText.enabled = true;
             nameText.text = player.pv.Owner.NickName;
         }
-        if (isTeamGame)
+        if (GameSession.gameModeInfo.isTeamGame)
         {
             teamIndicator.enabled = true;
             teamIndicator.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[player.myTeam==Team.HOME ? 0 : 1]);

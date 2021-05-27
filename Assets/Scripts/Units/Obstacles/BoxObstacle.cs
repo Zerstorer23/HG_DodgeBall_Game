@@ -108,7 +108,9 @@ public class BoxObstacle : MonoBehaviourPun
            if (healthPoint == null) return;
                switch (c.gameObject.tag) {
                   case ConstantStrings.TAG_PLAYER:
-
+                    if (healthPoint.pv.IsMine) {
+                        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = "갇혀죽었습니다!" });
+                    }
                     healthPoint.Kill_Immediate();
                       break;
                   case ConstantStrings.TAG_PROJECTILE:
