@@ -55,7 +55,7 @@ public class StatisticsManager : MonoBehaviourPun
     private Dictionary<string, int> localStatLibrary;
     public  void Init()
     {
-        Debug.Log("Init stat lib");
+
         statLibrary = new Dictionary<StatTypes, Dictionary<string, int>>();
         for (int i = 0; i < (int)StatTypes.END;  i++) {
             StatTypes head = (StatTypes)i;

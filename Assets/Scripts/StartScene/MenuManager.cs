@@ -66,8 +66,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
     }
     public override void OnJoinedRoom()
     {
-        Debug.Log(PhotonNetwork.CurrentRoom.Name);
-     
         PhotonNetwork.NickName = UI_ChangeName.default_name;
         loadingChuu.SetActive(false);
         foreach (GameObject go in disableInLoading)

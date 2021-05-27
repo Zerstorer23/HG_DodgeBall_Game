@@ -62,6 +62,17 @@ public class Action_SetProjectileCurves : SkillAction
         return 0f;
     }
 }
+public class Action_SetProjectile_InvincibleFromMapBullets : SkillAction
+{
+    // Start is called before the first frame update
+    public override float Activate()
+    {
+        if (parent.pv == null) return 0f;
+        bool enable = (bool)GetParam(SkillParams.Enable);
+        parent.pv.RPC("SetInvincibleFromMapBullets", RpcTarget.AllBuffered, enable);
+        return 0f;
+    }
+}
 public class Action_DoScaleTween : SkillAction
 {
     // Start is called before the first frame update

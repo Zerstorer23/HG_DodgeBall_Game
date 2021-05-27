@@ -2282,8 +2282,8 @@ MonoBehaviour:
   skillPanelUI: {fileID: 1564884124}
   leaderboardUI: {fileID: 0}
   gameOverManager: {fileID: 165690841}
-  versionCode: 0527
-  requireHalfAgreement: 1
+  versionCode: 0528
+  requireHalfAgreement: 0
 --- !u!114 &844291303
 MonoBehaviour:
   m_ObjectHideFlags: 0

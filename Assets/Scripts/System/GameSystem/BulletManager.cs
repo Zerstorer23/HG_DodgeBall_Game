@@ -139,7 +139,7 @@ public class BulletManager : MonoBehaviour
         var players = GetPlayersInField(gameField.fieldNo);
         int yasumiCount = 0;
         foreach (var p in players) {
-            CharacterType character = (CharacterType)p.CustomProperties["CHARACTER"];
+            CharacterType character = (CharacterType)ConnectedPlayerManager.GetPlayerProperty(p,"CHARACTER", CharacterType.NONE);
             if (character == CharacterType.YASUMI) {
                 yasumiCount++;
             }

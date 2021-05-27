@@ -57,7 +57,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
             GameFieldManager.SetGameMap(GameSession.gameModeInfo.gameMode);
             GameFieldManager.ChangeToSpectator();
             Debug.Log("난입세팅끝");
-            StartGame();
+            StartCoroutine(WaitAndStartGame());
         }
     }
 
@@ -84,8 +84,8 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         localPlayerObject = PhotonNetwork.Instantiate(ConstantStrings.PREFAB_STARTSCENE_PLAYERNAME, Vector3.zero, Quaternion.identity, 0);
         localPlayerInfo = localPlayerObject.GetComponent<HUD_UserName>();
         string name = PhotonNetwork.NickName;
-        CharacterType character = (CharacterType)GetPlayerProperty("CHARACTER", CharacterType.HARUHI);
-        Team myTeam = (Team)GetPlayerProperty("TEAM", Team.HOME);
+        CharacterType character = (CharacterType)ConnectedPlayerManager.GetPlayerProperty("CHARACTER", CharacterType.HARUHI);
+        Team myTeam = (Team)ConnectedPlayerManager.GetPlayerProperty("TEAM", Team.HOME);
         localPlayerInfo.pv.RPC("ChangeName", RpcTarget.AllBuffered, name);
         localPlayerInfo.pv.RPC("ChangeCharacter", RpcTarget.AllBuffered, (int)character);
         localPlayerInfo.pv.RPC("SetTeam", RpcTarget.AllBuffered, (int)myTeam);
@@ -195,6 +195,10 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
             StartGame();
         }
     }
+    IEnumerator WaitAndStartGame() {
+        yield return new WaitForFixedUpdate();
+        StartGame();
+    }
     public void StartGame()
     {
         if (localPlayerObject != null)
@@ -231,16 +235,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         }
 
     }
-    public static object GetPlayerProperty(string tag, object value)
-    {
-        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(tag))
-        {
-            return PhotonNetwork.LocalPlayer.CustomProperties[tag];
-        }
-        else
-        {
-            return value;
-        }
-    }
+
+
     #endregion
 }

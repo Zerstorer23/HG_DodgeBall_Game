@@ -15,7 +15,7 @@ public class GameStatus
     public int toKill;
     public GameStatus(SortedDictionary<string, Unit_Player> unitDict, Player lastDied)
     {
-        Team myTeam = (Team)UI_PlayerLobbyManager.GetPlayerProperty("TEAM", Team.HOME);
+        Team myTeam = (Team)ConnectedPlayerManager.GetPlayerProperty("TEAM", Team.HOME);
         this.lastDied = lastDied;
         foreach (Unit_Player p in unitDict.Values)
         {
@@ -62,7 +62,7 @@ public class GameStatus
         string o = "Game mode : " + GameSession.gameModeInfo.gameMode + "\n";
         o += "Total Players:" + total + "\n";
         o += "Total Alive:" + alive + "\n";
-        o += "Total Alive in my team:" + UI_PlayerLobbyManager.GetPlayerProperty("TEAM", Team.HOME) + " ? " + alive + "\n";
+        o += "Total Alive in my team:" + ConnectedPlayerManager.GetPlayerProperty("TEAM", Team.HOME) + " ? " + alive + "\n";
         o += "Total dead:" + dead + "\n";
         o += "Total to kill:" + toKill + "\n";
         o += "Last survivor:" + lastSurvivor + "\n";

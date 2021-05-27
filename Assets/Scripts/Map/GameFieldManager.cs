@@ -242,7 +242,7 @@ public class GameFieldManager : MonoBehaviourPun
 
         numActiveFields = Mathf.CeilToInt((float)playerList.Length / maxPlayerPerRoom);
         Debug.Log("Active fields : " + numActiveFields);
-        Dictionary<string, int> indexMap = ConnectedPlayerManager.GetIndexMap(playerList, true);
+        SortedDictionary<string, int> indexMap = ConnectedPlayerManager.GetIndexMap(playerList, true);
         foreach (var entry in indexMap) { 
             int assignField = (entry.Value + randomOffset) % numActiveFields;
             Debug.Log("Player  : "+entry.Key+" -> " +assignField);
@@ -333,5 +333,11 @@ public class GameFieldManager : MonoBehaviourPun
         ChatManager.SetInputFieldVisibility(true);
         MainCamera.FocusOnField(true);
        // MainCamera.instance.FocusOnAlivePlayer();
+    }
+    public static Player GetPlayerByID(string id) {
+        if (totalUnitsDictionary.ContainsKey(id)) {
+            return instance.totalPlayersDictionary[id];
+        }
+        return null;
     }
 }

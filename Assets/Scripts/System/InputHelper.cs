@@ -34,9 +34,6 @@ public class InputHelper :MonoBehaviour
             GetInputVertical = GetKeyInputVertical;
             GetTargetVector = GetMousePosition;
         }
-
-        Debug.Log("Do something special here");
-
     }
     float GetKeyInputHorizontal()
     {

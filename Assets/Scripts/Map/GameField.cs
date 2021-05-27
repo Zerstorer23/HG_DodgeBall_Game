@@ -71,10 +71,8 @@ public class GameField : MonoBehaviourPun
 
         Player winner = stat.lastSurvivor;
         Debug.Log("GAME FISNISHED / master: " + (winner == PhotonNetwork.LocalPlayer) + " winner "+winner); 
-        if (winner == PhotonNetwork.LocalPlayer)
-        {
-            pv.RPC("NotifyFieldWinner", RpcTarget.AllBuffered, winner);
-        }
+        pv.RPC("NotifyFieldWinner", RpcTarget.AllBufferedViaServer, winner);
+        
     }
 
     public Player fieldWinner = null;
@@ -83,6 +81,7 @@ public class GameField : MonoBehaviourPun
     [PunRPC]
     public void NotifyFieldWinner(Player winner)
     {
+        if (gameFieldFinished) return;
         gameFieldFinished = true;
         fieldWinner = winner;
         winnerName = winner.NickName;

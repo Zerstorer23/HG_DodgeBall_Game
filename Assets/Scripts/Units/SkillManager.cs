@@ -362,7 +362,6 @@ public class SkillManager : MonoBehaviourPun
             mySkill.Enqueue(new Action_Player_InvincibleBuff());//
             mySkill.Enqueue(new Action_WaitForSeconds());
         }
-        Debug.Log("Activate skill");
         StartCoroutine(mySkill.Activate());
     }
     private void DoSkillSet_Kimidori()
@@ -372,10 +371,12 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.MoveSpeed, 6f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KIMIDORI);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.Die);
+        mySkill.SetParam(SkillParams.Enable, !GameSession.gameModeInfo.isCoop);
+
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
         mySkill.Enqueue(new Action_InstantiateBullet_FollowPlayer());
         mySkill.Enqueue(new Action_SetProjectile_Orbit());
-        Debug.Log("Activate skill");
+        mySkill.Enqueue(new Action_SetProjectile_InvincibleFromMapBullets());
         StartCoroutine(mySkill.Activate());
     }
     private void DoSkillSet_Kyouko()

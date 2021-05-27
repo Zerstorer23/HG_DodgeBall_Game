@@ -78,6 +78,12 @@ public class HealthPoint : MonoBehaviourPun
         killerUID = null;
         if (unitType == UnitType.Projectile) currentLife = 1;
     }
+
+    [PunRPC]
+    public void SetInvincibleFromMapBullets(bool enable) {
+        invincibleFromMapBullets = enable;
+    }
+
     public void SetAssociatedField(int no) {
         associatedField = no;
     }
@@ -122,8 +128,7 @@ public class HealthPoint : MonoBehaviourPun
                 MainCamera.instance.DoShake();
                 unitPlayer.PlayHitAudio();
             }
-            bool targetIsDead = (expectedlife <= 0 || instaDeath);
-            NotifySourceOfDamage(attackerUserID, targetIsDead);
+            NotifySourceOfDamage(attackerUserID, instaDeath);
         }
     }
 
@@ -161,19 +166,25 @@ public class HealthPoint : MonoBehaviourPun
         }
     }
 
-    void NotifySourceOfDamage(string attackerUserID , bool targetIsDead)
+    void NotifySourceOfDamage(string attackerUserID , bool instaDeath)
     {
         Player p = ConnectedPlayerManager.GetPlayerByID(attackerUserID);
         string attackerNickname = (p == null) ? "???" : p.NickName;
+        bool targetIsDead = (expectedlife <= 0 || instaDeath);
         if (pv.IsMine)
         {
+            targetIsDead = (currentLife <= 0 || instaDeath);
             if (attackerUserID == null)
             { //AttackedByMapObject
                 
                 EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = "회피실패" });
                 if (targetIsDead)
                 {
-                    ChatManager.SendNotificationMessage(PhotonNetwork.NickName + "님이 사망했습니다.", "#FF0000");
+                    if (killerUID == null)
+                    {
+                        killerUID = "mapobj";
+                        ChatManager.SendNotificationMessage(PhotonNetwork.NickName + "님이 사망했습니다.", "#FF0000");
+                    }
                 }
             }
             else

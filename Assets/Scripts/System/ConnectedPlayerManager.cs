@@ -65,15 +65,12 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         SortedSet<string> myList = new SortedSet<string>();
         foreach (Player p in players)
         {
-            int seed = (p.CustomProperties.ContainsKey("SEED")) ? (int)p.CustomProperties["SEED"]
-                : 0;
+            int seed = (int)GetPlayerProperty(p, "SEED", 0);
             string id = (useRandom) ? seed + p.UserId : p.UserId;
             myList.Add(id);
         }
         int i = 0;
-        int mySeed = (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("SEED")) ? 
-            (int)PhotonNetwork.LocalPlayer.CustomProperties["SEED"]
-                : 0;
+        int mySeed = (int)GetPlayerProperty("SEED", 0);
         string myID = (useRandom) ? mySeed + PhotonNetwork.LocalPlayer.UserId : PhotonNetwork.LocalPlayer.UserId;
         foreach (var val in myList)
         {
@@ -82,25 +79,21 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         }
         return 0;
     }
-    internal static Dictionary<string,int> GetIndexMap(Player[] players, bool useRandom = false)
+    internal static SortedDictionary<string,int> GetIndexMap(Player[] players, bool useRandom = false)
     {
          instance.Init();
-        SortedSet<string> myList = new SortedSet<string>();
-        Dictionary<string, string> decodeMap = new Dictionary<string, string>();
+        SortedDictionary<string, string> decodeMap = new SortedDictionary<string, string>();
         foreach (Player p in players)
         {
-            int seed = (p.CustomProperties.ContainsKey("SEED")) ? (int)p.CustomProperties["SEED"]
-                : 0;
+            int seed = (int)GetPlayerProperty(p, "SEED", 0);
             string id = (useRandom) ? seed + p.UserId : p.UserId;
-            myList.Add(id);
             decodeMap.Add(id, p.UserId);
         }
         int i = 0;
-        Dictionary<string, int> indexMap = new Dictionary<string, int>();
-        foreach (var val in myList)
+        SortedDictionary<string, int> indexMap = new SortedDictionary<string, int>();
+        foreach (var val in decodeMap)
         {
-            string realID = decodeMap[val];
-            indexMap.Add(realID, i++);
+            indexMap.Add(val.Value, i++);
         }
         return indexMap;
     }
@@ -171,22 +164,43 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
             }
         }
     }
-
-
- /*   public void Disconnect()
+    public static object GetPlayerProperty(string tag, object value)
     {
-        PhotonNetwork.Disconnect();
-    }
-
-    public void Reconnect()
-    {
-        if (!PhotonNetwork.IsConnected && wasConnected)
+        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(tag))
         {
-            PhotonNetwork.ReconnectAndRejoin();
+            return PhotonNetwork.LocalPlayer.CustomProperties[tag];
         }
         else
         {
-            PhotonNetwork.ConnectUsingSettings();
+            return value;
         }
-    }*/
+    }
+
+    public static object GetPlayerProperty(Player p, string tag, object value)
+    {
+        if (p.CustomProperties.ContainsKey(tag))
+        {
+            return p.CustomProperties[tag];
+        }
+        else
+        {
+            return value;
+        }
+    }
+    /*   public void Disconnect()
+       {
+           PhotonNetwork.Disconnect();
+       }
+
+       public void Reconnect()
+       {
+           if (!PhotonNetwork.IsConnected && wasConnected)
+           {
+               PhotonNetwork.ReconnectAndRejoin();
+           }
+           else
+           {
+               PhotonNetwork.ConnectUsingSettings();
+           }
+       }*/
 }
