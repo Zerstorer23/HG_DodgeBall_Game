@@ -12,7 +12,8 @@ public class Unit_AutoDrive : MonoBehaviour
     SkillManager skillManager;
     Unit_Movement movement;
     internal GameObject directionIndicator;
-    public float range;
+    float range = 9f;
+    float attackRange = 9f;
     float escapePadding = 1f;
 
     public GameObject targetEnemy;
@@ -20,6 +21,7 @@ public class Unit_AutoDrive : MonoBehaviour
     [SerializeField] Unit_Player player;
    internal float aimAngle;
 
+    Vector3 xWall, yWall;
     public void SetInfo() {
         movement = player.movement;
         skillManager = player.skillManager;
@@ -27,13 +29,8 @@ public class Unit_AutoDrive : MonoBehaviour
         myInstanceID = player.gameObject.GetInstanceID();
     
     }
-    private void Awake()
-    {
-        SetRange(9f);
-    }
-    public void SetRange(float a) {
-        range = a;
-    }
+
+
     SortedDictionary<string,Unit_Player> playersOnMap;
     private void OnEnable()
     {
@@ -46,6 +43,11 @@ public class Unit_AutoDrive : MonoBehaviour
     private void Start()
     {
         FindNearestPlayer();
+    }
+    public bool CanAttackTarget() {
+        if (GameSession.gameModeInfo.isCoop) return true;
+        if (targetEnemy == null) return false;
+        return (Vector2.Distance(targetEnemy.transform.position,transform.position) <= attackRange) ;
     }
     private void OnDisable()
     {
@@ -76,6 +78,8 @@ public class Unit_AutoDrive : MonoBehaviour
             }
             Gizmos.DrawWireSphere(go.transform.position, 0.5f);
         }
+        Gizmos.DrawWireSphere(xWall, 1f);
+        Gizmos.DrawWireSphere(yWall, 1f);
     }
     // Update is called once per frame
 
@@ -149,18 +153,15 @@ public class Unit_AutoDrive : MonoBehaviour
         RemoveObjects();
         FindNearByObjects();
         lastVector = EvaluateMoves();
-        EvaluateAim();
+        //EvaluateAim();
     }
 
     public float EvaluateAim()
     {
         FindNearestPlayer();
         Vector3 targetPosition = (targetEnemy == null) ? lastVector : targetEnemy.transform.position;
-        Vector3 sourcePosition = (targetEnemy == null) ? Vector3.zero : transform.position;
+        Vector3 sourcePosition = (targetEnemy == null) ? Vector3.zero : movement.networkPos;
         aimAngle = GameSession.GetAngle(sourcePosition, targetPosition);
-/*        if (targetEnemy != null) {
-            Debug.Log("Target player at " + targetPosition + " source " + sourcePosition+ " angle "+aimAngle);
-        }*/
         directionIndicator.transform.localPosition = GetAngledVector(aimAngle, 1.4f); // new Vector3(dX, dY);
         directionIndicator.transform.localRotation = Quaternion.Euler(0, 0, aimAngle);
         return aimAngle;
@@ -195,15 +196,20 @@ public class Unit_AutoDrive : MonoBehaviour
                     move -= directionToTarget * multiplier;
                     break;
             }
+          //  Debug.Log("Inter move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
         }
 
-        move += GetAwayFromWalls();
-        if (move == Vector3.zero)
+        move += GetAwayFromWalls_2();
+       // Debug.Log("Wall move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
+        if (move.magnitude > 1f)
         {
-            move = lastVector;
+            move.Normalize();
         }
-
-        return move.normalized;
+        else if (move.sqrMagnitude <= 0.03f) {
+            move = Vector3.zero;
+        }
+      //  Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
+        return move;
     }
 
     Vector3 GetAwayFromWalls() {
@@ -216,9 +222,47 @@ public class Unit_AutoDrive : MonoBehaviour
         
         return dir;
     }
+    Vector3 GetAwayFromWalls_2()
+    {
+        Vector3 move = Vector3.zero;
+/*        if (
+            Mathf.Abs(movement.networkPos.x - movement.mapSpec.xMid) < Mathf.Epsilon
+            &&
+            Mathf.Abs(movement.networkPos.y - movement.mapSpec.yMid) < Mathf.Epsilon
+         )
+        {
+            return move;
+        }*/
+     
+        float xBound = (movement.networkPos.x < movement.mapSpec.xMid) ? movement.mapSpec.xMin : movement.mapSpec.xMax;
+        float yBound = (movement.networkPos.y < movement.mapSpec.yMid) ? movement.mapSpec.yMin : movement.mapSpec.yMax;
+
+        xWall = new Vector3(movement.networkPos.x, yBound);
+        if (Vector2.Distance(xWall, movement.networkPos) <= range) {
+            move += EvaluateToPoint(xWall, false, 2f);
+        }
+
+        yWall= new Vector3(xBound,  movement.networkPos.y);
+        if (Vector2.Distance(yWall, movement.networkPos) <= range)
+        {
+            move += EvaluateToPoint(yWall, false, 2f);
+        }
+
+     //   Debug.Log("Center " + (dirToCenter * GetMultiplier(centerDist)) + " bound " + (-dirToBound * GetMultiplier(boundDist)) + " move " + move);
+        return move;
+    }
+    Vector3 EvaluateToPoint(Vector3 point, bool positive, float flavour = 1f)
+    {
+        Vector3 dirToPoint = point - movement.networkPos;
+        dirToPoint.Normalize();
+        float dist = Vector2.Distance(point, movement.networkPos);
+        Vector3 direction = dirToPoint * GetMultiplier(dist) * flavour;
+        if (!positive) direction *= -1f;
+        return direction;
+    }
 
     float GetMultiplier(float x) {
-        float y = (1 / Mathf.Pow(x+ 2,2)) * 48 - 0.4f;
+        float y = (1 / Mathf.Pow(x+ 2,2)) * 48;
         return y;
     }
 }

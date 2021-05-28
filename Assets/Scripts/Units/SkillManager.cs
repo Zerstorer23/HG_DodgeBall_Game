@@ -41,7 +41,7 @@ public class SkillManager : MonoBehaviourPun
     {
         if (PhotonNetwork.Time < lastActivated + 0.4) return;
         if (InputHelper.skillKeyFired() || 
-            (MenuManager.auto_drive && CheckAutoDrive())   
+            (MenuManager.auto_drive && unitMovement.autoDriver.CanAttackTarget())   
             )
         {
             if (currStack > 0)
@@ -54,9 +54,7 @@ public class SkillManager : MonoBehaviourPun
             }
         }
     }
-    bool CheckAutoDrive() {
-        return unitMovement.autoDriver.targetEnemy != null;
-    }
+
 
     private void OnEnable()
     {

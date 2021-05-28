@@ -25,6 +25,13 @@ public class GameSession : MonoBehaviourPun
     public static int LocalPlayer_FieldNumber = -1;
     PhotonView pv;
 
+    public float gameSpeed = 1f;
+
+    private void FixedUpdate()
+    {
+        Time.timeScale = gameSpeed;
+    }
+
     public static GameSession instance
     {
         get
