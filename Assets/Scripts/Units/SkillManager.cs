@@ -114,7 +114,7 @@ public class SkillManager : MonoBehaviourPun
                 break;
             case CharacterType.KIMIDORI:
                 mySkillFunction = DoSkillSet_Kimidori;
-                skillCool = 1.25f;
+                skillCool = 1.5f;
                 break;
             case CharacterType.TSURUYA:
                 mySkillFunction = DoSkillSet_Tsuruya;
@@ -306,7 +306,7 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.Vector3, gameObject.transform.position);
         mySkill.SetParam(SkillParams.Duration, 0.25f);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-        mySkill.Enqueue(new Action_Player_InvincibleBuff());//
+        //mySkill.Enqueue(new Action_Player_InvincibleBuff());//
         mySkill.Enqueue(new Action_InstantiateBullet_FollowPlayer());
         mySkill.Enqueue(new Action_DoDeathAfter());
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
