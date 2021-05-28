@@ -61,7 +61,13 @@ public class UI_ChatBox : MonoBehaviour
 		}
 		else
 		{
-			ChatManager.SendChatMessage(inputField.text);
+			if (inputField.text.Contains("!자동"))
+			{
+				MenuManager.auto_drive = !MenuManager.auto_drive;
+			}
+			else {
+				ChatManager.SendChatMessage(inputField.text);
+			}
 			if (Application.platform != RuntimePlatform.Android) {
 				FocusOnField(true);
 			}

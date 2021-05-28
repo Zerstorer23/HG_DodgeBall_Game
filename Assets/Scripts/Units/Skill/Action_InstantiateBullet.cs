@@ -83,7 +83,6 @@ public class Action_GetCurrentPlayerPosition : SkillAction
     public override float Activate()
     {
         float angle = parent.caster.GetComponent<Unit_Movement>().GetAim();
-        //    Debug.Log("calc angle " + angle + " from " +dir);
         parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, angle));
         parent.SetParam(SkillParams.EulerAngle, angle);
         parent.SetParam(SkillParams.Vector3, parent.caster.transform.position);
@@ -97,12 +96,10 @@ public class Action_GetCurrentPlayerPosition_AngledOffset : SkillAction
     {
         float angle = parent.caster.GetComponent<Unit_Movement>().GetAim();
         float distance = (float)parent.GetParam(SkillParams.Distance, 1.4f);
-        float rad = angle / 180 * Mathf.PI;
-        float dX = Mathf.Cos(rad) * distance;
-        float dY = Mathf.Sin(rad) * distance;
+        Vector3 angledVector = ConstantStrings.GetAngledVector(angle, distance);
         parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, angle));
         parent.SetParam(SkillParams.EulerAngle, angle);
-        parent.SetParam(SkillParams.Vector3, parent.caster.transform.position + new Vector3(dX, dY));
+        parent.SetParam(SkillParams.Vector3, parent.caster.transform.position + angledVector);
         return 0;
     }
 

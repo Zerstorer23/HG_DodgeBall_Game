@@ -12,7 +12,11 @@ public class InputHelper :MonoBehaviour
     public delegate Vector3 Vector3Function();
     public static Vector3Function GetTargetVector;
 
-   public static string padXaxis = "RHorizontal";
+    public delegate bool skillFireFunc();
+    public static skillFireFunc skillKeyFired;
+
+
+    public static string padXaxis = "RHorizontal";
     public static string padYaxis = "RVertical";
     private void Awake()
     {
@@ -25,14 +29,14 @@ public class InputHelper :MonoBehaviour
             GetInputHorizontal = Control_MobileStick.GetInputHorizontal;
             GetInputVertical = Control_MobileStick.GetInputVertical;
             GetTargetVector = GetTouchPosition;
-
-
+            skillKeyFired = FireButtonDown_Mobile;
         }
         else
         {
             GetInputHorizontal = GetKeyInputHorizontal;
             GetInputVertical = GetKeyInputVertical;
             GetTargetVector = GetMousePosition;
+            skillKeyFired = FireButtonDown_PC;
         }
     }
     float GetKeyInputHorizontal()
@@ -66,5 +70,15 @@ public class InputHelper :MonoBehaviour
                 padYaxis = "RVerticalXbox";
                 break;
         }
+    }
+    private bool FireButtonDown_PC()
+    {
+        return Input.GetAxis("Fire1") > 0
+            || Input.GetKeyDown(KeyCode.Joystick1Button5)
+            || Input.GetKeyDown(KeyCode.Joystick1Button7);
+    }
+    private bool FireButtonDown_Mobile()
+    {
+        return UI_TouchPanel.isTouching;
     }
 }

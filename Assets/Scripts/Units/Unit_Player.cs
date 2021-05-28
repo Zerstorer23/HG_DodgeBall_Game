@@ -64,8 +64,6 @@ public class Unit_Player : MonoBehaviourPun
         ParseInstantiationData();
         if (pv.IsMine)
         {
-          //  movement.autoDriver = NetworkPosition.GetInst().autoDriver;
-          //  NetworkPosition.ConnectPlayer(this);
             EventManager.StartListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
             EventManager.StartListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, IncrementKill);
             MainCamera.SetFollow(GameSession.GetInst().networkPos);

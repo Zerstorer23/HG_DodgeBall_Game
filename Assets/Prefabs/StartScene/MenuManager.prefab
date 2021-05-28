@@ -2291,6 +2291,7 @@ MonoBehaviour:
   - {fileID: 5869086520886471121}
   lobbyManager: {fileID: 4733557269958086300}
   mapOptions: {fileID: 4503549055687909365}
+  autoToggle: {fileID: 6446113130511264222}
 --- !u!1 &5869086519952122146
 GameObject:
   m_ObjectHideFlags: 0

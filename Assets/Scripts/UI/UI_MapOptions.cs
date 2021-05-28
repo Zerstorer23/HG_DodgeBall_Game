@@ -11,7 +11,7 @@ public class UI_MapOptions : MonoBehaviourPun
 {
     //*****GAME SETTING***//
     public static readonly int default_lives_index = 1;
-    public static readonly MapDifficulty default_difficult = MapDifficulty.None;
+    public static readonly MapDifficulty default_difficult = MapDifficulty.Easy;
    // public int playerLives;
    // public MapDifficulty mapDifficulty;
     bool gameStarted = false;

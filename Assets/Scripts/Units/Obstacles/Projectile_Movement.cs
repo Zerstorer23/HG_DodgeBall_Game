@@ -159,7 +159,7 @@ public class Projectile_Movement : MonoBehaviourPun
     }
     private void FixedUpdate()
     {
-        if (mapSpec.IsOutOfBound(transform.position, 3f)) {
+        if (mapSpec.IsOutOfBound(transform.position, 6f)) {
             hp.Kill_Immediate();
         };
     }

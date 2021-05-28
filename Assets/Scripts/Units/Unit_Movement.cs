@@ -44,6 +44,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         {
             InputHelper.SetAxisNames();
         }
+        autoDriver.enabled = MenuManager.auto_drive;
     }
 
 
@@ -51,7 +52,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         mapSpec = spec;
     }
 
-   internal Unit_AutoDrive autoDriver;
+   public Unit_AutoDrive autoDriver;
 
     private void Start()
     {
@@ -231,7 +232,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
 
     public float GetAim()
     {
-        return aimAngle;
+        return (MenuManager.auto_drive)? autoDriver.EvaluateAim() : aimAngle;
     }
     public double networkExpectedTime;
     public Vector3 networkPos;

@@ -17,16 +17,15 @@ public class MenuManager : MonoBehaviourPunCallbacks
     [SerializeField] UI_PlayerLobbyManager lobbyManager;
     [SerializeField] UI_MapOptions mapOptions;
 
-  public  static bool auto_drive = false;
+    public  static bool auto_drive = false;
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
+        auto_drive = autoToggle.isOn;
     }
-
 
     private void Start()
     {
-
         DoLoading();
     }
 
@@ -37,16 +36,19 @@ public class MenuManager : MonoBehaviourPunCallbacks
         {
             go.SetActive(false);
         }
+        Debug.Log("Try connect");
         PhotonNetwork.ConnectUsingSettings();
     }
 
     public override void OnConnectedToMaster()
     {
         //PhotonNetwork.JoinLobby(TypedLobby.Default);
+        Debug.Log("Connected to master");
         JoinRoom();
     }
     public override void OnJoinedLobby()
     {
+        Debug.Log("Try join room");
         JoinRoom();
     }
     public void JoinRoom()
@@ -79,8 +81,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         return PhotonNetwork.LocalPlayer.NickName;
     }
+
+    [SerializeField] Toggle autoToggle;
     public void OnAutoToggle() {
-        auto_drive = !auto_drive;
+        auto_drive = autoToggle.isOn;
     }
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {

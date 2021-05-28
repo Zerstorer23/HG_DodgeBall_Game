@@ -40,7 +40,6 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         playerHash.Add("TEAM", Team.HOME);
         playerHash.Add("CHARACTER", CharacterType.NONE);
         playerHash.Add("SEED", UnityEngine.Random.Range(0, 133));
-     //   playerHash.Add("FIELD", 0);
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerHash);
         Debug.Log("Game started? " + mapOptions.GetGameStarted());
         if (!mapOptions.GetGameStarted())

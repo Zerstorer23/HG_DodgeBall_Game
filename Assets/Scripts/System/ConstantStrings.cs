@@ -66,6 +66,12 @@ public class ConstantStrings : MonoBehaviour
 
         return rot_z;// new Vector3(0f, 0f, rot_z);
     }
+    public static Vector3 GetAngledVector(float eulerAngle, float distance) {
+        float rad = eulerAngle / 180 * Mathf.PI;
+        float dX = Mathf.Cos(rad) * distance;
+        float dY = Mathf.Sin(rad) * distance;
+        return new Vector3(dX, dY);
+    }
 }
 
 public enum GameMode { 

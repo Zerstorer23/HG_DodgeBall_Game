@@ -18,9 +18,7 @@ public class SkillManager : MonoBehaviourPun
     public CharacterType myCharacter;
 
     delegate void voidFunc();
-    delegate bool skillFireFunc();
     voidFunc mySkillFunction;
-    skillFireFunc skillKeyFired;
     public int maxStack;
     public float cooltime;
     public bool skillInUse = false;
@@ -35,38 +33,16 @@ public class SkillManager : MonoBehaviourPun
         unitMovement = GetComponent<Unit_Movement>();
         player = GetComponent<Unit_Player>();
         buffManager = GetComponent<BuffManager>();
-        SetSkillKey();
     }
 
-    private void SetSkillKey()
-    {
-        if (Application.platform == RuntimePlatform.Android)
-        {
 
-            skillKeyFired = FireButtonDown_Mobile;
-        }
-        else {
-            skillKeyFired = FireButtonDown_PC;
-        }
-    }
-    private bool FireButtonDown_PC() {
-        return Input.GetAxis("Fire1") > 0 
-            || Input.GetKeyDown(KeyCode.Joystick1Button5) 
-            || Input.GetKeyDown(KeyCode.Joystick1Button7)
-            || MenuManager.auto_drive;
-    }
-    private bool FireButtonDown_Mobile() {
-        return UI_TouchPanel.isTouching;
-    }
 
     private void CheckSkillActivation()
     {
         if (PhotonNetwork.Time < lastActivated + 0.4) return;
-/*        if (Input.GetMouseButton(0) && EventSystem.current.IsPointerOverGameObject()){
-            return;
-        }*/
-
-        if (skillKeyFired())
+        if (InputHelper.skillKeyFired() || 
+            (MenuManager.auto_drive && CheckAutoDrive())   
+            )
         {
             if (currStack > 0)
             {
@@ -78,6 +54,10 @@ public class SkillManager : MonoBehaviourPun
             }
         }
     }
+    bool CheckAutoDrive() {
+        return unitMovement.autoDriver.targetEnemy != null;
+    }
+
     private void OnEnable()
     {
         ParseSkill();
@@ -428,10 +408,10 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_TSURUYA);
         mySkill.SetParam(SkillParams.Quarternion, Quaternion.identity);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-        float radius = 9f; //5
+        float radius = 12f; //5
         float timeStep = 0.25f; //0.25
-        int numStep = 3; //10
-        int shootAtOnce = 3;//10
+        int numStep = 4; //10
+        int shootAtOnce = 5;//10
         mySkill.SetParam(SkillParams.Duration, timeStep);
         BuffData buff = new BuffData(BuffType.MoveSpeed, -0.5f, timeStep * (numStep));
         mySkill.SetParam(SkillParams.BuffData, buff);

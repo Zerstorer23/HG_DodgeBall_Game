@@ -14,8 +14,8 @@ public class BulletManager : MonoBehaviour
     double startTime;
 
     public int activeMax = 30;
-    [Header("Spawner setting")]
     public int currentSpawned = 0;
+    [Header("Spawner setting")]
     public float minDelay, maxDelay;
     public float minDuration, maxDuration;
 
