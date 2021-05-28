@@ -34,12 +34,18 @@ public class Unit_AutoDrive : MonoBehaviour
     public void SetRange(float a) {
         range = a;
     }
+    SortedDictionary<string,Unit_Player> playersOnMap;
     private void OnEnable()
     {
         SetInfo();
         foundObjects = new Dictionary<int, GameObject>();
         EventManager.StartListening(MyEvents.EVENT_BOX_SPAWNED, OnBoxSpawned);
         EventManager.StartListening(MyEvents.EVENT_BOX_ENABLED, OnBoxEnabled);
+        playersOnMap = GameFieldManager.gameFields[player.fieldNo].playerSpawner.unitsOnMap;
+    }
+    private void Start()
+    {
+        FindNearestPlayer();
     }
     private void OnDisable()
     {
@@ -106,7 +112,6 @@ public class Unit_AutoDrive : MonoBehaviour
     void RemoveObjects()
     {
         List<int> keys = new List<int>(foundObjects.Keys);
-        float nearestEnemyDist = 0f;
 
         foreach (var key in keys) {
             GameObject go = foundObjects[key];
@@ -117,14 +122,6 @@ public class Unit_AutoDrive : MonoBehaviour
             else if(go.tag != TAG_BOX_OBSTACLE)
             {
                 float dist = Vector2.Distance(movement.networkPos, go.transform.position);
-                if (go.tag == TAG_PLAYER)
-                {
-                    if (dist < nearestEnemyDist || targetEnemy == null)
-                    {
-                        targetEnemy = go;
-                        nearestEnemyDist = dist;
-                    }
-                }
                 if (dist > (range + escapePadding))
                 {
                     //   Debug.Log("Remove for out of dist " + dist + " / " + (range + escapePadding));
@@ -133,7 +130,18 @@ public class Unit_AutoDrive : MonoBehaviour
             }
         }
     }
-
+    void FindNearestPlayer() {
+        float nearestEnemyDist = 0f;
+        foreach (var p in playersOnMap.Values) {
+            if (p == null || !p.gameObject.activeInHierarchy) continue;
+            if (p.gameObject.GetInstanceID() == myInstanceID) continue;
+            float dist = Vector2.Distance(movement.networkPos, p.gameObject.transform.position);
+            if (dist < nearestEnemyDist || targetEnemy == null) {
+                nearestEnemyDist = dist;
+                targetEnemy = p.gameObject;
+            }
+        }
+    }
     Vector3 lastVector = Vector3.zero;
     private void FixedUpdate()
     {
@@ -145,9 +153,13 @@ public class Unit_AutoDrive : MonoBehaviour
 
     public float EvaluateAim()
     {
+        FindNearestPlayer();
         Vector3 targetPosition = (targetEnemy == null) ? lastVector : targetEnemy.transform.position;
         Vector3 sourcePosition = (targetEnemy == null) ? Vector3.zero : transform.position;
         aimAngle = GameSession.GetAngle(sourcePosition, targetPosition);
+        if (targetEnemy != null) {
+            Debug.Log("Target player at " + targetPosition + " source " + sourcePosition+ " angle "+aimAngle);
+        }
         directionIndicator.transform.localPosition = GetAngledVector(aimAngle, 1.4f); // new Vector3(dX, dY);
         directionIndicator.transform.localRotation = Quaternion.Euler(0, 0, aimAngle);
         return aimAngle;
@@ -168,7 +180,7 @@ public class Unit_AutoDrive : MonoBehaviour
             float multiplier = GetMultiplier(distance);
             switch (go.tag) {
                 case TAG_PLAYER:
-                    move += (skillManager.currStack > 0)? directionToTarget * multiplier : -directionToTarget * multiplier;
+                    move += (skillManager.currStack > 0 || skillManager.skillInUse) ? directionToTarget * multiplier : -directionToTarget * multiplier;
                     break;
                 case TAG_PROJECTILE:
                     move -= directionToTarget * multiplier;

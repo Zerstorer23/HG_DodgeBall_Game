@@ -44,7 +44,11 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         {
             InputHelper.SetAxisNames();
         }
+        if (GameSession.gameModeInfo.gameMode == GameMode.Tournament
+            && PhotonNetwork.CurrentRoom.PlayerCount % 2 == 1
+            ) MenuManager.auto_drive = false;
         autoDriver.enabled = MenuManager.auto_drive;
+        Debug.Log("Auto Driver : " + MenuManager.auto_drive);
     }
 
 
