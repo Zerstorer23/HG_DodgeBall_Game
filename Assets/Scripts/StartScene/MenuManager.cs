@@ -4,6 +4,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 using static ConstantStrings;
+using ExitGames.Client.Photon;
 
 public class MenuManager : MonoBehaviourPunCallbacks
 {
@@ -76,7 +77,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
         lobbyManager.ConnectedToRoom();
     }
-
     public static string GetLocalName()
     {
         return PhotonNetwork.LocalPlayer.NickName;

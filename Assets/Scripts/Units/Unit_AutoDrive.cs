@@ -136,6 +136,7 @@ public class Unit_AutoDrive : MonoBehaviour
             if (p == null || !p.gameObject.activeInHierarchy) continue;
             if (p.gameObject.GetInstanceID() == myInstanceID) continue;
             float dist = Vector2.Distance(movement.networkPos, p.gameObject.transform.position);
+           // if (dist <= Mathf.Epsilon) continue;
             if (dist < nearestEnemyDist || targetEnemy == null) {
                 nearestEnemyDist = dist;
                 targetEnemy = p.gameObject;
@@ -157,9 +158,9 @@ public class Unit_AutoDrive : MonoBehaviour
         Vector3 targetPosition = (targetEnemy == null) ? lastVector : targetEnemy.transform.position;
         Vector3 sourcePosition = (targetEnemy == null) ? Vector3.zero : transform.position;
         aimAngle = GameSession.GetAngle(sourcePosition, targetPosition);
-        if (targetEnemy != null) {
+/*        if (targetEnemy != null) {
             Debug.Log("Target player at " + targetPosition + " source " + sourcePosition+ " angle "+aimAngle);
-        }
+        }*/
         directionIndicator.transform.localPosition = GetAngledVector(aimAngle, 1.4f); // new Vector3(dX, dY);
         directionIndicator.transform.localRotation = Quaternion.Euler(0, 0, aimAngle);
         return aimAngle;

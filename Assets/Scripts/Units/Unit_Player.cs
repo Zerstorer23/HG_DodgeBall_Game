@@ -184,12 +184,9 @@ public class Unit_Player : MonoBehaviourPun
     public void IncrementKill(EventObject eo)
     {
         if (eo.stringObj == pv.Owner.UserId) {
-            Debug.Log("Increment kill start");
             StatisticsManager.RPC_AddToStat(StatTypes.KILL, pv.Owner.UserId, 1);
             StatisticsManager.RPC_AddToStat(StatTypes.SCORE, pv.Owner.UserId, 16);
             StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_KILLS, 1);
-            Debug.Log("Increment kill finish");
-
         }
 
     }
@@ -197,7 +194,6 @@ public class Unit_Player : MonoBehaviourPun
     {
         if (pv.IsMine)
         {
-            Debug.Log("Evaded!");
             evasion++;
             StatisticsManager.RPC_AddToStat(StatTypes.EVADE, pv.Owner.UserId, 1);
             StatisticsManager.RPC_AddToStat(StatTypes.SCORE, pv.Owner.UserId, 1);

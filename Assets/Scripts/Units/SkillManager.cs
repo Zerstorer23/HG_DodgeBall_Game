@@ -114,7 +114,7 @@ public class SkillManager : MonoBehaviourPun
                 break;
             case CharacterType.KIMIDORI:
                 mySkillFunction = DoSkillSet_Kimidori;
-                skillCool = 0.7f;
+                skillCool = 1.25f;
                 break;
             case CharacterType.TSURUYA:
                 mySkillFunction = DoSkillSet_Tsuruya;
@@ -182,7 +182,7 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
         mySkill.Enqueue(new Action_InstantiateBulletAt());
-        mySkill.Enqueue(new Action_Player_InvincibleBuff());
+       // mySkill.Enqueue(new Action_Player_InvincibleBuff());
         mySkill.Enqueue(new Action_WaitForSeconds());
         mySkill.Enqueue(new Action_SetProjectileStraight());
         StartCoroutine(mySkill.Activate());
@@ -250,7 +250,7 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_MIKURU);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
         int numBullets = 1;
-        mySkill.Enqueue(new Action_Player_InvincibleBuff());//
+  //      mySkill.Enqueue(new Action_Player_InvincibleBuff());//
         for (int n = 0; n < numBullets; n++)
         {
             mySkill.Enqueue(new Action_GetCurrentPlayerPosition_AngledOffset());
@@ -339,7 +339,7 @@ public class SkillManager : MonoBehaviourPun
             mySkill.Enqueue(new Action_InstantiateBulletAt());
             //  mySkill.Enqueue(new Action_SetProjectileStraight());
             mySkill.Enqueue(new Action_SetProjectileCurves());
-            mySkill.Enqueue(new Action_Player_InvincibleBuff());//
+          //  mySkill.Enqueue(new Action_Player_InvincibleBuff());//
             mySkill.Enqueue(new Action_WaitForSeconds());
         }
         StartCoroutine(mySkill.Activate());
@@ -382,7 +382,7 @@ public class SkillManager : MonoBehaviourPun
                 mySkill.Enqueue(new Action_InstantiateBulletAt());
                 mySkill.Enqueue(new Action_SetProjectileStraight());
             }
-            mySkill.Enqueue(new Action_Player_InvincibleBuff());//
+            //mySkill.Enqueue(new Action_Player_InvincibleBuff());//
             mySkill.Enqueue(new Action_WaitForSeconds());
             for (int i = 0; i < stepSize; i++)
             {
@@ -392,7 +392,7 @@ public class SkillManager : MonoBehaviourPun
                 mySkill.Enqueue(new Action_InstantiateBulletAt());
                 mySkill.Enqueue(new Action_SetProjectileCurves());
             }
-            mySkill.Enqueue(new Action_Player_InvincibleBuff());//
+          //  mySkill.Enqueue(new Action_Player_InvincibleBuff());//
             mySkill.Enqueue(new Action_WaitForSeconds());
         }
 
