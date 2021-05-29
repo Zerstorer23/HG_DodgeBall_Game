@@ -38,7 +38,6 @@ public class Unit_AutoDrive : MonoBehaviour
         foundObjects = new Dictionary<int, GameObject>();
         EventManager.StartListening(MyEvents.EVENT_BOX_SPAWNED, OnBoxSpawned);
         EventManager.StartListening(MyEvents.EVENT_BOX_ENABLED, OnBoxEnabled);
-        playersOnMap = GameFieldManager.gameFields[player.fieldNo].playerSpawner.unitsOnMap;
     }
     private void Start()
     {
@@ -46,7 +45,13 @@ public class Unit_AutoDrive : MonoBehaviour
     }
     public bool CanAttackTarget() {
         if (GameSession.gameModeInfo.isCoop) return true;
-        if (targetEnemy == null) return false;
+        if (targetEnemy == null) {
+            FindNearestPlayer();
+        }
+        if (targetEnemy == null)
+        {
+            return false;
+        }
         return (Vector2.Distance(targetEnemy.transform.position,transform.position) <= attackRange) ;
     }
     private void OnDisable()
@@ -135,6 +140,8 @@ public class Unit_AutoDrive : MonoBehaviour
         }
     }
     void FindNearestPlayer() {
+
+        playersOnMap = GameFieldManager.gameFields[player.fieldNo].playerSpawner.unitsOnMap;
         float nearestEnemyDist = 0f;
         foreach (var p in playersOnMap.Values) {
             if (p == null || !p.gameObject.activeInHierarchy) continue;
@@ -146,6 +153,7 @@ public class Unit_AutoDrive : MonoBehaviour
                 targetEnemy = p.gameObject;
             }
         }
+      //  Debug.Log("Players " + playersOnMap.Count + " / " + targetEnemy);
     }
     Vector3 lastVector = Vector3.zero;
     private void FixedUpdate()

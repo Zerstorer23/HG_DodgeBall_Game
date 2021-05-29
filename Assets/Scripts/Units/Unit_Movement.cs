@@ -33,8 +33,6 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         pv = GetComponent<PhotonView>();
         buffManager = GetComponent<BuffManager>();
         unitPlayer = GetComponent<Unit_Player>();
-        PhotonNetwork.SendRate = 60; //60 / 60 on update
-        PhotonNetwork.SerializationRate = 60; // 32 32 on fixed
 
         networkPosIndicator = GameSession.GetInst().networkPos;
     }

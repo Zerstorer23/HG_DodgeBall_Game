@@ -8,7 +8,7 @@ public class UI_TouchPanel : MonoBehaviour
     // Start is called before the first frame update
     public static bool isTouching = false;
     public static Vector2 touchVector;
-/*    private void OnMouseDown()
+   private void OnMouseDown()
     {
         // var touches = Input.touches;
         Debug.Log("touch count " + Input.touchCount);
@@ -22,7 +22,7 @@ public class UI_TouchPanel : MonoBehaviour
               //  return;
             }
         }
-    }*/
+    }
     public void HandleTouch() {
         if (Input.touchCount <= 0) return;
 
@@ -70,24 +70,24 @@ public class UI_TouchPanel : MonoBehaviour
             Debug.Log("Mousedown "+isTouching);
 
         }*/
-    /*    private void Update()
+/*    private void Update()
+    {
+        if (Input.touchCount > 0)
         {
-            if (Input.touchCount > 0)
+            var touches = Input.touches;
+            for (int i = 0; i < touches.Length; i++)
             {
-                var touches = Input.touches;
-                for (int i = 0; i < touches.Length; i++)
+
+                if (!EventSystem.current.IsPointerOverGameObject(i))
                 {
-
-                    if (!EventSystem.current.IsPointerOverGameObject(i))
-                    {
-                        isTouching = true;
-                        EventManager.TriggerEvent(MyEvents.EVENT_SCREEN_TOUCH, new EventObject() { objData = touches[i].position });
-                        Debug.Log("Mousedown " + isTouching);
-                    }
+                    isTouching = true;
+                    EventManager.TriggerEvent(MyEvents.EVENT_SCREEN_TOUCH, new EventObject() { objData = touches[i].position });
+                    Debug.Log("Mousedown " + isTouching);
                 }
-
             }
-        }*/
+
+        }
+    }*/
 
     private void OnEnable()
     {

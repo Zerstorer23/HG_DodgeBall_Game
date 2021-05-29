@@ -23,6 +23,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         rectTransform = GetComponent<RectTransform>();
         auto_drive = autoToggle.isOn;
+
     }
 
     private void Start()
@@ -70,6 +71,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         PhotonNetwork.NickName = UI_ChangeName.default_name;
+        PhotonNetwork.SendRate = 60; //60 / 60 on update
+        PhotonNetwork.SerializationRate = 60; // 32 32 on fixed
         loadingChuu.SetActive(false);
         foreach (GameObject go in disableInLoading)
         {

@@ -36,8 +36,9 @@ public class Control_MobileStick : MonoBehaviour , IDragHandler,IPointerUpHandle
     public void OnDrag(PointerEventData ped)
     {
         Vector2 touchPoint = ped.position;
-        Vector2 rectPos = stickBackground.anchoredPosition + offset;
-       // Debug.Log("distance " + dist + " touch " + touchPoint + " / rect " + rectPos);
+        Vector2 rectPos =stickBackground.anchoredPosition + offset;// stickBackground.position;//
+        float dist = Vector2.Distance(rectPos, touchPoint);
+      //  Debug.Log("distance " + dist + " touch " + touchPoint + " / rect " + rectPos);
         delta = touchPoint - rectPos;
         stick.localPosition = Vector2.ClampMagnitude(delta, radius) + offset;
         return;     
