@@ -21,8 +21,10 @@ public class HealthPoint : MonoBehaviourPun
     internal BuffManager buffManager;
     internal Unit_Player unitPlayer;
     internal Projectile_DamageDealer damageDealer;
+    internal Component movement;
     internal Team myTeam = Team.HOME;
     public int associatedField = 0;
+    bool isMapObject = false;
 
     public string killerUID=null;
 
@@ -32,6 +34,14 @@ public class HealthPoint : MonoBehaviourPun
         buffManager = GetComponent<BuffManager>();
         unitPlayer = GetComponent<Unit_Player>();
         damageDealer = GetComponent<Projectile_DamageDealer>();
+        if (damageDealer != null) isMapObject = damageDealer.isMapObject;
+        if (unitType == UnitType.Player)
+        {
+            movement = GetComponent<Unit_Movement>();
+        }
+        else {
+            movement = GetComponent<Projectile_Movement>();
+        }
         try
         {
             myTeam = (Team)pv.Owner.CustomProperties["TEAM"];//TODO

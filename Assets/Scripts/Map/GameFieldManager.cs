@@ -209,9 +209,32 @@ public class GameFieldManager : MonoBehaviourPun
                 gameFields[i].gameObject.SetActive(false);
             }
         }
-
+        CheckGoogleEvents();
     }
 
+    private void CheckGoogleEvents()
+    {
+        if (PhotonNetwork.IsMasterClient) {
+
+            switch (GameSession.gameModeInfo.gameMode)
+            {
+                case GameMode.PVP:
+                    GooglePlayManager.IncrementEvent(GPGSIds.event_pvp_played, 1);
+                    break;
+                case GameMode.TEAM:
+                    GooglePlayManager.IncrementEvent(GPGSIds.event_team_played, 1);
+                    break;
+                case GameMode.Tournament:
+                    GooglePlayManager.IncrementEvent(GPGSIds.event_tournament_played, 1);
+                    break;
+                case GameMode.PVE:
+                    GooglePlayManager.IncrementEvent(GPGSIds.event_pvp_played, 1);
+                    break;
+            }
+            GooglePlayManager.IncrementEvent(GPGSIds.event_total_games_played, 1);
+            GooglePlayManager.IncrementEvent(GPGSIds.event_total_users_connected, PhotonNetwork.CurrentRoom.PlayerCount);
+        }
+    }
 
     int numActiveFields = 1;
     public void AssignMyRoom(Player[] playerList, int maxPlayerPerRoom)

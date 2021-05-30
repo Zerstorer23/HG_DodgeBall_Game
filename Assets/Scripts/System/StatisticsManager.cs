@@ -55,16 +55,18 @@ public class StatisticsManager : MonoBehaviourPun
     private Dictionary<string, int> localStatLibrary;
     public  void Init()
     {
-
+ 
         statLibrary = new Dictionary<StatTypes, Dictionary<string, int>>();
         for (int i = 0; i < (int)StatTypes.END;  i++) {
             StatTypes head = (StatTypes)i;
             Dictionary<string, int> library = new Dictionary<string, int>();
             statLibrary.Add(head, library);
         }
+
         localStatLibrary = new Dictionary<string, int>();
         LoadMyStats();
     }
+   
     public static void RPC_AddToStat(StatTypes stype ,string tag, int amount)
     {
         instance.pv.RPC("AddToStat", RpcTarget.AllBuffered,(int)stype, tag, amount);
@@ -108,6 +110,7 @@ public class StatisticsManager : MonoBehaviourPun
         localStatLibrary[tag] += value;
     }
     public int GetLocalStat(string tag, int value) {
+        if (!localStatLibrary.ContainsKey(tag)) return value;
         return localStatLibrary[tag];
     }
 

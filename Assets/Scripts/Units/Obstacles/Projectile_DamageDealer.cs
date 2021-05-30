@@ -45,7 +45,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         myCollider.enabled = true;
         attackedIDs = new Dictionary<string, double>();
     }
-    Dictionary<string,double> attackedIDs = new Dictionary<string, double>();
+    public Dictionary<string,double> attackedIDs = new Dictionary<string, double>();
     void FindCollider()
     {
         myCollider = GetComponent<PolygonCollider2D>();

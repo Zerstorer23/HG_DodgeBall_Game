@@ -86,6 +86,7 @@ MonoBehaviour:
   reactionType: 2
   mySprite: {fileID: 0}
   tweenEase: 0
+  synchedInitialCriticalPoint: 0
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,10 +121,10 @@ MonoBehaviour:
   exclusionPlayerID: 
   canKillBullet: 0
   isMapObject: 1
-  givesDamage: 1
+  givesDamage: 0
   customBuffs:
   - buffType: 1
-    modifier: -0.33
+    modifier: -0.5
     duration: 1.66
   myCollider: {fileID: 0}
 --- !u!114 &4556413170392631494

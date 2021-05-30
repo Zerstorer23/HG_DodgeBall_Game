@@ -25,7 +25,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        if (!PhotonNetwork.IsConnected) { 
+        if (!PhotonNetwork.IsConnected) {
             DoLoading();
         }
     }
@@ -44,6 +44,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         if (ConnectedPlayerManager.embarkCalled) return;
         JoinRoom();
+    }
+    public void OnClickLeaderBoard() {
+        GooglePlayManager.ShowLeaderBoard();
     }
 
     public static void JoinRoom()

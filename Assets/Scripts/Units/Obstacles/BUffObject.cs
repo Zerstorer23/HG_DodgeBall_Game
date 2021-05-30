@@ -64,6 +64,7 @@ public class BUffObject : MonoBehaviourPun
         if (buffManager.pv.IsMine)
         {
             buffManager.pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)buff.buffType, buff.modifier, buff.duration);
+            GooglePlayManager.IncrementAchievement(GPGSIds.achievement_buff_object_activated, 1);
         }
         boxCollider.enabled = false;
         canvas.enabled = false;

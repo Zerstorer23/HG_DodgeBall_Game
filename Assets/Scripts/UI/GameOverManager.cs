@@ -54,6 +54,7 @@ public class GameOverManager : MonoBehaviour
         SetWinnerInfo();
         SetScoreInfo();
         SetGameInfo();
+        CheckGoogleEvents();
     }
     private void Update()
     {
@@ -87,6 +88,7 @@ public class GameOverManager : MonoBehaviour
         miniWinnerName.text = string.Format("{0}초", gameTime.ToString("0.0"));
         if (GameSession.gameModeInfo.gameMode == GameMode.PVE) { 
             float prevScore = PlayerPrefs.GetFloat(ConstantStrings.PREFS_TIME_RECORD, 0f);
+            GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_pve_time, (int)gameTime);
             if (gameTime > prevScore) {
                 miniWinnerName.text = string.Format("<color=#ff00ff>[신기록]{0}초</color>", gameTime.ToString("0.0"));
                 PlayerPrefs.SetFloat(ConstantStrings.PREFS_TIME_RECORD, prevScore);
@@ -106,7 +108,7 @@ public class GameOverManager : MonoBehaviour
         {
 
             subWinnerPanel.SetActive(true);
-            CharacterType character = GetPlayerCharacter(player);
+            CharacterType character = GameSession.GetPlayerCharacter(player);
             subWinnerName.text = player.NickName;
             subWinnerImage.sprite = ConfigsManager.unitDictionary[character].portraitImage;
 
@@ -119,17 +121,7 @@ public class GameOverManager : MonoBehaviour
 
     }
 
-    public CharacterType GetPlayerCharacter(Player player)
-    {
-        if (!player.CustomProperties.ContainsKey("CHARACTER")) return CharacterType.NONE;
-        CharacterType character = (CharacterType)player.CustomProperties["CHARACTER"];
-        if (character == CharacterType.NONE)
-        {
-            if (!player.CustomProperties.ContainsKey("ACTUAL_CHARACTER")) return CharacterType.NONE;
-            character = (CharacterType)player.CustomProperties["ACTUAL_CHARACTER"];
-        }
-        return character;
-    }
+
 
     private void SetWinnerInfo()
     {
@@ -137,7 +129,7 @@ public class GameOverManager : MonoBehaviour
         if (finalWinner != null)
         {
 
-            CharacterType character = GetPlayerCharacter(finalWinner);
+            CharacterType character = GameSession.GetPlayerCharacter(finalWinner);
             winnerName.text = finalWinner.NickName;
             winnerImage.sprite = ConfigsManager.unitDictionary[character].portraitImage;
             if (GameSession.gameModeInfo.isTeamGame)
@@ -155,6 +147,96 @@ public class GameOverManager : MonoBehaviour
         else
         {
             winnerName.text = "무승부...";
+        }
+    }
+
+    private void CheckGoogleEvents()
+    {
+        if (Application.platform != RuntimePlatform.Android) return;
+        string localID = PhotonNetwork.LocalPlayer.UserId;
+        int kills = StatisticsManager.GetStat(StatTypes.KILL, localID);
+        int evades = StatisticsManager.GetStat(StatTypes.EVADE, localID);
+        GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_evasions, evades);
+        GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_kills, kills);
+        GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_highest_score, StatisticsManager.GetStat(StatTypes.SCORE, localID));
+        GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_kills, kills);
+        GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_evades, evades);
+        CharacterType characterType = GameSession.GetPlayerCharacter(PhotonNetwork.LocalPlayer);
+        string killStatID = null;
+        string pickStatID = null;
+        string winID = null;
+        switch (characterType)
+        {
+            case CharacterType.NAGATO:
+                killStatID = GPGSIds.event_nagato_kill;
+                pickStatID = GPGSIds.event_nagato_pick;
+                winID = GPGSIds.achievement_nagato_win;
+                break;
+            case CharacterType.HARUHI:
+                killStatID = GPGSIds.event_haruhi_kill;
+                pickStatID = GPGSIds.event_haruhi_picks;
+                winID = GPGSIds.achievement_haruhi_win;
+                break;
+            case CharacterType.MIKURU:
+                killStatID = GPGSIds.event_mikuru_kill;
+                pickStatID = GPGSIds.event_mikuru_pick;
+                winID = GPGSIds.achievement_mikuru_win;
+                break;
+            case CharacterType.KOIZUMI:
+                killStatID = GPGSIds.event_koizumi_kill;
+                pickStatID = GPGSIds.event_koizumi_pick;
+                winID = GPGSIds.achievement_koizumi_win;
+                break;
+            case CharacterType.KUYOU:
+                killStatID = GPGSIds.event_kuyou_kill;
+                pickStatID = GPGSIds.event_kuyou_pick;
+                winID = GPGSIds.achievement_kuyou_win;
+                break;
+            case CharacterType.ASAKURA:
+                killStatID = GPGSIds.event_asakura_kill;
+                pickStatID = GPGSIds.event_asakura_pick;
+                winID = GPGSIds.achievement_asakura_win;
+                break;
+            case CharacterType.KYOUKO:
+                killStatID = GPGSIds.event_kyouko_kill;
+                pickStatID = GPGSIds.event_kyouko_pick;
+                winID = GPGSIds.achievement_kyouko_win;
+                break;
+            case CharacterType.KIMIDORI:
+                killStatID = GPGSIds.event_kimidori_kill;
+                pickStatID = GPGSIds.event_kimidori_pick;
+                winID = GPGSIds.achievement_kimidori_win;
+                break;
+/*            case CharacterType.KYONMOUTO:
+                killStatID = GPGSIds.event_haruhi_kill;
+                pickStatID = GPGSIds.event_haruhi_picks;
+                break;*/
+            case CharacterType.SASAKI:
+                killStatID = GPGSIds.event_sasaki_kill;
+                pickStatID = GPGSIds.event_sasaki_pick;
+                winID = GPGSIds.achievement_sasaki_win;
+                break;
+            case CharacterType.TSURUYA:
+                killStatID = GPGSIds.event_tsuruya_kill;
+                pickStatID = GPGSIds.event_tsuruya_pick;
+                winID = GPGSIds.achievement_tsuruya_win;
+                break;
+            case CharacterType.KOIHIME:
+                killStatID = GPGSIds.event_koizumi_kill;
+                pickStatID = GPGSIds.event_koizumi_pick;
+                winID = GPGSIds.achievement_koizumi_win;
+                break;
+            case CharacterType.YASUMI:
+                killStatID = GPGSIds.event_haruhi_kill;
+                pickStatID = GPGSIds.event_haruhi_picks;
+                winID = GPGSIds.achievement_yasumi_win;
+                break;
+        }
+        GooglePlayManager.IncrementEvent(killStatID, (uint)kills);
+        GooglePlayManager.IncrementEvent(pickStatID, 1);
+        if (finalWinner == PhotonNetwork.LocalPlayer) {
+            GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_wins, 1);
+            GooglePlayManager.IncrementAchievement(winID, 1);
         }
     }
 

@@ -78,12 +78,12 @@ public class SkillManager : MonoBehaviourPun
         {
             case CharacterType.NAGATO:
                 mySkillFunction = DoSkillSet_Nagato;
-                skillCool = 3f; // 3f
+                skillCool = 3.3f; // 3f
                 maxStack = 5;
                 break;
             case CharacterType.HARUHI:
                 mySkillFunction = DoSkillSet_Haruhi;
-                skillCool = 3.5f;
+                skillCool = 3.3f;
                 break;
             case CharacterType.MIKURU:
                 mySkillFunction = DoSkillSet_Mikuru;
@@ -112,7 +112,7 @@ public class SkillManager : MonoBehaviourPun
                 break;
             case CharacterType.KIMIDORI:
                 mySkillFunction = DoSkillSet_Kimidori;
-                skillCool = 1.25f;
+                skillCool = 2f;
                 break;
             case CharacterType.TSURUYA:
                 mySkillFunction = DoSkillSet_Tsuruya;
@@ -175,8 +175,8 @@ public class SkillManager : MonoBehaviourPun
     {
         SkillSet mySkill = new SkillSet(gameObject, this);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_NAGATO);
-        mySkill.SetParam(SkillParams.Duration, 0.4f);
-        mySkill.SetParam(SkillParams.MoveSpeed, 25f);
+        mySkill.SetParam(SkillParams.Duration, 0.5f);
+        mySkill.SetParam(SkillParams.MoveSpeed, 23f);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
         mySkill.Enqueue(new Action_InstantiateBulletAt());
@@ -317,7 +317,7 @@ public class SkillManager : MonoBehaviourPun
 
         SkillSet mySkill = new SkillSet(gameObject, this);
         mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
-        mySkill.SetParam(SkillParams.MoveSpeed, 21f);
+        mySkill.SetParam(SkillParams.MoveSpeed, 22f);
         mySkill.SetParam(SkillParams.RotateAngle, 60f);
         mySkill.SetParam(SkillParams.RotateSpeed, 150f);
         mySkill.SetParam(SkillParams.Duration, 0.033f);
@@ -423,6 +423,7 @@ public class SkillManager : MonoBehaviourPun
             mySkill.Enqueue(new Action_SetProjectileStatic());
             if (i % shootAtOnce == 0)
             {
+                mySkill.Enqueue(new Action_SetProjectile_InvincibleFromMapBullets());
                 mySkill.Enqueue(new Action_WaitForSeconds());
             }
 

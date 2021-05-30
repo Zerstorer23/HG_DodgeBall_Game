@@ -64,19 +64,7 @@ public class UI_ChatBox : MonoBehaviour
 		{
 			string text = inputField.text;
 			if (text[0] == '!') {
-
-				if (text.Contains("자동"))
-				{
-					GameSession.auto_drive_enabled = !GameSession.auto_drive_enabled;
-				}
-				else if (text.Contains("탈취"))
-				{
-					GameSession.instance.photonView.RPC("ResignMaster", Photon.Pun.RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
-				}
-				else if (text.Contains("입항"))
-				{
-					ConnectedPlayerManager.KickEveryone();
-				}
+				ParseCommand(text);
 			}
 			else {
 				ChatManager.SendChatMessage(inputField.text);
@@ -87,6 +75,25 @@ public class UI_ChatBox : MonoBehaviour
 		}
 		inputField.text = "";
 
+	}
+	private void ParseCommand(string text) {
+
+		if (text.Contains("자동"))
+		{
+			GameSession.auto_drive_enabled = !GameSession.auto_drive_enabled;
+		}
+		else if (text.Contains("탈취"))
+		{
+			GameSession.instance.photonView.RPC("ResignMaster", Photon.Pun.RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
+		}
+		else if (text.Contains("입항"))
+		{
+			ConnectedPlayerManager.ReconnectEveryone();
+		}
+		else if (text.Contains("점검"))
+		{
+			ConnectedPlayerManager.ReconnectEveryone();
+		}
 	}
 	public void AddLine(string lineString)
 	{

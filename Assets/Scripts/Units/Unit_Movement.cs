@@ -82,10 +82,10 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         DequeuePositions();
         UpdateDirection();
     }
-
+    public float GetMovementSpeed() => moveSpeed * buffManager.GetBuff(BuffType.MoveSpeed);
     private void Move(float delta)
     {
-        float moveSpeedFinal = moveSpeed * buffManager.GetBuff(BuffType.MoveSpeed) * delta;
+        float moveSpeedFinal = GetMovementSpeed() * delta;
 
         if (pv.IsMine)
         {
@@ -109,7 +109,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
     private void GiveEvaluatedInput(float moveSpeedFinal)
     {
 
-        Vector3 recommendDirection = autoDriver.EvaluateMoves() * moveSpeedFinal; 
+        Vector3 recommendDirection = autoDriver.lastEvaluatedVector * moveSpeedFinal; 
         Vector3 newPosition = ClampPosition(new Vector3(networkPos.x + recommendDirection.x, networkPos.y + recommendDirection.y, 0f));
         // 32 16
         // 1.. 32   2. 16

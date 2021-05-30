@@ -214,13 +214,23 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         GameSession.instance.LeaveRoom();
     }
     public static bool embarkCalled = false;
-    public static void KickEveryone() {
+    public static void ReconnectEveryone() {
         if (!PhotonNetwork.IsMasterClient) return;
         GameSession.PushRoomASetting(ConstantStrings.HASH_GAME_STARTED, false);
         GameSession.instance.photonView.RPC("LeaveRoom", RpcTarget.Others);
         instance.StartCoroutine(WaitAndQuit());
     }
-
+    public static void KickEveryoneElse()
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+        GameSession.PushRoomASetting(ConstantStrings.HASH_GAME_STARTED, false);
+        var players = PhotonNetwork.PlayerListOthers;
+        foreach (var p in players) {
+            PhotonNetwork.CloseConnection(p);
+        }
+        GameSession.instance.photonView.RPC("LeaveRoom", RpcTarget.Others);
+        instance.StartCoroutine(WaitAndQuit());
+    }
     /*   public void Disconnect()
        {
            PhotonNetwork.Disconnect();

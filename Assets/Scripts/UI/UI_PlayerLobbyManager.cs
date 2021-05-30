@@ -82,7 +82,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         localPlayerObject = PhotonNetwork.Instantiate(ConstantStrings.PREFAB_STARTSCENE_PLAYERNAME, Vector3.zero, Quaternion.identity, 0);
         localPlayerInfo = localPlayerObject.GetComponent<HUD_UserName>();
         string name = PhotonNetwork.NickName;
-        CharacterType character = (CharacterType)ConnectedPlayerManager.GetPlayerProperty("CHARACTER",(GameSession.instance.devMode)?CharacterType.MIKURU : CharacterType.NONE);
+        CharacterType character = (CharacterType)ConnectedPlayerManager.GetPlayerProperty("CHARACTER",(GameSession.instance.devMode)?GameSession.instance.debugChara : CharacterType.NONE);
         Team myTeam = (Team)ConnectedPlayerManager.GetPlayerProperty("TEAM", Team.HOME);
         localPlayerInfo.pv.RPC("ChangeName", RpcTarget.AllBuffered, name);
         localPlayerInfo.pv.RPC("ChangeCharacter", RpcTarget.AllBuffered, (int)character);

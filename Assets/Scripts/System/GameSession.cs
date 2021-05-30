@@ -28,6 +28,7 @@ public class GameSession : MonoBehaviourPun
 
     public float gameSpeed = 1f;
     public bool devMode = false;
+    public CharacterType debugChara = CharacterType.NONE;
 
     public static bool auto_drive_enabled = false;
     public static bool auto_drive_toggled = false;
@@ -136,11 +137,21 @@ public class GameSession : MonoBehaviourPun
         //PhotonNetwork.RemoveRPCs(PhotonNetwork.LocalPlayer);
         PhotonNetwork.LeaveRoom();
     }
-
+    public static CharacterType GetPlayerCharacter(Player player)
+    {
+        if (!player.CustomProperties.ContainsKey("CHARACTER")) return CharacterType.NONE;
+        CharacterType character = (CharacterType)player.CustomProperties["CHARACTER"];
+        if (character == CharacterType.NONE)
+        {
+            if (!player.CustomProperties.ContainsKey("ACTUAL_CHARACTER")) return CharacterType.NONE;
+            character = (CharacterType)player.CustomProperties["ACTUAL_CHARACTER"];
+        }
+        return character;
+    }
     void OnApplicationPause(bool paused)
     {
         if (Application.platform == RuntimePlatform.Android) {
-
+            if (!GooglePlayManager.loggedIn) return;
             if (paused)
             {
                 Application.Quit();

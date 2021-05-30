@@ -35,12 +35,12 @@ public class Projectile_Movement : MonoBehaviourPun
 
     //Delay Move//
     float delay_enableAfter = 0f;
-    float delay_duration;
     [SerializeField] SpriteRenderer mySprite;
 
     PhotonView pv;
     MapSpec mapSpec;
     HealthPoint hp;
+    bool isMapObject = false;
 
     private void Awake()
     {
@@ -48,7 +48,8 @@ public class Projectile_Movement : MonoBehaviourPun
         hp = GetComponent<HealthPoint>();
         transSync = GetComponent<TransformSynchronisation>();
         syncTransform = transSync != null;
-
+        if(hp.damageDealer != null)
+        isMapObject = hp.damageDealer.isMapObject;
     }
 
     private void OnEnable()
@@ -90,11 +91,6 @@ public class Projectile_Movement : MonoBehaviourPun
         angleClockBound = rotateBound;
         angleAntiClockBound =  -rotateBound;
     }
-/*    [PunRPC]
-    public void SetDelay(float delay) {
-        delay_enableAfter = delay;
-        myCollider.enabled =false;
-    }*/
     [PunRPC]
     public void SetScale(float w, float h) {
         gameObject.transform.localScale = new Vector3(w, h, 1);
@@ -114,36 +110,15 @@ public class Projectile_Movement : MonoBehaviourPun
 
         }
     }
-    [PunRPC]
-    public void SetDuration(float delay)
-    {
-        delay_duration = delay;
-    }
+
 
     private void OnDisable()
     {
         delay_enableAfter = 0f;
-        delay_duration = 0f;
         mySprite.DORewind();
-        gameObject.transform.DORewind();
+        gameObject.transform.DORewind(); 
+        synchedInitialCriticalPoint = false;
     }
-
-/*    private void Start()
-    {
-        if(delay_enableAfter > 0)
-        {
-            myCollider.enabled = false;
-            StartCoroutine(WaitAndEnable());
-            mySprite.DOFade(1f, delay_enableAfter);
-        }
-    }*/
-/*
-    private IEnumerator WaitAndEnable()
-    {
-        yield return new WaitForSeconds(delay_enableAfter);
-        myCollider.enabled = true;
-    }
-  */
 
     private void Update()
     {
@@ -166,10 +141,7 @@ public class Projectile_Movement : MonoBehaviourPun
 
     private void DoMove_Straight()
     {
-        float rad = eulerAngle / 180 * Mathf.PI ;
-        float dX = Mathf.Cos(rad) * moveSpeed * Time.deltaTime;
-        float dY = Mathf.Sin(rad) * moveSpeed * Time.deltaTime; 
-        Vector3 moveDir = new Vector3(dX, dY);
+        Vector3 moveDir = GetAngledVector(eulerAngle, moveSpeed * Time.deltaTime);
         ChangeTransform(moveDir, eulerAngle);
     }
     private void DoMove_Curve()
@@ -185,10 +157,7 @@ public class Projectile_Movement : MonoBehaviourPun
         float amount = rotateScale * Time.deltaTime * goClockwise;
         angleStack += amount;
         eulerAngle += amount;
-        float rad = eulerAngle / 180 * Mathf.PI;
-        float dX = Mathf.Cos(rad) * moveSpeed * Time.deltaTime;
-        float dY = Mathf.Sin(rad) * moveSpeed * Time.deltaTime;
-        Vector3 moveDir = new Vector3(dX, dY);
+        Vector3 moveDir = GetAngledVector(eulerAngle, moveSpeed * Time.deltaTime);
         ChangeTransform(moveDir, eulerAngle);
         
     }
@@ -199,31 +168,24 @@ public class Projectile_Movement : MonoBehaviourPun
     {
         if (distanceMoved < orbitLength)
         {
-            float rad = eulerAngle / 180 * Mathf.PI;
-            float dX = Mathf.Cos(rad) * moveSpeed * Time.deltaTime * 2;
-            float dY = Mathf.Sin(rad) * moveSpeed * Time.deltaTime * 2;
-            Vector3 moveDir = new Vector3(dX, dY);
+            Vector3 moveDir = GetAngledVector(eulerAngle, moveSpeed * Time.deltaTime * 2);
             distanceMoved += Vector2.Distance(moveDir, Vector3.zero);
             ChangeTransform(moveDir, eulerAngle);
         }
         else {
             eulerAngle += orbitSpeed * Time.deltaTime;
-            float rad = eulerAngle / 180 * Mathf.PI;
-            float dX = Mathf.Cos(rad) * orbitLength;
-            float dY = Mathf.Sin(rad) * orbitLength;
             transform.localPosition = Vector3.zero;
-            Vector3 moveDir = new Vector3(dX, dY);
+            Vector3 moveDir = GetAngledVector(eulerAngle, orbitLength);
             ChangeTransform(moveDir, eulerAngle);
-            SyncAPoint();
         }
     }
 
     public bool synchedInitialCriticalPoint = false;
-    public void SyncAPoint() {
-        if (synchedInitialCriticalPoint) return;
+   /* public void SyncAPoint(bool forceSynch = false) {
+        if (synchedInitialCriticalPoint && !forceSynch) return;
         synchedInitialCriticalPoint = true;
         if (pv.IsMine) {
-            pv.RPC("SyncAPoint_Helper", RpcTarget.All, transform.localPosition, transform.rotation);
+            pv.RPC("SyncAPoint_Helper", RpcTarget.AllBufferedViaServer, transform.localPosition, transform.rotation);
         }
     }
     [PunRPC]
@@ -231,7 +193,7 @@ public class Projectile_Movement : MonoBehaviourPun
     {
         transform.localPosition = position;
         transform.rotation = rotation;
-    }
+    }*/
     private void DoMove_Static()
     {
         
@@ -262,6 +224,29 @@ public class Projectile_Movement : MonoBehaviourPun
             transform.localPosition += newDirection;
             transform.rotation = Quaternion.Euler(0, 0, newEulerAngle);
         }
+    }
+   public void GetExpectedPosition(List<Vector3> collisionList, Vector3 collisionSource, float maxRange, float duration = 1f) {
+        if (moveType == MoveType.Static) return ;
+        float totalDistance = moveSpeed * duration;
+        Vector3 endPosition = GetAngledVector(eulerAngle, totalDistance);
+        float stepLength = GetRadius(transform.localScale);
+        int steps = (int)(endPosition.magnitude / stepLength);
+        Vector3 unitVector = GetAngledVector(eulerAngle, (totalDistance / steps));
+        for (int i = 0; i < steps; i++) {
+            Vector3 point = transform.position + unitVector * i;
+            float collAngle = GetAngleBetween(point, collisionSource);
+            point += GetAngledVector(collAngle, stepLength);
+            //if (Vector2.Distance(point, collisionSource) > maxRange) continue;
+           // Debug.Log
+            collisionList.Add(point);
+        }
+        if ((stepLength * steps) < totalDistance)
+        {
+            float collAngle = GetAngleBetween(endPosition, collisionSource);
+            Vector3 point = endPosition + GetAngledVector(collAngle, stepLength);
+           // if (Vector2.Distance(point, collisionSource) > maxRange) return;
+            collisionList.Add(point);
+        } 
     }
 }
 

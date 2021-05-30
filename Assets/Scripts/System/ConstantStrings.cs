@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -71,6 +72,11 @@ public class ConstantStrings : MonoBehaviour
         float dX = Mathf.Cos(rad) * distance;
         float dY = Mathf.Sin(rad) * distance;
         return new Vector3(dX, dY);
+    }
+
+    internal static float GetRadius(Vector3 localScale)
+    {
+        return (Mathf.Max(localScale.x, localScale.y) * 0.5f);
     }
 }
 
