@@ -2346,7 +2346,8 @@ MonoBehaviour:
   versionCode: 0531
   requireHalfAgreement: 1
   gameSpeed: 1
-  devMode: 1
+  devMode: 0
+  debugChara: 0
 --- !u!114 &844291303
 MonoBehaviour:
   m_ObjectHideFlags: 0

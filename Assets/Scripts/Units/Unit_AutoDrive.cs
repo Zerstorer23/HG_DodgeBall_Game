@@ -36,7 +36,7 @@ public class Unit_AutoDrive : MonoBehaviour
         directionIndicator = player.driverIndicator;
         myInstanceID = player.gameObject.GetInstanceID();
         range = 15f;
-        collisionRange = range / 2f + GetRadius(transform.localScale)+0.4f;
+        collisionRange = range / 2f + GetRadius(transform.localScale) + 0.4f;
         DetermineAttackType();
     }
     void DetermineAttackType()
@@ -137,7 +137,7 @@ public class Unit_AutoDrive : MonoBehaviour
                     Gizmos.DrawWireSphere(go.transform.position, 0.5f);
                 }*/
 
-        Gizmos.DrawWireSphere(transform.position+lastEvaluatedVector, 0.5f);
+        Gizmos.DrawWireSphere(transform.position + lastEvaluatedVector, 0.5f);
         Gizmos.DrawWireSphere(xWall, 1f);
         Gizmos.DrawWireSphere(yWall, 1f);
         if (targetEnemy != null)
@@ -242,10 +242,10 @@ public class Unit_AutoDrive : MonoBehaviour
         FindNearestPlayer();
         lastEvaluatedVector = EvaluateMoves();
     }
-/*    private void Update()
-    {
+    /*    private void Update()
+        {
 
-    }*/
+        }*/
 
     public float EvaluateAim()
     {
@@ -312,17 +312,46 @@ public class Unit_AutoDrive : MonoBehaviour
                 case TAG_PROJECTILE:
                     HealthPoint hp = CacheComponent<HealthPoint>(tid, go);
                     Projectile_Movement pMove = (Projectile_Movement)hp.movement;
-                    OBJECT_APPROACH_STATUS approach = IsApproaching(pMove, distance);
-                    float speedMod = GetSpeedModifier(player.movement.GetMovementSpeed(), pMove.moveSpeed);
-                 
-                    if (approach == OBJECT_APPROACH_STATUS.AWAY) continue;
-                    
-                    if (distance < (range / 3))
+                    float targetSpeed = pMove.moveSpeed;
+                    float targetAngle = pMove.eulerAngle;
+                   // float speedMod = GetSpeedModifier(player.movement.GetMovementSpeed(), pMove.moveSpeed);
+                    if (pMove.characterUser == CharacterType.NAGATO)
                     {
-                        watchList.Add(go);
+                        move -= RotateClockWise(directionToTarget * multiplier * 5f);
+                        break;
                     }
-                    Vector3 direction = directionToTarget * multiplier * speedMod;
-                    move -= (approach==OBJECT_APPROACH_STATUS.APPROACHING) ?RotateClockWise(direction): direction;
+
+                    if (targetSpeed > player.movement.moveSpeed)
+                    {
+                        OBJECT_APPROACH_STATUS approach = IsApproaching(pMove, distance);
+                        //   if (approach == OBJECT_APPROACH_STATUS.AWAY) continue;
+
+                        if (distance < (range / 3))
+                        {
+                            watchList.Add(go);
+                        }
+                        //Debug.Log(approach);
+                        //move += directionToTarget * multiplier * 2;
+                        Vector3 direction;
+                        if (pMove.moveType == MoveType.Straight)
+                        {
+                            Debug.Log("Side evasion");
+                            direction = RotateClockWise(GetAngledVector(targetAngle, multiplier) * 2f);
+                        }
+                        else
+                        {
+                            Debug.Log("Back evasion");
+                            direction = directionToTarget * multiplier *3f;
+                        }
+
+                        move -= direction;
+
+                    }
+                    else
+                    {
+                        move -= directionToTarget * multiplier ;
+                    }
+
                     break;
                 case TAG_BUFF_OBJECT:
                     BoxCollider2D boxColl = CacheComponent<BoxCollider2D>(tid, go);
@@ -347,16 +376,18 @@ public class Unit_AutoDrive : MonoBehaviour
         if (move.magnitude > 1f)
         {
             move.Normalize();
+            if (secondPrediction)
+            {
+                //    move = FindEmptySpace(move);
+            }
         }
         else if (move.magnitude <= 0.25f)
         {
             move = Vector3.zero;
         }
-        else if (secondPrediction) {
-            move = FindEmptySpace(move);
-        }
 
-                //  Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
+
+        //  Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
         return move;
     }
     Vector3 RotateClockWise(Vector3 direction)
@@ -366,31 +397,37 @@ public class Unit_AutoDrive : MonoBehaviour
 
     OBJECT_APPROACH_STATUS IsApproaching(Projectile_Movement projMove, float dist)
     {
-        if ((dist-GetRadius(projMove.transform.localScale)) < collisionRange) return OBJECT_APPROACH_STATUS.COLLIDING;
+        float offset = 90f;
+        if ((dist
+            // -GetRadius(projMove.transform.localScale)
+            ) < collisionRange) return OBJECT_APPROACH_STATUS.COLLIDING;
         float myAngle = GetAngleBetween(movement.networkPos, projMove.transform.position);
         float angleDiff = Mathf.Abs(myAngle - projMove.eulerAngle);
         //Debug.Log(projMove.gameObject.name+": "+angleDiff);
-        return ((angleDiff < 240) && (angleDiff > 120)) ? OBJECT_APPROACH_STATUS.APPROACHING : OBJECT_APPROACH_STATUS.AWAY;
+        return ((angleDiff > (180 - offset)) && (angleDiff < (180 + offset))) ? OBJECT_APPROACH_STATUS.APPROACHING : OBJECT_APPROACH_STATUS.AWAY;
     }
-    Vector3 FindEmptySpace(Vector3 heuristicDirection) {
+    Vector3 FindEmptySpace(Vector3 heuristicDirection)
+    {
         collisionList = new List<Vector3>();
         if (watchList.Count == 0) return heuristicDirection;
         float duration = 1f;
         int searched = 0;
-        foreach (var go in watchList) {
+        foreach (var go in watchList)
+        {
             collisionList.Add(go.transform.position);
             HealthPoint hp = CacheComponent<HealthPoint>(go.GetInstanceID(), go);
-            if (hp != null && hp.movement != null) {
-               ((Projectile_Movement)hp.movement).GetExpectedPosition(collisionList, transform.position, collisionRange, duration);
+            if (hp != null && hp.movement != null)
+            {
+                ((Projectile_Movement)hp.movement).GetExpectedPosition(collisionList, transform.position, collisionRange, duration);
             }
             searched++;
         }
-        float originalAngle = GetAngleBetween(Vector3.zero, RotateClockWise( heuristicDirection));
+        float originalAngle = GetAngleBetween(Vector3.zero, RotateClockWise(heuristicDirection));
         float save = originalAngle;
         float length = movement.GetMovementSpeed() * Time.fixedDeltaTime;
         Vector3 advisedDirection = Vector3.zero;
         Debug.Log("Collision points " + collisionList.Count);
-        for (int i = 0; i < 360/60; i++)
+        for (int i = 0; i < 360 / 60; i++)
         {
             bool collided = false;
             originalAngle += 60;
@@ -408,12 +445,13 @@ public class Unit_AutoDrive : MonoBehaviour
             }
             if (!collided) break;
         }
-        if (advisedDirection == Vector3.zero) {
-           // Debug.LogError("no move");
+        if (advisedDirection == Vector3.zero)
+        {
+            // Debug.LogError("no move");
             return heuristicDirection;
         }
-        Debug.LogWarning(searched+": "+ save + " => " + originalAngle);
-        return advisedDirection;
+        Debug.LogWarning(searched + ": " + save + " => " + originalAngle);
+        return advisedDirection.normalized;
     }
 
     Vector3 GetAwayFromWalls_2()
@@ -455,7 +493,7 @@ public class Unit_AutoDrive : MonoBehaviour
     float GetMultiplier(float x)
     {
         float y = (1 / Mathf.Pow(x + 2, 2)) * 48;
-      //  float y = Mathf.Pow((range - x), 3);
+        //  float y = Mathf.Pow((range - x), 3);
         return y;
     }
 }

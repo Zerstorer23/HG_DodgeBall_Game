@@ -108,14 +108,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eulerAngle: 0
-  moveSpeed: 9
+  moveSpeed: 0
   rotateScale: 0
   angleClockBound: 0
   angleAntiClockBound: 0
   angleStack: 0
   goClockwise: 1
-  moveType: 2
+  moveType: 0
   reactionType: 1
+  characterUser: 0
   mySprite: {fileID: 8629071319339072152}
   tweenEase: 0
   synchedInitialCriticalPoint: 0
@@ -202,7 +203,8 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 1
   observableSearch: 2
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: 8976157517535040220}
   sceneViewId: 2
   InstantiationId: 0
   isRuntimeInstantiated: 0

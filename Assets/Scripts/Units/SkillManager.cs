@@ -176,7 +176,7 @@ public class SkillManager : MonoBehaviourPun
         SkillSet mySkill = new SkillSet(gameObject, this);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_NAGATO);
         mySkill.SetParam(SkillParams.Duration, 0.5f);
-        mySkill.SetParam(SkillParams.MoveSpeed, 23f);
+        mySkill.SetParam(SkillParams.MoveSpeed, 23f);//23
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
         mySkill.Enqueue(new Action_InstantiateBulletAt());
@@ -423,7 +423,7 @@ public class SkillManager : MonoBehaviourPun
             mySkill.Enqueue(new Action_SetProjectileStatic());
             if (i % shootAtOnce == 0)
             {
-                mySkill.Enqueue(new Action_SetProjectile_InvincibleFromMapBullets());
+                mySkill.Enqueue(new Action_Player_InvincibleBuff());
                 mySkill.Enqueue(new Action_WaitForSeconds());
             }
 

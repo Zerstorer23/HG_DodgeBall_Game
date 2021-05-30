@@ -27,7 +27,7 @@ public class Projectile_Movement : MonoBehaviourPun
     voidFunc DoMove;
     public MoveType moveType;
     public ReactionType reactionType = ReactionType.Bounce;
-
+    public CharacterType characterUser = CharacterType.NONE;
     internal void SetAssociatedField(int fieldNo)
     {
         mapSpec = GameFieldManager.gameFields[fieldNo].mapSpec;
