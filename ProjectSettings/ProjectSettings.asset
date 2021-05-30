@@ -248,7 +248,7 @@ PlayerSettings:
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
   AndroidKeystoreName: E:/BACK/UW Madison/KeyStore/app.jks
-  AndroidKeyaliasName: bismark439
+  AndroidKeyaliasName: ALIAS_NAME
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 0
   AndroidIsGame: 1

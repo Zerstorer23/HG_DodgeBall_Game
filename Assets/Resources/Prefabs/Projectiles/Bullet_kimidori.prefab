@@ -60,6 +60,7 @@ MonoBehaviour:
   reactionType: 0
   mySprite: {fileID: 2534975670834146036}
   tweenEase: 0
+  synchedInitialCriticalPoint: 0
 --- !u!61 &8692175640842045467
 BoxCollider2D:
   m_ObjectHideFlags: 0

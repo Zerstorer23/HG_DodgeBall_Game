@@ -153,6 +153,7 @@ MonoBehaviour:
   invincibleFromMapBullets: 0
   dontKillByException: 1
   associatedField: 0
+  killerUID: 
 --- !u!114 &6212558457632629342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,6 +171,7 @@ MonoBehaviour:
   isMapObject: 0
   givesDamage: 1
   customBuffs: []
+  myCollider: {fileID: 0}
 --- !u!114 &187803789871181374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,7 +184,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b05d870a9944fe841b7eb6c0dca26845, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncTransform: 0
   eulerAngle: 0
   moveSpeed: 0
   rotateScale: 0
@@ -193,6 +194,8 @@ MonoBehaviour:
   moveType: 0
   reactionType: 2
   mySprite: {fileID: 3005893680650928229}
+  tweenEase: 0
+  synchedInitialCriticalPoint: 0
 --- !u!114 &-8149601233891272938
 MonoBehaviour:
   m_ObjectHideFlags: 0

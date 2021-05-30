@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -61,9 +62,21 @@ public class UI_ChatBox : MonoBehaviour
 		}
 		else
 		{
-			if (inputField.text.Contains("!자동"))
-			{
-				MenuManager.auto_drive = !MenuManager.auto_drive;
+			string text = inputField.text;
+			if (text[0] == '!') {
+
+				if (text.Contains("자동"))
+				{
+					GameSession.auto_drive_enabled = !GameSession.auto_drive_enabled;
+				}
+				else if (text.Contains("탈취"))
+				{
+					GameSession.instance.photonView.RPC("ResignMaster", Photon.Pun.RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
+				}
+				else if (text.Contains("입항"))
+				{
+					ConnectedPlayerManager.KickEveryone();
+				}
 			}
 			else {
 				ChatManager.SendChatMessage(inputField.text);

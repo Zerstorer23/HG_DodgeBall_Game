@@ -108,6 +108,7 @@ MonoBehaviour:
   reactionType: 1
   mySprite: {fileID: 8629071319339072152}
   tweenEase: 0
+  synchedInitialCriticalPoint: 0
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
   m_ObjectHideFlags: 0

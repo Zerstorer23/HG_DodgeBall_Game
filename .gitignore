@@ -73,3 +73,5 @@ InitTestScene*.unity
 
 # End of https://www.toptal.com/developers/gitignore/api/unity
 Out/하망중계기/setting.txt
+Assets/Editor/PreloadSigningAlias.cs
+Assets/Editor/PreloadSigningAlias.cs.meta

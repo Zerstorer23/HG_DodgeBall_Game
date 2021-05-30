@@ -194,7 +194,7 @@ public class Projectile_Movement : MonoBehaviourPun
     }
     float orbitLength = 4f;
     float distanceMoved = 0;
-   float orbitSpeed = 120f;
+    float orbitSpeed = 120f;
     private void DoMove_Orbit()
     {
         if (distanceMoved < orbitLength)
@@ -214,9 +214,24 @@ public class Projectile_Movement : MonoBehaviourPun
             transform.localPosition = Vector3.zero;
             Vector3 moveDir = new Vector3(dX, dY);
             ChangeTransform(moveDir, eulerAngle);
+            SyncAPoint();
         }
     }
 
+    public bool synchedInitialCriticalPoint = false;
+    public void SyncAPoint() {
+        if (synchedInitialCriticalPoint) return;
+        synchedInitialCriticalPoint = true;
+        if (pv.IsMine) {
+            pv.RPC("SyncAPoint_Helper", RpcTarget.All, transform.localPosition, transform.rotation);
+        }
+    }
+    [PunRPC]
+    public void SyncAPoint_Helper(Vector3 position, Quaternion rotation)
+    {
+        transform.localPosition = position;
+        transform.rotation = rotation;
+    }
     private void DoMove_Static()
     {
         

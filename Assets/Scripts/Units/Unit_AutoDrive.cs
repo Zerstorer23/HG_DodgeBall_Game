@@ -9,25 +9,70 @@ using static GameFieldManager;
 public class Unit_AutoDrive : MonoBehaviour
 {
     [SerializeField] Dictionary<int, GameObject> foundObjects = new Dictionary<int, GameObject>();
+    Dictionary<int, object> componentDictionary = new Dictionary<int, object>();
     SkillManager skillManager;
     Unit_Movement movement;
     internal GameObject directionIndicator;
     float range = 9f;
-    float attackRange = 9f;
+    float attackRange = 15f;
     float escapePadding = 1f;
 
     public GameObject targetEnemy;
     int myInstanceID;
     [SerializeField] Unit_Player player;
    internal float aimAngle;
-
     Vector3 xWall, yWall;
+    public AI_ATTACK_TYPE aiAttackType = AI_ATTACK_TYPE.STANDARD;
+
     public void SetInfo() {
         movement = player.movement;
         skillManager = player.skillManager;
         directionIndicator = player.driverIndicator;
         myInstanceID = player.gameObject.GetInstanceID();
-    
+        DetermineAttackType();
+    }
+    void DetermineAttackType() {
+        switch (player.myCharacter)
+        {
+            case CharacterType.ASAKURA:
+            case CharacterType.KIMIDORI:
+                aiAttackType =  AI_ATTACK_TYPE.ANYTIME;
+                break;
+            case CharacterType.NAGATO:
+            case CharacterType.KYOUKO:
+            case CharacterType.TSURUYA:
+                aiAttackType = AI_ATTACK_TYPE.STANDARD;
+                break;
+            case CharacterType.HARUHI:
+            case CharacterType.KOIZUMI:
+            case CharacterType.SASAKI:
+            case CharacterType.KOIHIME:
+            case CharacterType.KUYOU:
+            case CharacterType.YASUMI:
+                aiAttackType = AI_ATTACK_TYPE.SHORT;
+                break;
+            case CharacterType.MIKURU:
+                aiAttackType = AI_ATTACK_TYPE.LONG;
+                break;
+            default:
+                aiAttackType = AI_ATTACK_TYPE.STANDARD;
+                break;
+        }
+        switch (aiAttackType)
+        {
+            case AI_ATTACK_TYPE.ANYTIME:
+                attackRange = 999f;
+                break;
+            case AI_ATTACK_TYPE.SHORT:
+                attackRange = range  * 0.5f;
+                break;
+            case AI_ATTACK_TYPE.LONG:
+                attackRange = range *1.5f;
+                break;
+            case AI_ATTACK_TYPE.STANDARD:
+                attackRange = range ;
+                break;
+        }
     }
 
 
@@ -108,7 +153,7 @@ public class Unit_AutoDrive : MonoBehaviour
                     }
                     break;
                 case TAG_PROJECTILE:
-                    HealthPoint hp = c.gameObject.GetComponent<HealthPoint>();
+                    HealthPoint hp = CacheComponent<HealthPoint>(tid, c.gameObject);
                     if (!hp.damageDealer.isMapObject && hp.pv.IsMine) continue;
                     foundObjects.Add(tid, c.gameObject);
                     break;
@@ -140,14 +185,13 @@ public class Unit_AutoDrive : MonoBehaviour
         }
     }
     void FindNearestPlayer() {
-
         playersOnMap = GameFieldManager.gameFields[player.fieldNo].playerSpawner.unitsOnMap;
         float nearestEnemyDist = 0f;
         foreach (var p in playersOnMap.Values) {
             if (p == null || !p.gameObject.activeInHierarchy) continue;
             if (p.gameObject.GetInstanceID() == myInstanceID) continue;
+            if (GameSession.gameModeInfo.isTeamGame && p.myTeam == player.myTeam) continue;
             float dist = Vector2.Distance(movement.networkPos, p.gameObject.transform.position);
-           // if (dist <= Mathf.Epsilon) continue;
             if (dist < nearestEnemyDist || targetEnemy == null) {
                 nearestEnemyDist = dist;
                 targetEnemy = p.gameObject;
@@ -174,6 +218,22 @@ public class Unit_AutoDrive : MonoBehaviour
         directionIndicator.transform.localRotation = Quaternion.Euler(0, 0, aimAngle);
         return aimAngle;
     }
+    T CacheComponent<T>(int tag, GameObject go) {
+        if (!componentDictionary.ContainsKey(tag))
+        {
+            T comp = go.GetComponent<T>();
+            componentDictionary.Add(tag, comp);
+        }
+        else {
+            if (componentDictionary[tag] == null)
+            {
+                T comp = go.GetComponent<T>();
+                componentDictionary[tag] = comp;
+            }
+        }
+        return (T)componentDictionary[tag];
+    }
+
 
 
     public Vector3 EvaluateMoves() {
@@ -183,6 +243,7 @@ public class Unit_AutoDrive : MonoBehaviour
             {
                 continue;
             }
+            int tid = go.GetInstanceID();
             Vector3 directionToTarget = go.transform.position - movement.networkPos;
             directionToTarget.Normalize();
             float distance = Vector3.Distance(go.transform.position, movement.networkPos) - Mathf.Max(go.transform.localScale.x, go.transform.localScale.y);
@@ -190,13 +251,23 @@ public class Unit_AutoDrive : MonoBehaviour
             float multiplier = GetMultiplier(distance);
             switch (go.tag) {
                 case TAG_PLAYER:
-                    move += (skillManager.currStack > 0 || skillManager.skillInUse) ? directionToTarget * multiplier : -directionToTarget * multiplier;
+                    Unit_Player unitPlayer = CacheComponent<Unit_Player>(tid, go);
+                    if (GameSession.gameModeInfo.isTeamGame && unitPlayer.myTeam == player.myTeam) continue;
+                    if (GameSession.gameModeInfo.isCoop) continue;
+                    bool positive = ((skillManager.currStack > 0 ||
+                        skillManager.skillInUse )||
+                        skillManager.buffManager.GetTrigger(BuffType.InvincibleFromBullets)
+                        &&
+                        (!unitPlayer.buffManager.GetTrigger(BuffType.InvincibleFromBullets)));
+
+                    move += positive ? directionToTarget * multiplier : -directionToTarget * multiplier;
                     break;
                 case TAG_PROJECTILE:
                     move -= directionToTarget * multiplier;
                     break;
                 case TAG_BUFF_OBJECT:
-                    if (go.GetComponent<BoxCollider2D>().enabled) {
+                    BoxCollider2D boxColl = CacheComponent<BoxCollider2D>(tid, go);
+                    if (boxColl.enabled) {
                         move += directionToTarget * multiplier *2;
                     }
                     break;
@@ -213,35 +284,16 @@ public class Unit_AutoDrive : MonoBehaviour
         {
             move.Normalize();
         }
-        else if (move.sqrMagnitude <= 0.03f) {
+        else if (move.magnitude <= 0.25f) {
             move = Vector3.zero;
         }
       //  Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
         return move;
     }
 
-    Vector3 GetAwayFromWalls() {
-        Vector3 center = new Vector3(movement.mapSpec.xMid, movement.mapSpec.yMid);
-        float dist = Vector2.Distance(center, movement.networkPos);
-        float notDistance = movement.mapSpec.xMid - movement.mapSpec.xMin;
-        Vector3 dir = center - movement.networkPos;
-        dir.Normalize();
-        dir = dir * GetMultiplier(notDistance - dist);
-        
-        return dir;
-    }
     Vector3 GetAwayFromWalls_2()
     {
         Vector3 move = Vector3.zero;
-/*        if (
-            Mathf.Abs(movement.networkPos.x - movement.mapSpec.xMid) < Mathf.Epsilon
-            &&
-            Mathf.Abs(movement.networkPos.y - movement.mapSpec.yMid) < Mathf.Epsilon
-         )
-        {
-            return move;
-        }*/
-     
         float xBound = (movement.networkPos.x < movement.mapSpec.xMid) ? movement.mapSpec.xMin : movement.mapSpec.xMax;
         float yBound = (movement.networkPos.y < movement.mapSpec.yMid) ? movement.mapSpec.yMin : movement.mapSpec.yMax;
 
@@ -273,4 +325,7 @@ public class Unit_AutoDrive : MonoBehaviour
         float y = (1 / Mathf.Pow(x+ 2,2)) * 48;
         return y;
     }
+}
+public enum AI_ATTACK_TYPE { 
+    ANYTIME,SHORT,LONG,STANDARD
 }

@@ -59,13 +59,15 @@ public class GameStatus
 
     public override string ToString()
     {
-        string o = "Game mode : " + GameSession.gameModeInfo.gameMode + "\n";
+        string o = "<color=#00c8c8>===============GameStat========================</color>\n";
+            o+="Game mode : " + GameSession.gameModeInfo.gameMode + "\n";
         o += "Total Players:" + total + "\n";
         o += "Total Alive:" + alive + "\n";
         o += "Total Alive in my team:" + ConnectedPlayerManager.GetPlayerProperty("TEAM", Team.HOME) + " ? " + alive + "\n";
         o += "Total dead:" + dead + "\n";
         o += "Total to kill:" + toKill + "\n";
         o += "Last survivor:" + lastSurvivor + "\n";
+        o += "<color=#00c8c8>===========================================</color>\n";
         return o;
 
     }

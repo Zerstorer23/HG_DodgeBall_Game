@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,10 +27,20 @@ public class GameSession : MonoBehaviourPun
     PhotonView pv;
 
     public float gameSpeed = 1f;
+    public bool devMode = false;
 
+    public static bool auto_drive_enabled = false;
+    public static bool auto_drive_toggled = false;
     private void FixedUpdate()
     {
         Time.timeScale = gameSpeed;
+    }
+    public static bool IsAutoDriving() {
+        return auto_drive_toggled && auto_drive_enabled;
+    }
+    public static void toggleAutoDriveByKeyInput() {
+        auto_drive_toggled = !auto_drive_toggled;
+        Debug.Log("Driving " + auto_drive_toggled);
     }
 
     public static GameSession instance
@@ -53,6 +64,10 @@ public class GameSession : MonoBehaviourPun
     public static Transform GetBulletHome() => instance.Home_Bullets;
     private void Awake()
     {
+        auto_drive_enabled = devMode;
+        auto_drive_toggled = devMode;
+        requireHalfAgreement = !devMode;
+
         pv = GetComponent<PhotonView>();
         configsManager = GetComponent<ConfigsManager>();
         versionText.text = versionCode+" 버전";
@@ -107,6 +122,21 @@ public class GameSession : MonoBehaviourPun
     {
         EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.PreGame });
     }
+    [PunRPC]
+    public void ResignMaster(Player newMaster) {
+        if (PhotonNetwork.IsMasterClient) {
+            PhotonNetwork.SetMasterClient(newMaster);
+        }
+    }
+    [PunRPC]
+    public void LeaveRoom()
+    {
+        ConnectedPlayerManager.embarkCalled = true;
+        Debug.LogWarning("Leave room");
+        //PhotonNetwork.RemoveRPCs(PhotonNetwork.LocalPlayer);
+        PhotonNetwork.LeaveRoom();
+    }
+
     void OnApplicationPause(bool paused)
     {
         if (Application.platform == RuntimePlatform.Android) {

@@ -1828,6 +1828,7 @@ MonoBehaviour:
   oldPosition: {x: 0, y: 0, z: 0}
   directionIndicator: {fileID: 3604318559537782419}
   autoDriver: {fileID: 5419062539944228608}
+  lastChangeToggle: 0
   networkExpectedTime: 0
   networkPos: {x: 0, y: 0, z: 0}
   lastSendTime: 0

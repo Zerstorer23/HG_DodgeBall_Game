@@ -32,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 8629071319047820310}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 40, y: 7, z: 1}
+  m_LocalScale: {x: 15, y: 4.55, z: 1}
   m_Children:
   - {fileID: 8629071319339072153}
   m_Father: {fileID: 0}
@@ -62,7 +62,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.3287589, y: 0.092283785}
+  m_Size: {x: 0.855209, y: 0.15}
   m_EdgeRadius: 0
 --- !u!50 &3262622108812552497
 Rigidbody2D:
@@ -83,7 +83,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 1
+  m_CollisionDetection: 0
   m_Constraints: 0
 --- !u!114 &8629071319047820330
 MonoBehaviour:
@@ -108,6 +108,7 @@ MonoBehaviour:
   reactionType: 2
   mySprite: {fileID: 0}
   tweenEase: 0
+  synchedInitialCriticalPoint: 0
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,7 +207,7 @@ Transform:
   m_GameObject: {fileID: 8629071319339072154}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.38, y: 0.65, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 8629071319047820309}
   m_RootOrder: 0

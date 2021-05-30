@@ -142,10 +142,8 @@ public class Unit_Player : MonoBehaviourPun
     private int GetTeamBalancedLife(Team myTeam, int maxLife) {
         int numMyTeam = ConnectedPlayerManager.GetNumberInTeam(myTeam);
         int otherTeam = ConnectedPlayerManager.GetNumberInTeam((myTeam == Team.HOME) ? Team.AWAY : Team.HOME);
-        Debug.Log("My team :" + myTeam + " = " + numMyTeam + " / " + otherTeam);
         int underdogged = (otherTeam - numMyTeam) * maxLife;
         if (underdogged <= 0) return 0; //같거나 우리팀이 더 많음
-        Debug.Log("Add nmodifier :" + underdogged / numMyTeam);
         return underdogged / numMyTeam; //차이 /우리팀수 
     }
 

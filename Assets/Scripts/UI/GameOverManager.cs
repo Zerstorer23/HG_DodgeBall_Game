@@ -90,31 +90,13 @@ public class GameOverManager : MonoBehaviour
             if (gameTime > prevScore) {
                 miniWinnerName.text = string.Format("<color=#ff00ff>[신기록]{0}초</color>", gameTime.ToString("0.0"));
                 PlayerPrefs.SetFloat(ConstantStrings.PREFS_TIME_RECORD, prevScore);
+                PlayerPrefs.Save();
             }
         }
     }
-
-    /*
-           string winnerUID = StatisticsManager.GetHighestPlayer(StatTypes.MINIGAME);
-        if (winnerUID == null)
-        {
-            minigamePanel.SetActive(false);
-        }
-        else
-        {
-            minigamePanel.SetActive(true);
-            int score = StatisticsManager.GetStat(StatTypes.MINIGAME, winnerUID);
-            Player player = ConnectedPlayerManager.GetPlayerByID(winnerUID);
-            CharacterType character = GetPlayerCharacter(player);
-            miniWinnerName.text = player.NickName;
-            miniWinnerImage.sprite = ConfigsManager.unitDictionary[character].portraitImage;
-            miniWinnerTitle.text = string.Format("눈치병신: {0}패", score.ToString());
-        }
-     */
     private void SetScoreInfo()
     {
         string winnerUID = StatisticsManager.GetHighestPlayer(StatTypes.SCORE);
-        Debug.Log("Subwinner id " + winnerUID);
         Player player = ConnectedPlayerManager.GetPlayerByID(winnerUID);
         if (player == null)
         {

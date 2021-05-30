@@ -4,12 +4,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
 {
     private static ConnectedPlayerManager prConnMan;
     public int myId = 0;
-    public static bool init = false;
+    public bool init = false;
     //***************//
 
    public override void OnJoinedRoom()
@@ -129,7 +130,7 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         }
     }
     public static Player GetPlayerByID(string id) {
-        if (!init) instance.Init();
+        instance.Init();
         if (id == null) return null;
         if (instance.playerDict.ContainsKey(id))
         {
@@ -187,6 +188,39 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
             return value;
         }
     }
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        Debug.LogWarning("Disconnected " + cause.ToString());
+        instance.init = false;
+        SceneManager.LoadScene(0);
+    }
+    public override void OnLeftRoom()
+    {
+        if (PhotonNetwork.IsConnected)
+        StartCoroutine(WaitAndReset());
+    }
+    IEnumerator WaitAndReset() {
+        Debug.LogWarning("Reload scene in 2 seconds");
+        yield return new WaitForSeconds(2f);
+        embarkCalled = false;
+        instance.init = false;
+        SceneManager.LoadScene(0);
+        MenuManager.JoinRoom();
+    }
+  static  IEnumerator WaitAndQuit()
+    {
+        Debug.LogWarning("Reload scene in 1 seconds");
+        yield return new WaitForSeconds(0.5f);
+        GameSession.instance.LeaveRoom();
+    }
+    public static bool embarkCalled = false;
+    public static void KickEveryone() {
+        if (!PhotonNetwork.IsMasterClient) return;
+        GameSession.PushRoomASetting(ConstantStrings.HASH_GAME_STARTED, false);
+        GameSession.instance.photonView.RPC("LeaveRoom", RpcTarget.Others);
+        instance.StartCoroutine(WaitAndQuit());
+    }
+
     /*   public void Disconnect()
        {
            PhotonNetwork.Disconnect();

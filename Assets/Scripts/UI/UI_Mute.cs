@@ -24,6 +24,7 @@ public class UI_Mute : MonoBehaviour
     public void OnToggleChanged() {
         int on = (muteTogle.isOn)? 1: 0;
         PlayerPrefs.SetInt(ConstantStrings.PREFS_MUTED, on);
+        PlayerPrefs.Save();
         SetAudio();
     }
     public void SetAudio() {

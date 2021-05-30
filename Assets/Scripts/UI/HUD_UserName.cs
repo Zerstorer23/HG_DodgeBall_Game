@@ -10,8 +10,6 @@ public class HUD_UserName : MonoBehaviourPun
 {
     public PhotonView pv;
     public bool isReady = false;
-    //  public string playerName = "ㅇㅇ";
-    // public CharacterType selectedCharacter = CharacterType.HARUHI;
 
     [SerializeField] Image readySprite;
     [SerializeField] Text nameText;

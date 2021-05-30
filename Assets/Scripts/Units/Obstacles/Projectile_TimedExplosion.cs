@@ -7,6 +7,7 @@ public class Projectile_TimedExplosion : MonoBehaviour
     Projectile_DamageDealer damageDealer;
     HealthPoint health;
     public float timeout;
+    //Tsuruya = 0.65
     private void Awake()
     {
         damageDealer = GetComponent<Projectile_DamageDealer>();

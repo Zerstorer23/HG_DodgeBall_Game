@@ -129,7 +129,7 @@ public class PlayerSpawner : MonoBehaviour
         if (gameField.gameFieldFinished)
         {
             //최후의 1인. 맵은 이미 지워져있음
-            Debug.Log(gameField.fieldNo + ": null the player last, only global " + eo.stringObj);
+          //  Debug.Log(gameField.fieldNo + ": null the player last, only global " + eo.stringObj);
             GameFieldManager.RemoveDeadPlayer(eo.stringObj);
             return;
         }
@@ -139,7 +139,7 @@ public class PlayerSpawner : MonoBehaviour
         unitsOnMap[eo.stringObj] = null;
         playersOnMap[eo.stringObj] = null;
         gameField.AddController(eo.stringObj);
-        Debug.Log(gameField.fieldNo + ": null the player " + eo.stringObj);
+     //   Debug.Log(gameField.fieldNo + ": null the player " + eo.stringObj);
         GameFieldManager.RemoveDeadPlayer(eo.stringObj);
         GameStatus stat = new GameStatus(unitsOnMap , lastDiedPlayer);//마지막 1인은 남아있어야함
         gameField.CheckFieldConditions(stat);
@@ -196,13 +196,11 @@ public class PlayerSpawner : MonoBehaviour
 
     public Transform GetNearestPlayerFrom(Vector3 position, string exclusionID = "")
     {
-        Debug.Log("Search nearest " + unitsOnMap.Count);
         Transform nearest = null;
         float nearestDistance = 0;
         int i = 0;
         foreach (var entry in unitsOnMap)
         {
-            Debug.Log("Search ... " + i++);
             if (entry.Value == null)
             {
                 continue;
@@ -212,7 +210,6 @@ public class PlayerSpawner : MonoBehaviour
                 if (entry.Value.pv.Owner.UserId == exclusionID) continue;
                 Transform trans = entry.Value.gameObject.transform;
                 float dist = Vector3.Distance(position, trans.position);
-                Debug.Log("Found " + trans.position + " at " + dist);
                 if (nearest == null || dist < nearestDistance)
                 {
                     nearest = trans;
@@ -226,7 +223,6 @@ public class PlayerSpawner : MonoBehaviour
 
     public void ResetPlayerMap()
     {
-        Debug.Log("Reset player map on ");
         unitsOnMap = new SortedDictionary<string, Unit_Player>();
         debugUnitList = new List<Unit_Player>();
         playersOnMap = new SortedDictionary<string, Player>();

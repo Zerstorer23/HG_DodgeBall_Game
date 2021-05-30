@@ -98,6 +98,7 @@ public class StatisticsManager : MonoBehaviourPun
         PlayerPrefs.SetInt(ConstantStrings.PREFS_KILLS, localStatLibrary[ConstantStrings.PREFS_KILLS]);
         PlayerPrefs.SetInt(ConstantStrings.PREFS_WINS, localStatLibrary[ConstantStrings.PREFS_WINS]);
         PlayerPrefs.SetInt(ConstantStrings.PREFS_EVADES, localStatLibrary[ConstantStrings.PREFS_EVADES]);
+        PlayerPrefs.Save();
     }
     public void AddToLocalStat(string tag, int value) {
         if (statLibrary == null)

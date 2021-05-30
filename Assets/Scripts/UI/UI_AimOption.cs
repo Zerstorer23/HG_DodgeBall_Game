@@ -16,5 +16,6 @@ public class UI_AimOption : MonoBehaviour
     public void OnToggleChanged() {
         aimManual = toggle.isOn;
         PlayerPrefs.SetInt(ConstantStrings.PREFS_MANUAL_AIM, (aimManual) ? 1 : 0);
+        PlayerPrefs.Save();
     }
 }

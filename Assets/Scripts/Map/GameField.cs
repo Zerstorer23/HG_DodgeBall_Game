@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameField : MonoBehaviourPun
+public class GameField : MonoBehaviour
 {
     public int fieldNo = 0;
     public MapSpec mapSpec = new MapSpec();
@@ -20,11 +20,6 @@ public class GameField : MonoBehaviourPun
     internal  Dictionary<string, int> desolator_controllers = new Dictionary<string, int>();
     public int expectedNumPlayer = 0;
 
-    PhotonView pv;
-    private void Awake()
-    {
-        pv = GetComponent<PhotonView>();
-    }
     private void OnEnable()
     {
         EventManager.StartListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeathTriggered);
@@ -63,33 +58,20 @@ public class GameField : MonoBehaviourPun
     }
     internal void CheckFieldConditions(GameStatus stat)
     {
-        if (fieldNo != GameSession.LocalPlayer_FieldNumber || gameFieldFinished) return;
+        if (gameFieldFinished) return;
         CheckSuddenDeath(stat.alive);
         Debug.Log(stat.ToString());
         bool fieldFinished = GameSession.gameModeInfo.IsFieldFinished(stat);
         if (!fieldFinished) return;
 
         Player winner = stat.lastSurvivor;
-        Debug.Log("GAME FISNISHED / master: " + (winner == PhotonNetwork.LocalPlayer) + " winner "+winner); 
-        pv.RPC("NotifyFieldWinner", RpcTarget.AllBufferedViaServer, winner);
-        
+        Debug.Log("GAME FISNISHED / master: " + (winner == PhotonNetwork.LocalPlayer) + " winner "+winner);
+        GameFieldManager.pv.RPC("NotifyFieldWinner", RpcTarget.AllBufferedViaServer,fieldNo, winner);
+       // NotifyFieldWinner(winner);
     }
 
     public Player fieldWinner = null;
     public string winnerName = null;
-
-    [PunRPC]
-    public void NotifyFieldWinner(Player winner)
-    {
-        if (gameFieldFinished) return;
-        gameFieldFinished = true;
-        fieldWinner = winner;
-        winnerName = winner.NickName;
-      //  Debug.Log("FIeld " + fieldNo + " finished with winner " + fieldWinner);
-        EventManager.TriggerEvent(MyEvents.EVENT_FIELD_FINISHED, new EventObject() { intObj = fieldNo });
-        gameObject.SetActive(false);
-        GameFieldManager.CheckGameFinished();
-    }
 
     public void CheckSuddenDeath(int numAlive, bool timeout = false)
     {
@@ -231,7 +213,6 @@ public class GameField : MonoBehaviourPun
     {
         int x = pNumber % w;
         int y = pNumber / w;
-        Debug.Log(pNumber + " Found " + x + "," + y);
         return GetPoissonPositionNear(x, y);
 
     }

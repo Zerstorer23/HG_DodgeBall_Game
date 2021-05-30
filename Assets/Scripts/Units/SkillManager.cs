@@ -13,7 +13,7 @@ public class SkillManager : MonoBehaviourPun
     public PhotonView pv;
     Unit_Movement unitMovement;
     Unit_Player player;
-    BuffManager buffManager;
+    internal BuffManager buffManager;
     //Data
     public CharacterType myCharacter;
 
@@ -41,7 +41,7 @@ public class SkillManager : MonoBehaviourPun
     {
         if (PhotonNetwork.Time < lastActivated + 0.4) return;
         if (InputHelper.skillKeyFired() || 
-            (MenuManager.auto_drive && unitMovement.autoDriver.CanAttackTarget())   
+            (GameSession.IsAutoDriving() && unitMovement.autoDriver.CanAttackTarget())   
             )
         {
             if (currStack > 0)
@@ -112,11 +112,11 @@ public class SkillManager : MonoBehaviourPun
                 break;
             case CharacterType.KIMIDORI:
                 mySkillFunction = DoSkillSet_Kimidori;
-                skillCool = 1.5f;
+                skillCool = 1.25f;
                 break;
             case CharacterType.TSURUYA:
                 mySkillFunction = DoSkillSet_Tsuruya;
-                skillCool = 3f;
+                skillCool = 4f;
                 maxStack = 3;
                 break;
             case CharacterType.YASUMI:
@@ -258,7 +258,6 @@ public class SkillManager : MonoBehaviourPun
             // mySkill.Enqueue(new Action_WaitForSeconds());
         }
 
-        Debug.Log("Activate skill");
         StartCoroutine(mySkill.Activate());
     }
 
@@ -289,7 +288,6 @@ public class SkillManager : MonoBehaviourPun
         mySkill.Enqueue(new Action_PlayerChangeSpriteColor());
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 1f });
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Height, paramValue = 1f });
-        Debug.Log("Activate skill");
         StartCoroutine(mySkill.Activate());
     }
 
@@ -311,7 +309,6 @@ public class SkillManager : MonoBehaviourPun
         mySkill.Enqueue(new Action_GunObject_SetAngle());
         mySkill.Enqueue(new Action_Projectile_ResetAngle());
         mySkill.Enqueue(new Action_PlayerDoGunAnimation());
-        Debug.Log("Activate skill");
         StartCoroutine(mySkill.Activate());
     }
 
@@ -394,7 +391,6 @@ public class SkillManager : MonoBehaviourPun
             mySkill.Enqueue(new Action_WaitForSeconds());
         }
 
-        Debug.Log("Activate skill");
         StartCoroutine(mySkill.Activate());
     }
 
@@ -406,12 +402,12 @@ public class SkillManager : MonoBehaviourPun
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_TSURUYA);
         mySkill.SetParam(SkillParams.Quarternion, Quaternion.identity);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-        float radius = 12f; //5
+        float radius = 15f; //5
         float timeStep = 0.25f; //0.25
-        int numStep = 4; //10
+        int numStep = 5; //10
         int shootAtOnce = 5;//10
         mySkill.SetParam(SkillParams.Duration, timeStep);
-        BuffData buff = new BuffData(BuffType.MoveSpeed, -0.5f, timeStep * (numStep));
+        BuffData buff = new BuffData(BuffType.MoveSpeed, -0.2f, timeStep * (numStep));
         mySkill.SetParam(SkillParams.BuffData, buff);
         mySkill.Enqueue(new Action_Player_AddBuff());
         for (int i = 0; i < numStep * shootAtOnce; i++)

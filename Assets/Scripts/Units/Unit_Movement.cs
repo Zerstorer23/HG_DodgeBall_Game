@@ -36,15 +36,14 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
 
         networkPosIndicator = GameSession.GetInst().networkPos;
     }
-    private new void OnEnable()
+    public override void OnEnable()
     {
         if (UI_GamePadOptions.useGamepad)
         {
             InputHelper.SetAxisNames();
         }
       //  if (GameSession.gameModeInfo.gameMode == GameMode.Tournament && PhotonNetwork.CurrentRoom.PlayerCount % 2 == 1 ) MenuManager.auto_drive = false;
-        autoDriver.enabled = MenuManager.auto_drive;
-        Debug.Log("Auto Driver : " + MenuManager.auto_drive);
+        autoDriver.gameObject.SetActive(GameSession.auto_drive_enabled);
     }
 
 
@@ -65,8 +64,20 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         }
     }
     // Update is called once per frame
+    public float lastChangeToggle = 0;
     private void Update()
     {
+        if (pv.IsMine) {
+            if (Input.GetKeyDown(KeyCode.F) && GameSession.auto_drive_enabled)
+            {
+                if (Time.time > (lastChangeToggle + 0.25f))
+                {
+                    lastChangeToggle = Time.time;
+                    GameSession.toggleAutoDriveByKeyInput();
+                }
+            }
+
+        }
         Move(Time.deltaTime);
         DequeuePositions();
         UpdateDirection();
@@ -78,7 +89,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
 
         if (pv.IsMine)
         {
-            if (MenuManager.auto_drive)
+            if (GameSession.IsAutoDriving())
             {
                 GiveEvaluatedInput(moveSpeedFinal);
             }
@@ -95,33 +106,6 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
 
     }
 
-    double nextRandomTIme;
-    Vector3 lastRandomMove = Vector3.zero;
-    private void GiveRandomInput(float moveSpeedFinal)
-    {
-
-        var deltaX = lastRandomMove.x;
-        var deltaY = lastRandomMove.y;
-        if (networkPos.x >= mapSpec.xMax
-            || networkPos.x <= mapSpec.xMin
-            || networkPos.y >= mapSpec.yMax
-            || networkPos.y <= mapSpec.yMin
-            ) nextRandomTIme = PhotonNetwork.Time;
-
-        if (PhotonNetwork.Time >= nextRandomTIme)
-        {
-            deltaX = Random.Range(-1, 2) * moveSpeedFinal;
-            deltaY = Random.Range(-1, 2) * moveSpeedFinal;
-            lastRandomMove = new Vector3(deltaX, deltaY, 0f);
-            double time = Random.Range(0f, 1.5f);
-            nextRandomTIme = PhotonNetwork.Time + time;
-        }
-        Vector3 newPosition = ClampPosition(new Vector3(networkPos.x + deltaX, networkPos.y + deltaY, 0f));
-        // 32 16
-        // 1.. 32   2. 16
-        // 33 / 34 / 18
-        EnqueuePosition(newPosition);
-    }
     private void GiveEvaluatedInput(float moveSpeedFinal)
     {
 
@@ -232,7 +216,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
 
     public float GetAim()
     {
-        return (MenuManager.auto_drive)? autoDriver.EvaluateAim() : aimAngle;
+        return (GameSession.IsAutoDriving()) ? autoDriver.EvaluateAim() : aimAngle;
     }
     public double networkExpectedTime;
     public Vector3 networkPos;
