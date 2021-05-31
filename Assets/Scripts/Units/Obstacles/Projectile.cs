@@ -27,12 +27,24 @@ public class Projectile : MonoBehaviourPun
         string playerID = (string)pv.InstantiationData[1];
         bool followPlayer = (bool)pv.InstantiationData[2];
         player = GameFieldManager.gameFields[fieldNo].playerSpawner.GetPlayerByOwnerID(playerID);
-        if (followPlayer && player != null)
+
+        if (player != null)
         {
-            player.SetMyProjectile(gameObject);
+            if (followPlayer)
+            {
+                player.SetMyProjectile(gameObject);
+            }
+            player.AddProjectile(gameObject.GetInstanceID(), health);
         }
         else {
             transform.SetParent(GameSession.GetBulletHome());
+        }
+    }
+    private void OnDisable()
+    {
+        if (player != null)
+        {
+            player.RemoveProjectile(gameObject.GetInstanceID());
         }
     }
 

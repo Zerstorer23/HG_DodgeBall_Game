@@ -43,9 +43,9 @@ public class Projectile_DamageDealer : MonoBehaviourPun
             exclusionPlayerID = pv.Owner.UserId;
         }
         myCollider.enabled = true;
-        attackedIDs = new Dictionary<string, double>();
+        attackedIDs = new Dictionary<int, double>();
     }
-    public Dictionary<string,double> attackedIDs = new Dictionary<string, double>();
+    public Dictionary<int, double> attackedIDs = new Dictionary<int, double>();
     void FindCollider()
     {
         myCollider = GetComponent<PolygonCollider2D>();
@@ -63,11 +63,11 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         }
     }
 
-    /*
-        [PunRPC]
-        public void SetExclusionPlayer(string playerID) {
-            exclusionPlayerID = playerID;
-        }*/
+  
+    [PunRPC]
+    public void ToggleDamage(bool enable) {
+        givesDamage = enable;
+    }
 
     // Start is called before the first frame update
     private void OnTriggerEnter2D(Collider2D collision)
@@ -119,6 +119,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
                 }
                 break;
             case TAG_BOX_OBSTACLE:
+            case TAG_WALL:
                 //Bounce
                 contact = collision.GetContact(0);
                 //   Debug.Log("Contact at" + contact.point);
@@ -171,7 +172,8 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     
     }
     bool CheckManifoldDamage(HealthPoint otherHP) {
-        string uid = otherHP.pv.Owner.UserId;
+        if (!givesDamage) return true;
+        int uid = otherHP.gameObject.GetInstanceID();
         double curr = PhotonNetwork.Time;
         if (attackedIDs.ContainsKey(uid))
         {

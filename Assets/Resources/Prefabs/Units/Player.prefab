@@ -1773,14 +1773,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8822352236447964827}
-  - component: {fileID: 8822352236447964825}
   - component: {fileID: 8822352236447964824}
+  - component: {fileID: 8822352236447964825}
   - component: {fileID: 8822352236447964830}
   - component: {fileID: 8092163232600007844}
   - component: {fileID: 831789703712551272}
   - component: {fileID: -4324785610606511446}
   - component: {fileID: 5223520803493915819}
-  - component: {fileID: 2603996422842996677}
   - component: {fileID: 3251075621680519964}
   m_Layer: 10
   m_Name: Player
@@ -1812,26 +1811,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8822352236447964825
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8822352236447964826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c50bddec9b40320419102fc8346b392c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 10
-  oldPosition: {x: 0, y: 0, z: 0}
-  directionIndicator: {fileID: 3604318559537782419}
-  autoDriver: {fileID: 5419062539944228608}
-  lastChangeToggle: 0
-  networkExpectedTime: 0
-  networkPos: {x: 0, y: 0, z: 0}
-  lastSendTime: 0
 --- !u!114 &8822352236447964824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1858,6 +1837,26 @@ MonoBehaviour:
   characterBodymanager: {fileID: 1743256954223984165}
   evasion: 0
   mainSprite: {fileID: 0}
+--- !u!114 &8822352236447964825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8822352236447964826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c50bddec9b40320419102fc8346b392c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 10
+  oldPosition: {x: 0, y: 0, z: 0}
+  directionIndicator: {fileID: 3604318559537782419}
+  autoDriver: {fileID: 5419062539944228608}
+  lastChangeToggle: 0
+  networkExpectedTime: 0
+  networkPos: {x: 0, y: 0, z: 0}
+  lastSendTime: 0
 --- !u!95 &8822352236447964830
 Animator:
   serializedVersion: 3
@@ -1949,25 +1948,6 @@ MonoBehaviour:
   dontKillByException: 0
   associatedField: 0
   killerUID: 
---- !u!114 &2603996422842996677
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8822352236447964826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3289f26786d67b4e83ad0d809ecea24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pv: {fileID: 0}
-  myCharacter: 0
-  maxStack: 0
-  cooltime: 0
-  skillInUse: 0
-  remainingStackTime: 0
-  currStack: 0
 --- !u!114 &3251075621680519964
 MonoBehaviour:
   m_ObjectHideFlags: 0

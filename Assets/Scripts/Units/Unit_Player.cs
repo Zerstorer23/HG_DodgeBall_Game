@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -22,6 +23,7 @@ public class Unit_Player : MonoBehaviourPun
     public GameObject driverIndicator;
 
     List<GameObject> myUnderlings = new List<GameObject>();
+    Dictionary<int, HealthPoint> myProjectiles = new Dictionary<int, HealthPoint>();
 
     public Team myTeam = Team.HOME;
     public int fieldNo = 0;
@@ -36,11 +38,9 @@ public class Unit_Player : MonoBehaviourPun
         animator = GetComponent<Animator>();
         pv = GetComponent<PhotonView>();
         health = GetComponent<HealthPoint>();
-        skillManager = GetComponent<SkillManager>();
         movement = GetComponent<Unit_Movement>();
         buffManager = GetComponent<BuffManager>();
         circleCollider = GetComponent<CircleCollider2D>();
-
     }
     private void OnDisable()
     {
@@ -52,7 +52,7 @@ public class Unit_Player : MonoBehaviourPun
             GameFieldManager.ChangeToSpectator();
         }
         circleCollider.radius = 0.33f;
-
+        myProjectiles = new Dictionary<int, HealthPoint>();
         EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_DIED, new EventObject() { stringObj = pv.Owner.UserId, intObj = fieldNo });
     }
     private void OnEnable()
@@ -76,7 +76,7 @@ public class Unit_Player : MonoBehaviourPun
     }
     void ParseInstantiationData() {
         myCharacter = (CharacterType)pv.InstantiationData[0];
-        skillManager.SetSkill(myCharacter);
+        AddSkillManager();
         myPortrait.sprite = ConfigsManager.unitDictionary[myCharacter].portraitImage;
         CheckCustomCharacter();
         int maxLife = (int)pv.InstantiationData[1];
@@ -178,7 +178,20 @@ public class Unit_Player : MonoBehaviourPun
         AudioManager.PlayAudioOneShot(shootAudio);
 
     }
-
+    public void AddProjectile(int id, HealthPoint proj) {
+        if (myProjectiles.ContainsKey(id))
+        {
+            myProjectiles[id] = proj;
+        }
+        else {
+            myProjectiles.Add(id, proj);
+        }
+    }
+    public void RemoveProjectile(int id) {
+        if (myProjectiles.ContainsKey(id)) {
+            myProjectiles.Remove(id);
+        }
+    }
     public void IncrementKill(EventObject eo)
     {
         if (eo.stringObj == pv.Owner.UserId) {
@@ -208,5 +221,53 @@ public class Unit_Player : MonoBehaviourPun
         }
     
     }
- 
+
+    internal bool FindAttackHistory(int tid)
+    {
+        foreach (var proj in myProjectiles.Values) {
+            if (proj.damageDealer.attackedIDs.ContainsKey(tid)) return true;
+        }
+        return false;
+    }
+
+    public void AddSkillManager() {
+        switch (myCharacter)
+        {
+            case CharacterType.NAGATO:
+                skillManager = gameObject.AddComponent<Skill_Nagato>();
+                break;
+            case CharacterType.HARUHI:
+                skillManager = gameObject.AddComponent<Skill_Haruhi>();
+                break;
+            case CharacterType.MIKURU:
+                skillManager = gameObject.AddComponent<Skill_Mikuru>();
+                break;
+            case CharacterType.KOIZUMI:
+            case CharacterType.KOIHIME:
+                skillManager = gameObject.AddComponent<Skill_Koizumi>();
+                break;
+            case CharacterType.KUYOU:
+                skillManager = gameObject.AddComponent<Skill_Kuyou>();
+                break;
+            case CharacterType.ASAKURA:
+                skillManager = gameObject.AddComponent<Skill_Asakura>();
+                break;
+            case CharacterType.KYOUKO:
+                skillManager = gameObject.AddComponent<Skill_Kyouko>();
+                break;
+            case CharacterType.KIMIDORI:
+                skillManager = gameObject.AddComponent<Skill_Kimidori>();
+                break;
+            case CharacterType.SASAKI:
+                skillManager = gameObject.AddComponent<Skill_Sasaki>();
+                break;
+            case CharacterType.TSURUYA:
+                skillManager = gameObject.AddComponent<Skill_Tsuruya>();
+                break;
+            case CharacterType.YASUMI:
+                skillManager = gameObject.AddComponent<Skill_Yasumi>();
+                break;
+        }
+        //UnityEditorInternal.ComponentUtility.MoveComponentUp(skillManager);
+    }
 }

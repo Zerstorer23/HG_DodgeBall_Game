@@ -23,13 +23,11 @@ public class GameOverManager : MonoBehaviour
     Player finalWinner;
 
 
-    public double startTime;
     public double timeoutWait = -1;
 
 
     public void SetPanel(Player receivedWinner)
     {
-        startTime = PhotonNetwork.Time;
         timeoutWait = 5;
         finalWinner = receivedWinner;
         if (finalWinner != null)
@@ -56,18 +54,16 @@ public class GameOverManager : MonoBehaviour
         SetGameInfo();
         CheckGoogleEvents();
     }
-    private void Update()
+    private void FixedUpdate()
     {
-        if (timeoutWait <= 0) return;
-        double remain = (startTime + timeoutWait) - PhotonNetwork.Time;
-        if (remain <= 0)
+        timeoutWait -= Time.fixedDeltaTime;
+        if (timeoutWait <= 0)
         {
-            timeoutWait = -1f;
             StartCoroutine(WaitAndOut());
         }
         else
         {
-            returnMenuText.text = remain.ToString("0") + " 초후 돌아갑니다...";
+            returnMenuText.text = timeoutWait.ToString("0") + " 초후 돌아갑니다...";
         }
     }
     IEnumerator WaitAndOut()

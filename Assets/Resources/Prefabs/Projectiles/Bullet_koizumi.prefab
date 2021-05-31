@@ -193,6 +193,7 @@ MonoBehaviour:
   goClockwise: 1
   moveType: 0
   reactionType: 2
+  characterUser: 4
   mySprite: {fileID: 3005893680650928229}
   tweenEase: 0
   synchedInitialCriticalPoint: 0

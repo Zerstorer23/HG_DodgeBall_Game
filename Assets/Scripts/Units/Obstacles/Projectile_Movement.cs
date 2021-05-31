@@ -181,19 +181,7 @@ public class Projectile_Movement : MonoBehaviourPun
     }
 
     public bool synchedInitialCriticalPoint = false;
-   /* public void SyncAPoint(bool forceSynch = false) {
-        if (synchedInitialCriticalPoint && !forceSynch) return;
-        synchedInitialCriticalPoint = true;
-        if (pv.IsMine) {
-            pv.RPC("SyncAPoint_Helper", RpcTarget.AllBufferedViaServer, transform.localPosition, transform.rotation);
-        }
-    }
-    [PunRPC]
-    public void SyncAPoint_Helper(Vector3 position, Quaternion rotation)
-    {
-        transform.localPosition = position;
-        transform.rotation = rotation;
-    }*/
+
     private void DoMove_Static()
     {
         
@@ -225,7 +213,7 @@ public class Projectile_Movement : MonoBehaviourPun
             transform.rotation = Quaternion.Euler(0, 0, newEulerAngle);
         }
     }
-   public void GetExpectedPosition(List<Vector3> collisionList, Vector3 collisionSource, float maxRange, float duration = 1f) {
+/*   public void GetExpectedPosition(List<Vector3> collisionList, Vector3 collisionSource, float maxRange, float duration = 1f) {
         if (moveType == MoveType.Static) return ;
         float totalDistance = moveSpeed * duration;
         Vector3 endPosition = GetAngledVector(eulerAngle, totalDistance);
@@ -247,6 +235,6 @@ public class Projectile_Movement : MonoBehaviourPun
            // if (Vector2.Distance(point, collisionSource) > maxRange) return;
             collisionList.Add(point);
         } 
-    }
+    }*/
 }
 

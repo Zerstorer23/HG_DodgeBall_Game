@@ -42,7 +42,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         {
             InputHelper.SetAxisNames();
         }
-      //  if (GameSession.gameModeInfo.gameMode == GameMode.Tournament && PhotonNetwork.CurrentRoom.PlayerCount % 2 == 1 ) MenuManager.auto_drive = false;
+        //  if (GameSession.gameModeInfo.gameMode == GameMode.Tournament && PhotonNetwork.CurrentRoom.PlayerCount % 2 == 1 ) MenuManager.auto_drive = false;
         autoDriver.gameObject.SetActive(GameSession.auto_drive_enabled);
     }
 
@@ -51,13 +51,13 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         mapSpec = spec;
     }
 
-   public Unit_AutoDrive autoDriver;
+    public Unit_AutoDrive autoDriver;
 
     private void Start()
     {
         if (pv.IsMine)
         {
-            
+
             directionIndicator.SetActive(true);
             positionQueue = new Queue<TimeVector>();
             networkPos = transform.position;
@@ -109,11 +109,12 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
     private void GiveEvaluatedInput(float moveSpeedFinal)
     {
 
-        Vector3 recommendDirection = autoDriver.lastEvaluatedVector * moveSpeedFinal; 
-        Vector3 newPosition = ClampPosition(new Vector3(networkPos.x + recommendDirection.x, networkPos.y + recommendDirection.y, 0f));
-        // 32 16
-        // 1.. 32   2. 16
-        // 33 / 34 / 18
+        Vector3 recommendDirection = autoDriver.lastEvaluatedVector * moveSpeedFinal;
+        Vector3 newPosition = ClampPosition(networkPos, recommendDirection);// new Vector3(networkPos.x + recommendDirection.x, networkPos.y + recommendDirection.y, 0f));
+                                                                            // 32 16
+                                                                            // 1.. 32   2. 16
+                                                                            // 33 / 34 / 18
+       // if (CheckWallContact(newPosition)) return;
         EnqueuePosition(newPosition);
     }
 
@@ -122,7 +123,8 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         var deltaX = InputHelper.GetInputHorizontal() * moveSpeedFinal;
         var deltaY = InputHelper.GetInputVertical() * moveSpeedFinal;
 
-        Vector3 newPosition = ClampPosition(new Vector3(networkPos.x +  deltaX, networkPos.y + deltaY, 0f));
+        Vector3 newPosition = ClampPosition(networkPos, new Vector3(deltaX, deltaY));////new Vector3(networkPos.x +  deltaX, networkPos.y + deltaY, 0f));
+       // if (CheckWallContact(newPosition)) return;
         EnqueuePosition(newPosition);
 
     }
@@ -136,8 +138,8 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
             networkExpectedTime = PhotonNetwork.Time + GameSession.STANDARD_PING;
             oldPosition = newPosition;
             if (PhotonNetwork.CurrentRoom.PlayerCount == 1) {
-            positionQueue.Enqueue(new TimeVector(networkExpectedTime, networkPos));
-          }
+                positionQueue.Enqueue(new TimeVector(networkExpectedTime, networkPos));
+            }
         }
         else if (positionQueue.Count <= 0)
         {
@@ -146,10 +148,52 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         }
         networkPosIndicator.position = newPosition;
     }
-    Vector3 ClampPosition(Vector3 position) {
-        float newX =  Mathf.Clamp(position.x, mapSpec.xMin, mapSpec.xMax);
-        float newY = Mathf.Clamp(position.y, mapSpec.yMin, mapSpec.yMax);
-        return new Vector3(newX, newY);
+    Vector3 ClampPosition(Vector3 position, Vector3 direction) {
+        direction = CheckWallContact_Slide(position, direction);
+        float newX = Mathf.Clamp(position.x + direction.x, mapSpec.xMin, mapSpec.xMax);
+        float newY = Mathf.Clamp(position.y + direction.y, mapSpec.yMin, mapSpec.yMax);
+        Vector3 newPos = new Vector3(newX, newY);
+        return newPos;
+    }
+    bool CheckWallContact(Vector3 position) {
+
+        Collider2D[] collisions = Physics2D.OverlapCircleAll(
+        position, 0.25f, LayerMask.GetMask(ConstantStrings.TAG_WALL));
+
+        foreach (var c in collisions)
+        {
+            if (c.gameObject.tag == ConstantStrings.TAG_WALL) return true;
+        }
+        return false;
+    }
+    Vector3 CheckWallContact_Slide(Vector3 position, Vector3 direction)
+    {
+
+        Collider2D[] collisions = Physics2D.OverlapCircleAll(
+        position, 0.25f, LayerMask.GetMask(ConstantStrings.TAG_WALL));
+
+        bool isContact = false;
+        foreach (var c in collisions)
+        {
+            if (c.gameObject.tag == ConstantStrings.TAG_WALL) {
+                isContact = true;
+                break;
+            }
+        }
+        if (isContact)
+        {
+            bool xMajor = Mathf.Abs(direction.x) > Mathf.Abs(direction.y);
+            if (xMajor)
+            {
+                return new Vector3(0, direction.y);
+            }
+            else {
+                return new Vector3(direction.x,0);
+            }
+        }
+        else {
+            return direction;
+        }
     }
 
     void DequeuePositions()
@@ -170,7 +214,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
             // lastDequeuedPosition = tv.position;
         }
         else {
-            transform.position = ClampPosition(transform.position);
+            transform.position = transform.position;
         }
 
     }

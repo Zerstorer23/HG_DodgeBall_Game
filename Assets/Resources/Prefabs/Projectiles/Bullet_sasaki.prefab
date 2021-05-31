@@ -74,8 +74,10 @@ MonoBehaviour:
   goClockwise: 1
   moveType: 0
   reactionType: 1
+  characterUser: 10
   mySprite: {fileID: 8629071319339072152}
   tweenEase: 1
+  synchedInitialCriticalPoint: 0
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
   m_ObjectHideFlags: 0

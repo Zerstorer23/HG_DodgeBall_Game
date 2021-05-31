@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8709314251964653671}
   - component: {fileID: -5103611605035117184}
   - component: {fileID: 8629071319047820330}
-  - component: {fileID: 954937302656838271}
+  - component: {fileID: -6068978053554526307}
   - component: {fileID: -8895642817908627982}
   - component: {fileID: 6212558457632629342}
   - component: {fileID: 4556413170392631494}
@@ -112,10 +112,11 @@ MonoBehaviour:
   goClockwise: 1
   moveType: 2
   reactionType: 2
+  characterUser: 6
   mySprite: {fileID: 2534975670834146036}
   tweenEase: 0
   synchedInitialCriticalPoint: 0
---- !u!114 &954937302656838271
+--- !u!114 &-6068978053554526307
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,12 +125,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8629071319047820310}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38daa8e59d8fe9c409bbfe8bbf38441c, type: 3}
+  m_Script: {fileID: 11500000, guid: 67b33125b71be42439e54176c8047315, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  networkExpectedTime: 0
   networkPos: {x: 0, y: 0, z: 0}
   networkQuaternion: {x: 0, y: 0, z: 0, w: 0}
-  syncPeriod: 1
+  syncRotation: 1
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199,7 +201,7 @@ MonoBehaviour:
   OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: -6068978053554526307}
   sceneViewId: 2
   InstantiationId: 0
   isRuntimeInstantiated: 0

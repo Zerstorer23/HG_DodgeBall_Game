@@ -16,7 +16,6 @@ public class Unit_AutoDrive : MonoBehaviour
     internal GameObject directionIndicator;
     float range;
     float attackRange = 10f;
-    float collisionRange;
     float escapePadding = 1f;
 
     public GameObject targetEnemy;
@@ -26,17 +25,17 @@ public class Unit_AutoDrive : MonoBehaviour
     Vector3 xWall, yWall;
     public AI_ATTACK_TYPE aiAttackType = AI_ATTACK_TYPE.STANDARD;
 
-    public List<GameObject> watchList = new List<GameObject>();
-    List<Vector3> collisionList = new List<Vector3>();
     public bool secondPrediction = true;
+
+    bool isKamikazeSkill = false;
+
     public void SetInfo()
     {
         movement = player.movement;
         skillManager = player.skillManager;
         directionIndicator = player.driverIndicator;
         myInstanceID = player.gameObject.GetInstanceID();
-        range = 15f;
-        collisionRange = range / 2f + GetRadius(transform.localScale) + 0.4f;
+        range = 20f;
         DetermineAttackType();
     }
     void DetermineAttackType()
@@ -44,44 +43,44 @@ public class Unit_AutoDrive : MonoBehaviour
         switch (player.myCharacter)
         {
             case CharacterType.KIMIDORI:
-                aiAttackType = AI_ATTACK_TYPE.ANYTIME;
-                break;
-            case CharacterType.TSURUYA:
-                aiAttackType = AI_ATTACK_TYPE.STANDARD;
-                break;
-            case CharacterType.HARUHI:
-            case CharacterType.KOIZUMI:
-            case CharacterType.SASAKI:
-            case CharacterType.KOIHIME:
-            case CharacterType.KUYOU:
-            case CharacterType.YASUMI:
-                aiAttackType = AI_ATTACK_TYPE.SHORT;
-                break;
             case CharacterType.MIKURU:
-            case CharacterType.NAGATO:
-            case CharacterType.ASAKURA:
-            case CharacterType.KYOUKO:
-                aiAttackType = AI_ATTACK_TYPE.LONG;
-                break;
-            default:
-                aiAttackType = AI_ATTACK_TYPE.STANDARD;
-                break;
-        }
-        switch (aiAttackType)
-        {
-            case AI_ATTACK_TYPE.ANYTIME:
                 attackRange = 999f;
                 break;
-            case AI_ATTACK_TYPE.SHORT:
-                attackRange = range * 0.5f;
+            case CharacterType.TSURUYA:
+                attackRange = 12;
                 break;
-            case AI_ATTACK_TYPE.LONG:
-                attackRange = range * 2f;
+            case CharacterType.HARUHI:
+                attackRange = 5.5f;
+                isKamikazeSkill = true;
                 break;
-            case AI_ATTACK_TYPE.STANDARD:
+            case CharacterType.KUYOU:
+                attackRange = 4f;
+                isKamikazeSkill = true;
+                break;
+            case CharacterType.KOIZUMI:
+            case CharacterType.KOIHIME:
+                attackRange = 10f;
+                isKamikazeSkill = true;
+                break;
+            case CharacterType.SASAKI:
+                attackRange = 12f;
+                isKamikazeSkill = true;
+                break;
+            case CharacterType.YASUMI:
+                attackRange = 4f;
+                break;
+            case CharacterType.NAGATO:
+                attackRange = 6f;
+                break;
+            case CharacterType.ASAKURA:
+            case CharacterType.KYOUKO:
+                attackRange = 20f;
+                break;
+            default:
                 attackRange = range;
                 break;
         }
+
     }
 
 
@@ -128,33 +127,22 @@ public class Unit_AutoDrive : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, range);
-        /*        foreach (GameObject go in foundObjects.Values)
+                foreach (GameObject go in foundObjects.Values)
                 {
                     if (go == null || !go.activeInHierarchy)
                     {
                         continue;
                     }
                     Gizmos.DrawWireSphere(go.transform.position, 0.5f);
-                }*/
-
-        Gizmos.DrawWireSphere(transform.position + lastEvaluatedVector, 0.5f);
+                }
+        Gizmos.color = (doApproach) ? Color.cyan : Color.red;
+        Gizmos.DrawWireSphere(transform.position + lastEvaluatedVector, 0.6f);
         Gizmos.DrawWireSphere(xWall, 1f);
         Gizmos.DrawWireSphere(yWall, 1f);
         if (targetEnemy != null)
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(targetEnemy.transform.position, 1f);
-        }
-        Gizmos.color = Color.cyan;
-        foreach (var go in watchList)
-        {
-            if (go == null) continue;
-            Gizmos.DrawWireSphere(go.transform.position, 0.6f);
-        }
-        Gizmos.color = Color.green;
-        foreach (var go in collisionList)
-        {
-            Gizmos.DrawWireSphere(go, 0.7f);
         }
     }
     // Update is called once per frame
@@ -163,7 +151,7 @@ public class Unit_AutoDrive : MonoBehaviour
     void FindNearByObjects()
     {
         Collider2D[] collisions = Physics2D.OverlapCircleAll(
-            movement.networkPos, range, LayerMask.GetMask(TAG_PLAYER, TAG_PROJECTILE, TAG_BUFF_OBJECT));
+            movement.networkPos, range, LayerMask.GetMask(TAG_PLAYER, TAG_PROJECTILE, TAG_BUFF_OBJECT, TAG_WALL));
 
         for (int i = 0; i < collisions.Length; i++)
         {
@@ -188,6 +176,9 @@ public class Unit_AutoDrive : MonoBehaviour
                     foundObjects.Add(tid, c.gameObject);
                     break;
                 case TAG_BUFF_OBJECT:
+                    foundObjects.Add(tid, c.gameObject);
+                    break;
+                case TAG_WALL:
                     foundObjects.Add(tid, c.gameObject);
                     break;
             }
@@ -224,6 +215,8 @@ public class Unit_AutoDrive : MonoBehaviour
             if (p == null || !p.gameObject.activeInHierarchy) continue;
             if (p.gameObject.GetInstanceID() == myInstanceID) continue;
             if (GameSession.gameModeInfo.isTeamGame && p.myTeam == player.myTeam) continue;
+            if (p.buffManager.GetTrigger(BuffType.InvincibleFromBullets)) continue;
+            if (p.buffManager.GetTrigger(BuffType.MirrorDamage)) continue;
             float dist = Vector2.Distance(movement.networkPos, p.gameObject.transform.position);
             if (dist < nearestEnemyDist || targetEnemy == null)
             {
@@ -240,12 +233,11 @@ public class Unit_AutoDrive : MonoBehaviour
         FindNearByObjects();
         //EvaluateAim();
         FindNearestPlayer();
+    }
+    private void Update()
+    {
         lastEvaluatedVector = EvaluateMoves();
     }
-    /*    private void Update()
-        {
-
-        }*/
 
     public float EvaluateAim()
     {
@@ -280,7 +272,6 @@ public class Unit_AutoDrive : MonoBehaviour
     Vector3 EvaluateMoves()
     {
         Vector3 move = Vector3.zero;
-        watchList = new List<GameObject>();
         foreach (GameObject go in foundObjects.Values)
         {
             if (go == null || !go.activeInHierarchy)
@@ -291,69 +282,18 @@ public class Unit_AutoDrive : MonoBehaviour
             Vector3 directionToTarget = go.transform.position - movement.networkPos;
             directionToTarget.Normalize();
             float distance = Vector3.Distance(go.transform.position, movement.networkPos) - GetRadius(go.transform.localScale);
-            if (distance > range) continue;
-
-            float multiplier = GetMultiplier(distance);
+         //   if (distance > range) continue;
+            float multiplier = 0f;
             switch (go.tag)
             {
                 case TAG_PLAYER:
-                    Unit_Player unitPlayer = CacheComponent<Unit_Player>(tid, go);
-                    bool positive = ((skillManager.currStack > 0 ||
-                        skillManager.skillInUse) ||
-                        skillManager.buffManager.GetTrigger(BuffType.InvincibleFromBullets)
-                        &&
-                        (!unitPlayer.buffManager.GetTrigger(BuffType.InvincibleFromBullets))
-                        );
-                    multiplier *= 2;
-                    move += positive
-                        ? directionToTarget * multiplier :
-                        -directionToTarget * multiplier;
+                    move += EvaluatePlayer(go, tid, directionToTarget, distance);
                     break;
                 case TAG_PROJECTILE:
-                    HealthPoint hp = CacheComponent<HealthPoint>(tid, go);
-                    Projectile_Movement pMove = (Projectile_Movement)hp.movement;
-                    float targetSpeed = pMove.moveSpeed;
-                    float targetAngle = pMove.eulerAngle;
-                   // float speedMod = GetSpeedModifier(player.movement.GetMovementSpeed(), pMove.moveSpeed);
-                    if (pMove.characterUser == CharacterType.NAGATO)
-                    {
-                        move -= RotateClockWise(directionToTarget * multiplier * 5f);
-                        break;
-                    }
-
-                    if (targetSpeed > player.movement.moveSpeed)
-                    {
-                        OBJECT_APPROACH_STATUS approach = IsApproaching(pMove, distance);
-                        //   if (approach == OBJECT_APPROACH_STATUS.AWAY) continue;
-
-                        if (distance < (range / 3))
-                        {
-                            watchList.Add(go);
-                        }
-                        //Debug.Log(approach);
-                        //move += directionToTarget * multiplier * 2;
-                        Vector3 direction;
-                        if (pMove.moveType == MoveType.Straight)
-                        {
-                            Debug.Log("Side evasion");
-                            direction = RotateClockWise(GetAngledVector(targetAngle, multiplier) * 2f);
-                        }
-                        else
-                        {
-                            Debug.Log("Back evasion");
-                            direction = directionToTarget * multiplier *3f;
-                        }
-
-                        move -= direction;
-
-                    }
-                    else
-                    {
-                        move -= directionToTarget * multiplier ;
-                    }
-
+                    move +=EvaluateProjectile(tid,go,distance,directionToTarget);
                     break;
                 case TAG_BUFF_OBJECT:
+                    multiplier = GetMultiplier(distance);
                     BoxCollider2D boxColl = CacheComponent<BoxCollider2D>(tid, go);
                     if (boxColl.enabled)
                     {
@@ -361,12 +301,13 @@ public class Unit_AutoDrive : MonoBehaviour
                     }
                     break;
                 case TAG_BOX_OBSTACLE:
+                    multiplier = GetMultiplier(distance);
                     move -= directionToTarget * multiplier;
-                    if (distance < (range / 3))
-                    {
-                        watchList.Add(go);
-                    }
                     break;
+/*                case TAG_WALL:
+                    multiplier = GetMultiplier(distance);
+                    move -= directionToTarget * multiplier * 0.5f;
+                    break;*/
             }
             //  Debug.Log("Inter move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
         }
@@ -376,10 +317,6 @@ public class Unit_AutoDrive : MonoBehaviour
         if (move.magnitude > 1f)
         {
             move.Normalize();
-            if (secondPrediction)
-            {
-                //    move = FindEmptySpace(move);
-            }
         }
         else if (move.magnitude <= 0.25f)
         {
@@ -390,86 +327,150 @@ public class Unit_AutoDrive : MonoBehaviour
         //  Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
         return move;
     }
-    Vector3 RotateClockWise(Vector3 direction)
+    public bool doApproach = false;
+    private Vector3 EvaluatePlayer( GameObject go, int tid, Vector3 directionToTarget, float distance)
     {
-        return new Vector3(direction.y, -direction.x);
+        float multiplier = GetMultiplier(distance);
+        Unit_Player unitPlayer = CacheComponent<Unit_Player>(tid, go);
+        bool skillAvailable = skillManager.SkillIsReady();
+        bool skillInUse = skillManager.SkillInUse();
+        if (isKamikazeSkill && skillInUse)
+        {
+            doApproach = !player.FindAttackHistory(tid);
+        }
+        else {
+            doApproach = skillAvailable;
+        }
+        if (doApproach )
+        {
+            switch (player.myCharacter )
+            {
+                case CharacterType.NAGATO:
+                case CharacterType.HARUHI:
+                case CharacterType.KOIZUMI:
+                case CharacterType.KUYOU:
+                case CharacterType.KIMIDORI:
+                case CharacterType.SASAKI:
+                case CharacterType.KOIHIME:
+                    if (isKamikazeSkill)
+                    {
+                        multiplier = GetMultiplier(distance / 2f);
+                    }
+                    else {
+                        multiplier = GetMultiplier(distance/1.5f);
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            switch (unitPlayer.myCharacter)
+            {
+                case CharacterType.NAGATO:
+                case CharacterType.MIKURU:
+                case CharacterType.HARUHI:
+                case CharacterType.KOIZUMI:
+                case CharacterType.SASAKI:
+                case CharacterType.KOIHIME:
+                    multiplier= -GetMultiplier(distance/5f);
+                    break;
+                default:
+                    multiplier *= -1f;
+                    break;
+            }
+        }
+        return directionToTarget * multiplier;
     }
 
-    OBJECT_APPROACH_STATUS IsApproaching(Projectile_Movement projMove, float dist)
+    private Vector3 EvaluateProjectile(int tid, GameObject go,float distance,Vector3 directionToTarget)
     {
-        float offset = 90f;
-        if ((dist
-            // -GetRadius(projMove.transform.localScale)
-            ) < collisionRange) return OBJECT_APPROACH_STATUS.COLLIDING;
-        float myAngle = GetAngleBetween(movement.networkPos, projMove.transform.position);
-        float angleDiff = Mathf.Abs(myAngle - projMove.eulerAngle);
-        //Debug.Log(projMove.gameObject.name+": "+angleDiff);
-        return ((angleDiff > (180 - offset)) && (angleDiff < (180 + offset))) ? OBJECT_APPROACH_STATUS.APPROACHING : OBJECT_APPROACH_STATUS.AWAY;
+        if (isKamikazeSkill && skillManager.SkillInUse())
+        {
+            return Vector3.zero;
+        }
+        HealthPoint hp = CacheComponent<HealthPoint>(tid, go);
+        Projectile_Movement pMove = (Projectile_Movement)hp.movement;
+        float multiplier = GetMultiplier(distance);
+        // float speedMod = GetSpeedModifier(player.movement.GetMovementSpeed(), pMove.moveSpeed);
+        if (pMove.characterUser == CharacterType.NAGATO)
+        {
+            Vector3 dir = PerpendicularEscape(pMove, directionToTarget) * GetMultiplier(distance/3f);
+          //  Debug.Log("Move to " + dir);
+            return dir;
+        }
+
+        if (pMove.moveSpeed > player.movement.GetMovementSpeed())
+        {
+            if (pMove.moveType == MoveType.Straight)
+            {
+                float speedDiff = pMove.moveSpeed / player.movement.GetMovementSpeed();
+                Vector3 dir = PerpendicularEscape(pMove, directionToTarget) * GetMultiplier(distance / speedDiff);
+             //   Debug.Log("Move to " + dir);
+                return dir;
+            }
+            else
+            {
+               // Debug.Log("Back evasion");
+                return -directionToTarget * multiplier;
+            }
+
+
+        }
+        else
+        {
+            return -directionToTarget * multiplier;
+        }
+
     }
-    Vector3 FindEmptySpace(Vector3 heuristicDirection)
+
+    Vector3 PerpendicularEscape(Projectile_Movement projMove, Vector3 dirToTarget)
     {
-        collisionList = new List<Vector3>();
-        if (watchList.Count == 0) return heuristicDirection;
-        float duration = 1f;
-        int searched = 0;
-        foreach (var go in watchList)
-        {
-            collisionList.Add(go.transform.position);
-            HealthPoint hp = CacheComponent<HealthPoint>(go.GetInstanceID(), go);
-            if (hp != null && hp.movement != null)
-            {
-                ((Projectile_Movement)hp.movement).GetExpectedPosition(collisionList, transform.position, collisionRange, duration);
+        float guessedAngle = GetAngleBetween(Vector3.zero, dirToTarget);
+        float currDist = Vector2.Distance(projMove.transform.position, transform.position);
+      //  Debug.Log("Original proj " + projMove.transform.position + " Angle " + projMove.transform.rotation.eulerAngles.z+" length "+ currDist+" dsir to target" +dirToTarget);
+        Vector3 translation = GetAngledVector(projMove.transform.rotation.eulerAngles.z, currDist);
+        Vector3 projPos = projMove.transform.position + translation;
+      //  Debug.Log("Translation " + translation);
+        float highDist = 0f;
+        float highAngle = -1f;
+        for (float angle = -90f; angle <= 90f; angle += 180f) {
+            float iterAngle = (guessedAngle + angle) % 360;
+            Vector3 myPos = transform.position + GetAngledVector(iterAngle, movement.GetMovementSpeed()*Time.fixedDeltaTime);
+            float dist = Vector2.Distance(myPos, projPos);
+          //  Debug.Log("Original proj " + projMove.transform.position + " my original " + transform.position);
+         //   Debug.Log(iterAngle+": projectile at "+projPos+" Me at"+(myPos)+" relativeVector"+ (projPos - myPos)+":"+((angle<0)?"Clock ":"AntiClock") + " = > " + dist);
+            if (highAngle == -1f || dist > highDist) {
+                highDist = dist;
+                highAngle = iterAngle % 360f; 
+                
             }
-            searched++;
         }
-        float originalAngle = GetAngleBetween(Vector3.zero, RotateClockWise(heuristicDirection));
-        float save = originalAngle;
-        float length = movement.GetMovementSpeed() * Time.fixedDeltaTime;
-        Vector3 advisedDirection = Vector3.zero;
-        Debug.Log("Collision points " + collisionList.Count);
-        for (int i = 0; i < 360 / 60; i++)
-        {
-            bool collided = false;
-            originalAngle += 60;
-            advisedDirection = GetAngledVector(originalAngle, length);
-            Vector3 expectedPos = transform.position + advisedDirection;
-            foreach (var collisionPoint in collisionList)
-            {
-                searched++;
-                if (Vector2.Distance(expectedPos, collisionPoint) < 1.5f)
-                {
-                    //Debug.LogWarning("Expected collision at " + originalAngle);
-                    collided = true;
-                    break;
-                }
-            }
-            if (!collided) break;
-        }
-        if (advisedDirection == Vector3.zero)
-        {
-            // Debug.LogError("no move");
-            return heuristicDirection;
-        }
-        Debug.LogWarning(searched + ": " + save + " => " + originalAngle);
-        return advisedDirection.normalized;
+    //    Debug.Log("Recommend angle " + highAngle+" dist "+highDist+" vector "+ GetAngledVector(highAngle, dirToTarget.magnitude));
+        return GetAngledVector(highAngle, dirToTarget.magnitude);
     }
 
     Vector3 GetAwayFromWalls_2()
     {
+        if (isKamikazeSkill && skillManager.SkillInUse())
+        {
+            return Vector3.zero;
+        }
+        int activeMax = gameFields[player.fieldNo].bulletSpawner.activeMax;
         Vector3 move = Vector3.zero;
         float xBound = (movement.networkPos.x < movement.mapSpec.xMid) ? movement.mapSpec.xMin : movement.mapSpec.xMax;
         float yBound = (movement.networkPos.y < movement.mapSpec.yMid) ? movement.mapSpec.yMin : movement.mapSpec.yMax;
 
         xWall = new Vector3(movement.networkPos.x, yBound);
+        float mod = (activeMax == 0) ? 1f: 2f;
         if (Vector2.Distance(xWall, movement.networkPos) <= range)
         {
-            move += EvaluateToPoint(xWall, false, 2f);
+            move += EvaluateToPoint(xWall, false, mod);
         }
 
         yWall = new Vector3(xBound, movement.networkPos.y);
         if (Vector2.Distance(yWall, movement.networkPos) <= range)
         {
-            move += EvaluateToPoint(yWall, false, 2f);
+            move += EvaluateToPoint(yWall, false, mod);
         }
 
         //   Debug.Log("Center " + (dirToCenter * GetMultiplier(centerDist)) + " bound " + (-dirToBound * GetMultiplier(boundDist)) + " move " + move);
@@ -501,7 +502,7 @@ public enum AI_ATTACK_TYPE
 {
     ANYTIME, SHORT, LONG, STANDARD
 }
-public enum OBJECT_APPROACH_STATUS
+public enum APPROACH_STATUS
 {
-    APPROACHING, AWAY, COLLIDING
+    APPROACHING_GOANTI,APPROACH_GOCLOCK, AWAY, COLLIDING
 }

@@ -32,6 +32,7 @@ public class ConstantStrings : MonoBehaviour
     public const string TAG_BOUNDARY = "MapBoundary";
     public const string TAG_BOX_OBSTACLE = "BoxObstacle";
     public const string TAG_BUFF_OBJECT = "BuffObject";
+    public const string TAG_WALL = "Wall";
 
 
     public const string HASH_MAP_DIFF = "MapDifficulty";
@@ -64,7 +65,10 @@ public class ConstantStrings : MonoBehaviour
         Vector3 diff = to - from;
         diff.Normalize();
         float rot_z = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
-
+        if (rot_z < 0) {
+            rot_z = rot_z+360;
+        }
+       // Debug.Log(from + " - " + to + " = " + rot_z);
         return rot_z;// new Vector3(0f, 0f, rot_z);
     }
     public static Vector3 GetAngledVector(float eulerAngle, float distance) {
