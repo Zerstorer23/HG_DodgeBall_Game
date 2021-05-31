@@ -97,6 +97,7 @@ public abstract class SkillManager : MonoBehaviourPun
 
     private void CheckSkillStack()
     {
+       // Debug.Log(currStack + " " + maxStack + " " + skillInUse);
         if (currStack < maxStack && !skillInUse)
         {
             remainingStackTime -= Time.deltaTime * buffManager.GetBuff(BuffType.Cooltime);

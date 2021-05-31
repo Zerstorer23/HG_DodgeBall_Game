@@ -7,7 +7,7 @@ public class Skill_Sasaki : SkillManager
 {
     public override void LoadInformation()
     {
-        cooltime = 6f;
+        cooltime = 4.75f;
     }
 
     public override void MySkillFunction()

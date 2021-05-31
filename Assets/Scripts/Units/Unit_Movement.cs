@@ -182,13 +182,13 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         }
         if (isContact)
         {
-            bool xMajor = Mathf.Abs(direction.x) > Mathf.Abs(direction.y);
+         bool xMajor = Mathf.Abs(direction.x) > Mathf.Abs(direction.y);
             if (xMajor)
             {
-                return new Vector3(0, direction.y);
+                return new Vector3(direction.x * 0.5f, direction.y*0.25f);
             }
             else {
-                return new Vector3(direction.x,0);
+                return new Vector3(direction.x * 0.25f, direction.y * 0.5f);
             }
         }
         else {

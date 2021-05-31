@@ -54,7 +54,7 @@ public class Unit_AutoDrive : MonoBehaviour
                 isKamikazeSkill = true;
                 break;
             case CharacterType.KUYOU:
-                attackRange = 4f;
+                attackRange = 5f;
                 isKamikazeSkill = true;
                 break;
             case CharacterType.KOIZUMI:
@@ -336,7 +336,12 @@ public class Unit_AutoDrive : MonoBehaviour
         bool skillInUse = skillManager.SkillInUse();
         if (isKamikazeSkill && skillInUse)
         {
-            doApproach = !player.FindAttackHistory(tid);
+            if (player.myCharacter == CharacterType.SASAKI) {
+                doApproach = true;
+            }
+            else {
+                doApproach = !player.FindAttackHistory(tid);
+            }
         }
         else {
             doApproach = skillAvailable;
@@ -349,7 +354,6 @@ public class Unit_AutoDrive : MonoBehaviour
                 case CharacterType.HARUHI:
                 case CharacterType.KOIZUMI:
                 case CharacterType.KUYOU:
-                case CharacterType.KIMIDORI:
                 case CharacterType.SASAKI:
                 case CharacterType.KOIHIME:
                     if (isKamikazeSkill)
@@ -359,6 +363,9 @@ public class Unit_AutoDrive : MonoBehaviour
                     else {
                         multiplier = GetMultiplier(distance/1.5f);
                     }
+                    break;
+                case CharacterType.KIMIDORI:
+                    multiplier = GetMultiplier(distance / 1.75f);
                     break;
             }
         }

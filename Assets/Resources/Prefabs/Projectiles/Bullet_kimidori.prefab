@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8629071319047820309}
   - component: {fileID: 8629071319047820330}
-  - component: {fileID: -7411745239832256786}
   - component: {fileID: 8692175640842045467}
   - component: {fileID: -8895642817908627982}
   - component: {fileID: 6212558457632629342}
@@ -63,21 +62,6 @@ MonoBehaviour:
   mySprite: {fileID: 2534975670834146036}
   tweenEase: 0
   synchedInitialCriticalPoint: 0
---- !u!114 &-7411745239832256786
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8629071319047820310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38daa8e59d8fe9c409bbfe8bbf38441c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  networkPos: {x: 0, y: 0, z: 0}
-  networkQuaternion: {x: 0, y: 0, z: 0, w: 0}
-  syncPeriod: 1
 --- !u!61 &8692175640842045467
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -173,7 +157,7 @@ MonoBehaviour:
   OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
-  - {fileID: -7411745239832256786}
+  - {fileID: 0}
   sceneViewId: 2
   InstantiationId: 0
   isRuntimeInstantiated: 0

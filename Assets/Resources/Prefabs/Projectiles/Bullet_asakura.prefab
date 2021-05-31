@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8629071319047820309}
   - component: {fileID: 8709314251964653671}
-  - component: {fileID: -5103611605035117184}
   - component: {fileID: 8629071319047820330}
   - component: {fileID: -6068978053554526307}
   - component: {fileID: -8895642817908627982}
@@ -70,27 +69,6 @@ PolygonCollider2D:
       - {x: -0.2779977, y: -0.22164682}
       - {x: 0.53255206, y: -0.11388618}
       - {x: 0.9042947, y: 0.10638344}
---- !u!50 &-5103611605035117184
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8629071319047820310}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4
 --- !u!114 &8629071319047820330
 MonoBehaviour:
   m_ObjectHideFlags: 0

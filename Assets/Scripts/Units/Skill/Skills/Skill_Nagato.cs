@@ -14,23 +14,24 @@ public class Skill_Nagato : SkillManager
         ActionSet mySkill = new ActionSet(gameObject, this);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_NAGATO);
         mySkill.SetParam(SkillParams.Duration, 0.4f);
-        mySkill.SetParam(SkillParams.MoveSpeed, 24f);
+        mySkill.SetParam(SkillParams.MoveSpeed, 22f);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
         mySkill.SetParam(SkillParams.Enable, false);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
         mySkill.Enqueue(new Action_InstantiateBulletAt());
-        mySkill.Enqueue(new Action_Projectile_ToggleDamage());
+     //   mySkill.Enqueue(new Action_Projectile_ToggleDamage());
         // mySkill.Enqueue(new Action_Player_InvincibleBuff());
         mySkill.Enqueue(new Action_WaitForSeconds());
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Enable, paramValue = true });
-        mySkill.Enqueue(new Action_Projectile_ToggleDamage());
+     //   mySkill.Enqueue(new Action_Projectile_ToggleDamage());
         mySkill.Enqueue(new Action_SetProjectileStraight());
         StartCoroutine(mySkill.Activate());
     }
 
     public override void LoadInformation()
     {
-        cooltime = 3.3f; // 3f
+        cooltime = 3.3f;
+       // if (GameSession.instance.devMode) cooltime = 1f;
         maxStack = 5;
     }
 }

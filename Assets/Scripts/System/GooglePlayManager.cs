@@ -38,6 +38,7 @@ public class GooglePlayManager : MonoBehaviour
                     else
                     {
                         Debug.Log("Fail");
+                        loggedIn = true;
                     }
                 });
             }

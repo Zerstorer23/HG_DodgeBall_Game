@@ -19,7 +19,7 @@ public class Skill_Asakura : SkillManager
         mySkill.SetParam(SkillParams.RotateSpeed, 150f);
         mySkill.SetParam(SkillParams.Duration, 0.033f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_ASAKURA);
-        mySkill.SetParam(SkillParams.ReactionType, ReactionType.Bounce);
+        mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
 
         float angleOffset = unitMovement.GetAim();
         int numStep = 15;

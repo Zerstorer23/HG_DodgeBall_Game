@@ -99,7 +99,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
         Debug.Log("Master changed");
-        GameSession.PushRoomASetting(HASH_ROOM_RANDOM_SEED, Random.Range(0, 7));
+        if (PhotonNetwork.IsMasterClient) {
+            GameSession.PushRoomASetting(HASH_ROOM_RANDOM_SEED, Random.Range(0, 133));
+        }
         HUD_UserName.PushPlayerSetting(PhotonNetwork.LocalPlayer, "SEED", Random.Range(0, 133));
         mapOptions.UpdateSettingsUI(); //Player Leave room
     }
