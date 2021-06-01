@@ -8,7 +8,7 @@ public class UI_TouchPanel : MonoBehaviour
     // Start is called before the first frame update
     public static bool isTouching = false;
     public static Vector2 touchVector;
-   private void OnMouseDown()
+/*   private void OnMouseDown()
     {
         // var touches = Input.touches;
         Debug.Log("touch count " + Input.touchCount);
@@ -22,7 +22,7 @@ public class UI_TouchPanel : MonoBehaviour
               //  return;
             }
         }
-    }
+    }*/
     public void HandleTouch() {
         if (Input.touchCount <= 0) return;
 

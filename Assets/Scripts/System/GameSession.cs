@@ -158,5 +158,9 @@ public class GameSession : MonoBehaviourPun
             }
         }
     }
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.Save();
+    }
 
 }

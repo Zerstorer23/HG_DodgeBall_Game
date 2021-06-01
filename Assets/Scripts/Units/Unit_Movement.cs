@@ -232,7 +232,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
     }
 
     float indicatorLength = 1f;
-    void UpdateDirection()
+    public void UpdateDirection()
     {
         if (UI_AimOption.aimManual)
         {
@@ -260,7 +260,16 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
 
     public float GetAim()
     {
-        return (GameSession.IsAutoDriving()) ? autoDriver.EvaluateAim() : aimAngle;
+        if (GameSession.IsAutoDriving()) {
+            return autoDriver.EvaluateAim();
+        }
+        else if (Application.platform == RuntimePlatform.Android) {
+            UpdateDirection();
+            return aimAngle;
+        }
+        else {
+            return aimAngle;
+        }
     }
     public double networkExpectedTime;
     public Vector3 networkPos;
