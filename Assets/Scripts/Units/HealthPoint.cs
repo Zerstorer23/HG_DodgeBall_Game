@@ -136,6 +136,7 @@ public class HealthPoint : MonoBehaviourPun
             {
                 PhotonNetwork.Instantiate(ConstantStrings.PREFAB_HEAL_1, transform.position, Quaternion.identity, 0);
                 MainCamera.instance.DoShake();
+                Handheld.Vibrate();
                 unitPlayer.PlayHitAudio();
             }
             NotifySourceOfDamage(attackerUserID, instaDeath);

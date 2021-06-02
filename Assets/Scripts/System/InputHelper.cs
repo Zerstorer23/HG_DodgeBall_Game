@@ -3,8 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class InputHelper :MonoBehaviour
+public class InputHelper : MonoBehaviour
 {
+/*#if UNITY_ANDROID && !UNITY_EDITOR
+    public static AndroidJavaClass AndroidPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+    public static AndroidJavaObject AndroidcurrentActivity = AndroidPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+    public static AndroidJavaObject AndroidVibrator = AndroidcurrentActivity.Call<AndroidJavaObject>("getSystemService", "vibrator");
+#endif*/
+
     public delegate float FloatFunction();
     public static FloatFunction GetInputHorizontal;
     public static FloatFunction GetInputVertical;
@@ -81,4 +87,13 @@ public class InputHelper :MonoBehaviour
     {
         return UI_TouchPanel.isTouching;
     }
+
+/*    public static void Vibrate(long mills = 1000)
+    {
+        #if UNITY_ANDROID && !UNITY_EDITOR
+                if (Application.platform == RuntimePlatform.Android) {
+                    AndroidVibrator.Call("vibrate", mills);
+            }
+        #endif
+    }*/
 }
