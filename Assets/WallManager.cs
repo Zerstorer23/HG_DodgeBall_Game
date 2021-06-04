@@ -11,6 +11,7 @@ public class WallManager : MonoBehaviour
     private void OnEnable()
     {
         bool enableWalls = GameSession.gameModeInfo.gameMode == GameMode.PVP;
+        if (GameSession.instance.devMode) enableWalls = false;
         if (enableWalls) {
             int seed = (int)PhotonNetwork.CurrentRoom.CustomProperties[ConstantStrings.HASH_ROOM_RANDOM_SEED];
             selectedIndex = seed % WallSets.Length;

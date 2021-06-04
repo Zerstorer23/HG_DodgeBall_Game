@@ -13,5 +13,8 @@ MonoBehaviour:
   m_Name: PVP
   m_EditorClassIdentifier: 
   gameMode: 0
-  callSuddenDeath: 1
+  callSuddenDeath: 0
   useDesolator: 1
+  scaleMapByPlayerNum: 0
+  isTeamGame: 0
+  isCoop: 0

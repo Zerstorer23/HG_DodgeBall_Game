@@ -8,6 +8,8 @@ public class MyEvents {
     public const string EVENT_PLAYER_SPAWNED = "PlayerSpawned";
     public const string EVENT_PLAYER_DIED = "PlayerDied";
     public const string EVENT_PLAYER_KILLED_A_PLAYER = "PlayerKilledAPlayer";
+    public const string EVENT_MY_PROJECTILE_HIT = "ProjectileHit";
+    public const string EVENT_MY_PROJECTILE_MISS = "ProjectileMiss";
     public const string EVENT_BOX_SPAWNED = "BoxSpawned";
     public const string EVENT_BOX_ENABLED = "BoxEnabled";
 

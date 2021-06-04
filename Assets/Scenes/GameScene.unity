@@ -3003,7 +3003,7 @@ MonoBehaviour:
   skillPanelUI: {fileID: 1564884124}
   leaderboardUI: {fileID: 0}
   gameOverManager: {fileID: 165690841}
-  versionCode: 0533
+  versionCode: 0538
   requireHalfAgreement: 1
   gameSpeed: 1
   devMode: 0
@@ -3068,6 +3068,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 90a88aa56f09e0047b5c32c8ec6a07e2, type: 2}
   - {fileID: 11400000, guid: 31b85d31c72f5fd4f8f675618b223cbf, type: 2}
   - {fileID: 11400000, guid: 7ded6326dcfbace45891d88d610bcd33, type: 2}
+  - {fileID: 11400000, guid: f01fed37c548d1e44b3f6a3460023746, type: 2}
+  - {fileID: 11400000, guid: b0f786c8c4a156944b16d6f7e162b8a6, type: 2}
+  - {fileID: 11400000, guid: 9e180f409d93c9744a4a8ddefe2f84d6, type: 2}
+  - {fileID: 11400000, guid: 938fb2cbe3a9c7a4f8650c63d9ef612a, type: 2}
+  - {fileID: 11400000, guid: 96131eec98ad92d4cb0c8f8536d97401, type: 2}
   buffConfigs:
   - {fileID: 11400000, guid: 8a3d9885cacb20c47bd7f8d170b502f4, type: 2}
   - {fileID: 11400000, guid: f0443da244408cd458234c96d3131e1f, type: 2}

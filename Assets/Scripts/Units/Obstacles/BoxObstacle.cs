@@ -34,6 +34,13 @@ public class BoxObstacle : MonoBehaviourPun
         EventManager.StartListening(MyEvents.EVENT_FIELD_FINISHED, OnGameEnd);
         transform.SetParent(GameSession.GetBulletHome());
         fieldNumber = (int)pv.InstantiationData[0];
+        height = (float)pv.InstantiationData[1];
+        width = (float)pv.InstantiationData[2];
+        this.warnDelay = (float)pv.InstantiationData[3];
+        transform.localScale = new Vector3(width, height, 1);
+        StartFadeIn();
+
+
         isDead = false;
         boundarySprite.enabled = true;
         EventManager.TriggerEvent(MyEvents.EVENT_BOX_SPAWNED, new EventObject() { goData = gameObject });
@@ -66,17 +73,7 @@ public class BoxObstacle : MonoBehaviourPun
         Debug.DrawLine(bottomRight, bottomLeft, color, duration);
         Debug.DrawLine(bottomLeft, topLeft, color, duration);
     }
-    [PunRPC]
-    public void SetInformation(float _width, float _delay) {
 
-        this.warnDelay = _delay;
-        height = (UnityEngine.Random.Range(0f, 1f) < 0.5f) ? _width : _width / 2f;
-        width = (UnityEngine.Random.Range(0f, 1f) < 0.5f) ? _width : _width / 2f;
-
-        transform.localScale = new Vector3(width, height, 1);
-        StartFadeIn();
-
-    }
     private void OnDisable()
     {
         fillSprite.DORewind();

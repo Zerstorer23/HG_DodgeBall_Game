@@ -3,16 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using static ConstantStrings;
 
-public class Skill_Sasaki : SkillManager
+public class Skill_Sasaki : ISkill
 {
-    public override void LoadInformation()
+    public override ActionSet GetSkillActionSet(SkillManager skm)
     {
-        cooltime = 4.75f;
-    }
-
-    public override void MySkillFunction()
-    {
-        ActionSet mySkill = new ActionSet(gameObject, this);
+        ActionSet mySkill = new ActionSet(skm);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_SASAKI);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
 
@@ -40,7 +35,13 @@ public class Skill_Sasaki : SkillManager
             mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = dur / steps });
             mySkill.Enqueue(new Action_WaitForSeconds());
         }
-        StartCoroutine(mySkill.Activate());
+        return mySkill;
+    }
+
+
+    public override void LoadInformation(SkillManager skm)
+    {skm.
+        cooltime = 4.75f;
     }
 
 }

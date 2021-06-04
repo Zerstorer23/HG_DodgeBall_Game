@@ -11,7 +11,7 @@ public class Action_InstantiateBullet : SkillAction
 
         int fieldNumber = parent.castingPlayer.fieldNo;
         GameObject obj = PhotonNetwork.Instantiate(
-            (string)GetParam(SkillParams.PrefabName),
+            GetParam<string>(SkillParams.PrefabName),
             parent.caster.transform.position,
             parent.caster.transform.rotation,0
             , new object[] {fieldNumber, parent.casterPV.Owner.UserId, false}
@@ -35,7 +35,7 @@ public class Action_InstantiateBullet_FollowPlayer : SkillAction
     {
         int fieldNumber = parent.castingPlayer.fieldNo;
         GameObject obj = PhotonNetwork.Instantiate(
-            (string)GetParam(SkillParams.PrefabName),
+            GetParam<string>(SkillParams.PrefabName),
             parent.caster.transform.position,
             parent.caster.transform.rotation, 0
             , new object[] { fieldNumber, parent.casterPV.Owner.UserId, true
@@ -55,11 +55,11 @@ public class Action_InstantiateBulletAt : SkillAction
     {
 
         int fieldNumber = parent.castingPlayer.fieldNo;
-        Vector3 pos = (Vector3)GetParam(SkillParams.Vector3);
-        Quaternion angle = (Quaternion)GetParam(SkillParams.Quarternion);
+        Vector3 pos = GetParam<Vector3>(SkillParams.Vector3);
+        Quaternion angle = GetParam<Quaternion>(SkillParams.Quarternion);
 
         GameObject obj = PhotonNetwork.Instantiate(
-          (string)GetParam(SkillParams.PrefabName), pos, angle, 0
+          GetParam<string>(SkillParams.PrefabName), pos, angle, 0
             , new object[] { fieldNumber, parent.casterPV.Owner.UserId, false });
         parent.spawnedObject = obj;
         parent.pv = parent.spawnedObject.GetComponent<PhotonView>();
@@ -95,7 +95,7 @@ public class Action_GetCurrentPlayerPosition_AngledOffset : SkillAction
     public override float Activate()
     {
         float angle = parent.caster.GetComponent<Unit_Movement>().GetAim();
-        float distance = (float)parent.GetParam(SkillParams.Distance, 1.4f);
+        float distance = GetParam<float>(SkillParams.Distance, 1.4f);
         Vector3 angledVector = ConstantStrings.GetAngledVector(angle, distance);
         parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, angle));
         parent.SetParam(SkillParams.EulerAngle, angle);
@@ -109,8 +109,8 @@ public class Action_GetCurrentPlayerVector3_AngledOffset : SkillAction
 
     public override float Activate()
     {
-        float angle =(float) parent.GetParam(SkillParams.EulerAngle);
-        float distance = (float)parent.GetParam(SkillParams.Distance, 1.4f);
+        float angle = GetParam<float>(SkillParams.EulerAngle);
+        float distance = GetParam<float>(SkillParams.Distance, 1.4f);
         float rad = angle / 180 * Mathf.PI;
         float dX = Mathf.Cos(rad) * distance;
         float dY = Mathf.Sin(rad) * distance;

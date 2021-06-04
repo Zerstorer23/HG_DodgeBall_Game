@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -14,7 +15,9 @@ public class Unit_AutoDrive : MonoBehaviour
     SkillManager skillManager;
     Unit_Movement movement;
     internal GameObject directionIndicator;
-    float range;
+    float findRange;
+    public float range_knn = 5f;
+    public float range_collision = 3f;
     float attackRange = 10f;
     float escapePadding = 1f;
 
@@ -28,14 +31,15 @@ public class Unit_AutoDrive : MonoBehaviour
     public bool secondPrediction = true;
 
     bool isKamikazeSkill = false;
-
+    public List<GameObject> collisionList = new List<GameObject>();
     public void SetInfo()
     {
         movement = player.movement;
         skillManager = player.skillManager;
         directionIndicator = player.driverIndicator;
         myInstanceID = player.gameObject.GetInstanceID();
-        range = 20f;
+        findRange = 20f;
+        range_knn = (gameFields[player.fieldNo].bulletSpawner.activeMax <= 4) ? findRange : 5f;
         DetermineAttackType();
     }
     void DetermineAttackType()
@@ -54,7 +58,7 @@ public class Unit_AutoDrive : MonoBehaviour
                 isKamikazeSkill = true;
                 break;
             case CharacterType.KUYOU:
-                attackRange = 5f;
+                attackRange = 5.6f;
                 isKamikazeSkill = true;
                 break;
             case CharacterType.KOIZUMI:
@@ -63,7 +67,7 @@ public class Unit_AutoDrive : MonoBehaviour
                 isKamikazeSkill = true;
                 break;
             case CharacterType.SASAKI:
-                attackRange = 12f;
+                attackRange = 8f;
                 isKamikazeSkill = true;
                 break;
             case CharacterType.YASUMI:
@@ -76,8 +80,11 @@ public class Unit_AutoDrive : MonoBehaviour
             case CharacterType.KYOUKO:
                 attackRange = 20f;
                 break;
+            case CharacterType.KYONMOUTO:
+                attackRange = 5f;
+                break;
             default:
-                attackRange = range;
+                attackRange = findRange;
                 break;
         }
 
@@ -126,15 +133,15 @@ public class Unit_AutoDrive : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, range);
-                foreach (GameObject go in foundObjects.Values)
-                {
-                    if (go == null || !go.activeInHierarchy)
-                    {
-                        continue;
-                    }
-                    Gizmos.DrawWireSphere(go.transform.position, 0.5f);
-                }
+        Gizmos.DrawWireSphere(transform.position, findRange);
+        foreach (GameObject go in foundObjects.Values)
+        {
+            if (go == null || !go.activeInHierarchy)
+            {
+                continue;
+            }
+            Gizmos.DrawWireSphere(go.transform.position, 0.5f);
+        }
         Gizmos.color = (doApproach) ? Color.cyan : Color.red;
         Gizmos.DrawWireSphere(transform.position + lastEvaluatedVector, 0.6f);
         Gizmos.DrawWireSphere(xWall, 1f);
@@ -144,6 +151,16 @@ public class Unit_AutoDrive : MonoBehaviour
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(targetEnemy.transform.position, 1f);
         }
+        Gizmos.color = Color.green;
+        for (int i = 0; i < 360; i++)
+        {
+            if (!blockedAngles[i])
+            {
+                Vector3 pos = transform.position + GetAngledVector(i, range_collision);
+                Gizmos.DrawWireSphere(pos, 0.05f);
+            }
+        }
+
     }
     // Update is called once per frame
 
@@ -151,7 +168,7 @@ public class Unit_AutoDrive : MonoBehaviour
     void FindNearByObjects()
     {
         Collider2D[] collisions = Physics2D.OverlapCircleAll(
-            movement.networkPos, range, LayerMask.GetMask(TAG_PLAYER, TAG_PROJECTILE, TAG_BUFF_OBJECT, TAG_WALL));
+            movement.networkPos, findRange, LayerMask.GetMask(TAG_PLAYER, TAG_PROJECTILE, TAG_BUFF_OBJECT));
 
         for (int i = 0; i < collisions.Length; i++)
         {
@@ -171,16 +188,17 @@ public class Unit_AutoDrive : MonoBehaviour
                     }
                     break;
                 case TAG_PROJECTILE:
-                    HealthPoint hp = CacheComponent<HealthPoint>(tid, c.gameObject);
-                    if (!hp.damageDealer.isMapObject && hp.pv.IsMine) continue;
-                    foundObjects.Add(tid, c.gameObject);
+                    if (CheckIfProjetilcIsDangerous(tid, c.gameObject))
+                    {
+                        foundObjects.Add(tid, c.gameObject);
+                    }
                     break;
                 case TAG_BUFF_OBJECT:
                     foundObjects.Add(tid, c.gameObject);
                     break;
-                case TAG_WALL:
-                    foundObjects.Add(tid, c.gameObject);
-                    break;
+                    /*                case TAG_WALL:
+                                        foundObjects.Add(tid, c.gameObject);
+                                        break;*/
             }
         }
     }
@@ -198,7 +216,7 @@ public class Unit_AutoDrive : MonoBehaviour
             else if (go.tag != TAG_BOX_OBSTACLE)
             {
                 float dist = Vector2.Distance(movement.networkPos, go.transform.position);
-                if (dist > (range + escapePadding))
+                if (dist > (findRange + escapePadding))
                 {
                     //   Debug.Log("Remove for out of dist " + dist + " / " + (range + escapePadding));
                     foundObjects.Remove(key);
@@ -272,6 +290,7 @@ public class Unit_AutoDrive : MonoBehaviour
     Vector3 EvaluateMoves()
     {
         Vector3 move = Vector3.zero;
+        collisionList = new List<GameObject>();
         foreach (GameObject go in foundObjects.Values)
         {
             if (go == null || !go.activeInHierarchy)
@@ -281,8 +300,8 @@ public class Unit_AutoDrive : MonoBehaviour
             int tid = go.GetInstanceID();
             Vector3 directionToTarget = go.transform.position - movement.networkPos;
             directionToTarget.Normalize();
-            float distance = Vector3.Distance(go.transform.position, movement.networkPos) - GetRadius(go.transform.localScale);
-         //   if (distance > range) continue;
+            float distance = Vector2.Distance(go.transform.position, movement.networkPos) - GetRadius(go.transform.localScale);
+            //   if (distance > range) continue;
             float multiplier = 0f;
             switch (go.tag)
             {
@@ -290,7 +309,12 @@ public class Unit_AutoDrive : MonoBehaviour
                     move += EvaluatePlayer(go, tid, directionToTarget, distance);
                     break;
                 case TAG_PROJECTILE:
-                    move +=EvaluateProjectile(tid,go,distance,directionToTarget);
+                    if (distance < range_knn)
+                    {
+                        collisionList.Add(go);
+                    }
+                    move += EvaluateProjectile(tid, go, distance, directionToTarget);
+
                     break;
                 case TAG_BUFF_OBJECT:
                     multiplier = GetMultiplier(distance);
@@ -304,15 +328,19 @@ public class Unit_AutoDrive : MonoBehaviour
                     multiplier = GetMultiplier(distance);
                     move -= directionToTarget * multiplier;
                     break;
-/*                case TAG_WALL:
-                    multiplier = GetMultiplier(distance);
-                    move -= directionToTarget * multiplier * 0.5f;
-                    break;*/
+                    /*                case TAG_WALL:
+                                        multiplier = GetMultiplier(distance);
+                                        move -= directionToTarget * multiplier * 0.5f;
+                                        break;*/
             }
             //  Debug.Log("Inter move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
         }
 
         move += GetAwayFromWalls_2();
+        if (collisionList.Count > 0)
+        {
+            move += Drive_KNN();
+        }
         // Debug.Log("Wall move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
         if (move.magnitude > 1f)
         {
@@ -323,12 +351,13 @@ public class Unit_AutoDrive : MonoBehaviour
             move = Vector3.zero;
         }
 
+        move = AbsoluteEvasion(move);
 
         //  Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
         return move;
     }
     public bool doApproach = false;
-    private Vector3 EvaluatePlayer( GameObject go, int tid, Vector3 directionToTarget, float distance)
+    private Vector3 EvaluatePlayer(GameObject go, int tid, Vector3 directionToTarget, float distance)
     {
         float multiplier = GetMultiplier(distance);
         Unit_Player unitPlayer = CacheComponent<Unit_Player>(tid, go);
@@ -336,19 +365,30 @@ public class Unit_AutoDrive : MonoBehaviour
         bool skillInUse = skillManager.SkillInUse();
         if (isKamikazeSkill && skillInUse)
         {
-            if (player.myCharacter == CharacterType.SASAKI) {
+            if (player.myCharacter == CharacterType.SASAKI)
+            {
                 doApproach = true;
             }
-            else {
+            else
+            {
                 doApproach = !player.FindAttackHistory(tid);
             }
         }
-        else {
+        else
+        {
             doApproach = skillAvailable;
         }
-        if (doApproach )
+        if (player.myCharacter == CharacterType.KIMIDORI)
         {
-            switch (player.myCharacter )
+            multiplier += (distance < 4f) ?
+                    -GetMultiplier(distance / 2f)
+                : GetMultiplier(distance / 2f);
+            return directionToTarget * multiplier;
+        }
+
+        if (doApproach)
+        {
+            switch (player.myCharacter)
             {
                 case CharacterType.NAGATO:
                 case CharacterType.HARUHI:
@@ -360,12 +400,10 @@ public class Unit_AutoDrive : MonoBehaviour
                     {
                         multiplier = GetMultiplier(distance / 2f);
                     }
-                    else {
-                        multiplier = GetMultiplier(distance/1.5f);
+                    else
+                    {
+                        multiplier = GetMultiplier(distance / 1.5f);
                     }
-                    break;
-                case CharacterType.KIMIDORI:
-                    multiplier = GetMultiplier(distance / 1.75f);
                     break;
             }
         }
@@ -379,7 +417,12 @@ public class Unit_AutoDrive : MonoBehaviour
                 case CharacterType.KOIZUMI:
                 case CharacterType.SASAKI:
                 case CharacterType.KOIHIME:
-                    multiplier= -GetMultiplier(distance/5f);
+                    multiplier = -GetMultiplier(distance / 5f);
+                    break;
+                case CharacterType.KIMIDORI:
+                    multiplier = (distance < 4f) ?
+                          GetMultiplier(distance / 5f)
+                        : -GetMultiplier(distance / 5f);
                     break;
                 default:
                     multiplier *= -1f;
@@ -389,7 +432,7 @@ public class Unit_AutoDrive : MonoBehaviour
         return directionToTarget * multiplier;
     }
 
-    private Vector3 EvaluateProjectile(int tid, GameObject go,float distance,Vector3 directionToTarget)
+    private Vector3 EvaluateProjectile(int tid, GameObject go, float distance, Vector3 directionToTarget)
     {
         if (isKamikazeSkill && skillManager.SkillInUse())
         {
@@ -401,8 +444,8 @@ public class Unit_AutoDrive : MonoBehaviour
         // float speedMod = GetSpeedModifier(player.movement.GetMovementSpeed(), pMove.moveSpeed);
         if (pMove.characterUser == CharacterType.NAGATO)
         {
-            Vector3 dir = PerpendicularEscape(pMove, directionToTarget) * GetMultiplier(distance/3f);
-          //  Debug.Log("Move to " + dir);
+            Vector3 dir = PerpendicularEscape(pMove, directionToTarget) * GetMultiplier(distance / 3f);
+            //  Debug.Log("Move to " + dir);
             return dir;
         }
 
@@ -412,12 +455,12 @@ public class Unit_AutoDrive : MonoBehaviour
             {
                 float speedDiff = pMove.moveSpeed / player.movement.GetMovementSpeed();
                 Vector3 dir = PerpendicularEscape(pMove, directionToTarget) * GetMultiplier(distance / speedDiff);
-             //   Debug.Log("Move to " + dir);
+                //   Debug.Log("Move to " + dir);
                 return dir;
             }
             else
             {
-               // Debug.Log("Back evasion");
+                // Debug.Log("Back evasion");
                 return -directionToTarget * multiplier;
             }
 
@@ -434,25 +477,27 @@ public class Unit_AutoDrive : MonoBehaviour
     {
         float guessedAngle = GetAngleBetween(Vector3.zero, dirToTarget);
         float currDist = Vector2.Distance(projMove.transform.position, transform.position);
-      //  Debug.Log("Original proj " + projMove.transform.position + " Angle " + projMove.transform.rotation.eulerAngles.z+" length "+ currDist+" dsir to target" +dirToTarget);
+        //  Debug.Log("Original proj " + projMove.transform.position + " Angle " + projMove.transform.rotation.eulerAngles.z+" length "+ currDist+" dsir to target" +dirToTarget);
         Vector3 translation = GetAngledVector(projMove.transform.rotation.eulerAngles.z, currDist);
         Vector3 projPos = projMove.transform.position + translation;
-      //  Debug.Log("Translation " + translation);
+        //  Debug.Log("Translation " + translation);
         float highDist = 0f;
         float highAngle = -1f;
-        for (float angle = -90f; angle <= 90f; angle += 180f) {
+        for (float angle = -90f; angle <= 90f; angle += 180f)
+        {
             float iterAngle = (guessedAngle + angle) % 360;
-            Vector3 myPos = transform.position + GetAngledVector(iterAngle, movement.GetMovementSpeed()*Time.fixedDeltaTime);
+            Vector3 myPos = transform.position + GetAngledVector(iterAngle, movement.GetMovementSpeed() * Time.fixedDeltaTime);
             float dist = Vector2.Distance(myPos, projPos);
-          //  Debug.Log("Original proj " + projMove.transform.position + " my original " + transform.position);
-         //   Debug.Log(iterAngle+": projectile at "+projPos+" Me at"+(myPos)+" relativeVector"+ (projPos - myPos)+":"+((angle<0)?"Clock ":"AntiClock") + " = > " + dist);
-            if (highAngle == -1f || dist > highDist) {
+            //  Debug.Log("Original proj " + projMove.transform.position + " my original " + transform.position);
+            //   Debug.Log(iterAngle+": projectile at "+projPos+" Me at"+(myPos)+" relativeVector"+ (projPos - myPos)+":"+((angle<0)?"Clock ":"AntiClock") + " = > " + dist);
+            if (highAngle == -1f || dist > highDist)
+            {
                 highDist = dist;
-                highAngle = iterAngle % 360f; 
-                
+                highAngle = iterAngle % 360f;
+
             }
         }
-    //    Debug.Log("Recommend angle " + highAngle+" dist "+highDist+" vector "+ GetAngledVector(highAngle, dirToTarget.magnitude));
+        //    Debug.Log("Recommend angle " + highAngle+" dist "+highDist+" vector "+ GetAngledVector(highAngle, dirToTarget.magnitude));
         return GetAngledVector(highAngle, dirToTarget.magnitude);
     }
 
@@ -468,14 +513,14 @@ public class Unit_AutoDrive : MonoBehaviour
         float yBound = (movement.networkPos.y < movement.mapSpec.yMid) ? movement.mapSpec.yMin : movement.mapSpec.yMax;
 
         xWall = new Vector3(movement.networkPos.x, yBound);
-        float mod = (activeMax == 0) ? 1f: 2f;
-        if (Vector2.Distance(xWall, movement.networkPos) <= range)
+        float mod = (activeMax == 0) ? 1f : 2f;
+        if (Vector2.Distance(xWall, movement.networkPos) <= findRange)
         {
             move += EvaluateToPoint(xWall, false, mod);
         }
 
         yWall = new Vector3(xBound, movement.networkPos.y);
-        if (Vector2.Distance(yWall, movement.networkPos) <= range)
+        if (Vector2.Distance(yWall, movement.networkPos) <= findRange)
         {
             move += EvaluateToPoint(yWall, false, mod);
         }
@@ -491,6 +536,120 @@ public class Unit_AutoDrive : MonoBehaviour
         Vector3 direction = dirToPoint * GetMultiplier(dist) * flavour;
         if (!positive) direction *= -1f;
         return direction;
+    }
+
+    [SerializeField] BitArray blockedAngles = new BitArray(360, false);
+    Vector3 AbsoluteEvasion(Vector3 finalDir)
+    {
+        int searchRange = 15;
+        blockedAngles.SetAll(false);
+        // Collider2D[] collisions = Physics2D.OverlapCircleAll(transform.position, collideRadius, LayerMask.GetMask(TAG_PROJECTILE));
+        foreach (GameObject go in foundObjects.Values)
+        {
+            if (go == null || !go.activeInHierarchy) continue;
+            if (go.tag != TAG_PROJECTILE) continue;
+            if (Vector2.Distance(go.transform.position, transform.position) > range_collision) continue;
+            if (!CheckIfProjetilcIsDangerous(go.GetInstanceID(), go)) continue;
+            int angleToObj = (int)GetAngleBetween(movement.networkPos, go.transform.position);
+            int startAngle = (angleToObj - searchRange);
+            if (startAngle < 0) startAngle += 360;
+            /*  int endAngle = angleToObj + searchRange;
+              if (endAngle > 360) endAngle %= 360;*/
+            for (float i = 0; i < searchRange * 2; i++)
+            {
+                int angleIndex = (int)((startAngle + i) % 360f);
+                if (angleIndex >= 360) angleIndex %= 360;
+                blockedAngles[angleIndex] = true;
+            }
+        }
+        int initAngle = (int)(GetAngleBetween(Vector3.zero, finalDir));
+        int searchIndex = initAngle - searchRange;
+        if (searchIndex < 0) searchIndex += 360;
+        int continuousCount = 0;
+        int numSearch = 0;
+        int endCount = searchRange * 2;
+        while (continuousCount < endCount && numSearch < 360)
+        {
+            if (!blockedAngles[searchIndex])
+            {
+                continuousCount++;
+            }
+            else
+            {
+                continuousCount = 0;
+            }
+            searchIndex++;
+            if (searchIndex >= 360) searchIndex %= 360;
+            numSearch++;
+        }
+        float finalAngle = searchIndex - searchRange;
+        if (finalAngle < 0) finalAngle += 360f;
+        //   if (finalAngle != initAngle) Debug.LogWarning("Modify " + initAngle + " => " + finalAngle+" search count "+numSearch);
+        return GetAngledVector(finalAngle, finalDir.magnitude);
+    }
+    Vector3 Drive_KNN()
+    {
+        float angleStep = 10f;
+        float moveDist = Mathf.Max(movement.GetMovementSpeed() * Time.deltaTime, 1f);
+
+        float maxDist = 0f;
+        float maxAngle = 0f;
+        int minDanger = -1;
+        for (float currAngle = 0; currAngle < 360f; currAngle += angleStep)
+        {
+            Vector3 newPos = GetAngledVector(currAngle, moveDist) + transform.position;
+            float totalDist = 0f;
+            int dangerCount = 0;
+            foreach (GameObject go in collisionList)
+            {
+                Projectile_Movement pMove = (Projectile_Movement)CacheComponent<HealthPoint>(go.GetInstanceID(), go).movement;
+                Vector3 expectedTargetPos = pMove.GetNextPosition();
+                float currDist = Vector2.Distance(newPos, expectedTargetPos);
+                if (currDist < range_knn)
+                {
+                    totalDist += Mathf.Pow(currDist, 2);
+                    dangerCount++;
+                }
+            }
+            /*            float centerDist = Vector2.Distance(new Vector2(movement.mapSpec.xMid, movement.mapSpec.yMid), transform.position);
+                        float boundDist = Vector2.Distance(new Vector2(movement.mapSpec.xMin, movement.mapSpec.yMin), new Vector2(movement.mapSpec.xMid, movement.mapSpec.yMid));
+
+
+                        totalDist += Mathf.Pow((boundDist - centerDist), 2);*/
+            float wallDist = Vector2.Distance(newPos, xWall);
+            if (wallDist < range_knn * 2)
+            {
+                totalDist += Mathf.Pow(wallDist, 2);
+                dangerCount++;
+            }
+            wallDist = Vector2.Distance(newPos, yWall);
+            if (wallDist < range_knn * 2)
+            {
+                totalDist += Mathf.Pow(wallDist, 2);
+                dangerCount++;
+            }
+            if (dangerCount < minDanger || minDanger < 0)
+            {
+                maxDist = totalDist;
+                maxAngle = currAngle;
+            }
+            else if(dangerCount == minDanger){
+                if (totalDist > maxDist)
+                {
+                    maxDist = totalDist;
+                    maxAngle = currAngle;
+                }
+            }
+        }
+
+        return GetAngledVector(maxAngle, moveDist);
+    }
+    bool CheckIfProjetilcIsDangerous(int tid, GameObject go)
+    {
+        HealthPoint hp = CacheComponent<HealthPoint>(tid, go);
+        if (!hp.damageDealer.isMapObject && hp.pv.IsMine) return false;
+        if (GameSession.gameModeInfo.isTeamGame && hp.myTeam == player.myTeam) return false;
+        return true;
     }
     public float GetSpeedModifier(float mySpeed, float targetSpeed)
     {
@@ -511,5 +670,5 @@ public enum AI_ATTACK_TYPE
 }
 public enum APPROACH_STATUS
 {
-    APPROACHING_GOANTI,APPROACH_GOCLOCK, AWAY, COLLIDING
+    APPROACHING_GOANTI, APPROACH_GOCLOCK, AWAY, COLLIDING
 }

@@ -270,7 +270,6 @@ GameObject:
   - component: {fileID: 2480895131875863820}
   - component: {fileID: 1316997393031184959}
   - component: {fileID: 3390347450338821709}
-  - component: {fileID: 2480895131875863817}
   - component: {fileID: 8438767592492853387}
   m_Layer: 10
   m_Name: Desolator
@@ -328,25 +327,8 @@ MonoBehaviour:
   networkPos: {x: 0, y: 0, z: 0}
   networkQuaternion: {x: 0, y: 0, z: 0, w: 0}
   syncRotation: 0
---- !u!95 &2480895131875863817
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2480895131875863821}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  syncType: 1
+  syncPeriod: 0
 --- !u!114 &8438767592492853387
 MonoBehaviour:
   m_ObjectHideFlags: 0

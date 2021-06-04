@@ -1780,6 +1780,7 @@ GameObject:
   - component: {fileID: 831789703712551272}
   - component: {fileID: -4324785610606511446}
   - component: {fileID: 5223520803493915819}
+  - component: {fileID: 1069040598155419742}
   - component: {fileID: 3251075621680519964}
   m_Layer: 10
   m_Name: Player
@@ -1948,6 +1949,25 @@ MonoBehaviour:
   dontKillByException: 0
   associatedField: 0
   killerUID: 
+--- !u!114 &1069040598155419742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8822352236447964826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3289f26786d67b4e83ad0d809ecea24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pv: {fileID: 0}
+  myCharacter: 0
+  maxStack: 1
+  cooltime: 0
+  skillInUse: 0
+  remainingStackTime: 0
+  currStack: 0
 --- !u!114 &3251075621680519964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2546,6 +2566,16 @@ PrefabInstance:
       propertyPath: m_Bounds.m_Extent.y
       value: 0.08460659
       objectReference: {fileID: 0}
+    - target: {fileID: 7403675684429973510, guid: 35ed23f3269498f42a8ff5e4b166a5bc,
+        type: 3}
+      propertyPath: m_BoneTransforms.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7403675684429973510, guid: 35ed23f3269498f42a8ff5e4b166a5bc,
+        type: 3}
+      propertyPath: m_BoneTransforms.Array.data[0]
+      value: 
+      objectReference: {fileID: 4446382069462193250}
     - target: {fileID: 7780571104850000517, guid: 35ed23f3269498f42a8ff5e4b166a5bc,
         type: 3}
       propertyPath: m_LocalRotation.w
@@ -2613,6 +2643,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 35ed23f3269498f42a8ff5e4b166a5bc, type: 3}
+--- !u!4 &4446382069462193250 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7787917697199496860, guid: 35ed23f3269498f42a8ff5e4b166a5bc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5881847404234803966}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1743256954223984165 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5301246916368528603, guid: 35ed23f3269498f42a8ff5e4b166a5bc,

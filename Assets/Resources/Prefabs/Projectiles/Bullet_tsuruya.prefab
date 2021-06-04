@@ -161,7 +161,6 @@ MonoBehaviour:
   characterUser: 11
   mySprite: {fileID: 8629071319339072152}
   tweenEase: 1
-  synchedInitialCriticalPoint: 0
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,6 +211,7 @@ MonoBehaviour:
   givesDamage: 1
   customBuffs: []
   myCollider: {fileID: 4545853780612740703}
+  damageManifold: 0
 --- !u!95 &255576372026609423
 Animator:
   serializedVersion: 3

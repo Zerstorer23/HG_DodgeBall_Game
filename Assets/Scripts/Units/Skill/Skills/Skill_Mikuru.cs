@@ -3,17 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using static ConstantStrings;
 
-public class Skill_Mikuru : SkillManager
+public class Skill_Mikuru : ISkill
 {
-    public override void LoadInformation()
+    public override ActionSet GetSkillActionSet(SkillManager skm)
     {
-        cooltime = 3.2f;
-    }
-
-    public override void MySkillFunction()
-    {
-        ActionSet mySkill = new ActionSet(gameObject, this);
-        mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
+        ActionSet mySkill = new ActionSet(skm);
+        mySkill.SetParam(SkillParams.UserID, skm.pv.Owner.UserId);
         mySkill.SetParam(SkillParams.MoveSpeed, 165f);
         mySkill.SetParam(SkillParams.Distance, 5f);
         mySkill.SetParam(SkillParams.Duration, 0.35f);
@@ -25,12 +20,16 @@ public class Skill_Mikuru : SkillManager
         {
             mySkill.Enqueue(new Action_GetCurrentPlayerPosition_AngledOffset());
             mySkill.Enqueue(new Action_InstantiateBulletAt());
-            // mySkill.Enqueue(new Action_SetProjectileExcludePlayer());
             mySkill.Enqueue(new Action_SetProjectileStraight());
-            // mySkill.Enqueue(new Action_WaitForSeconds());
         }
-
-        StartCoroutine(mySkill.Activate());
+        return mySkill;
     }
+
+
+    public override void LoadInformation(SkillManager skm)
+    {
+        skm.cooltime = 3.2f;
+    }
+
 
 }

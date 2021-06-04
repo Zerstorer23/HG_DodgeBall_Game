@@ -19,23 +19,23 @@ public class ActionSet
 
     private Dictionary<SkillParams, object> parameters = new Dictionary<SkillParams, object>();
 
-    internal object GetParam(SkillParams key)
+    internal T GetParam<T>(SkillParams key)
     {
         Debug.Assert(parameters.ContainsKey(key), " missing param : "+key);
-        return parameters[key];
+        return (T)parameters[key];
     }
-    internal object GetParam(SkillParams key, object defaultVal)
+    internal T GetParam<T>(SkillParams key, object defaultVal)
     {
         if (!parameters.ContainsKey(key)) {
             parameters.Add(key, defaultVal);
         }
-        return parameters[key];
+        return (T)parameters[key];
     }
 
-    public ActionSet(UnityEngine.GameObject casterObj, SkillManager skm)
+    public ActionSet( SkillManager skm)
     {
-        caster = casterObj;
-        castingPlayer = casterObj.GetComponent<Unit_Player>();
+        caster = skm.gameObject;
+        castingPlayer = skm.gameObject.GetComponent<Unit_Player>();
         casterPV = caster.GetComponent<PhotonView>();
         skillManager = skm;
     }
@@ -98,7 +98,8 @@ public enum SkillParams {
     FieldNumber,
     RotateAngle,
     RotateSpeed,
-    Distance
+    Distance,
+    PhotonView
 }
 
 /*

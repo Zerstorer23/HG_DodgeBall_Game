@@ -3,17 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using static ConstantStrings;
 
-public class Skill_Asakura : SkillManager
+public class Skill_Asakura : ISkill
 {
-    public override void LoadInformation()
+    public override ActionSet GetSkillActionSet(SkillManager skm)
     {
-        cooltime = 4f;
-    }
-
-    public override void MySkillFunction()
-    {
-        ActionSet mySkill = new ActionSet(gameObject, this);
-        mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
+        ActionSet mySkill = new ActionSet(skm);
         mySkill.SetParam(SkillParams.MoveSpeed, 22f);
         mySkill.SetParam(SkillParams.RotateAngle, 60f);
         mySkill.SetParam(SkillParams.RotateSpeed, 150f);
@@ -21,7 +15,7 @@ public class Skill_Asakura : SkillManager
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_ASAKURA);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
 
-        float angleOffset = unitMovement.GetAim();
+        float angleOffset = skm.unitMovement.GetAim();
         int numStep = 15;
         for (int i = 0; i < numStep; i++)
         {
@@ -34,7 +28,14 @@ public class Skill_Asakura : SkillManager
             //  mySkill.Enqueue(new Action_Player_InvincibleBuff());//
             mySkill.Enqueue(new Action_WaitForSeconds());
         }
-        StartCoroutine(mySkill.Activate());
+        return mySkill;
     }
+
+
+    public override void LoadInformation(SkillManager skm)
+    {
+        skm.cooltime = 4f;
+    }
+
 
 }

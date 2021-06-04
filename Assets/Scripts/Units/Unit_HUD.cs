@@ -59,7 +59,7 @@ public class Unit_HUD : MonoBehaviour
             MP_fillStack.fillAmount = 1;
             return;
         }
-            float stackFill = (float)skill.currStack / skill.maxStack;
+        float stackFill = (float)skill.currStack / skill.maxStack;
         MP_fillStack.fillAmount = stackFill;
         float coolFill = 1 - (skill.remainingStackTime / skill.cooltime);
         MP_fillCooltime.fillAmount = stackFill + (1f / player.skillManager.maxStack) * coolFill;

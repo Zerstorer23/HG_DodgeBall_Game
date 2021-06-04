@@ -116,7 +116,7 @@ public class Unit_SharedMovement : MonoBehaviourPun
         if (pv.IsMine)
         {
             float deltaX = sum * moveSpeed * delta;
-            float newX = Mathf.Clamp(transSync.networkPos.x + deltaX, mapSpec.xMin, mapSpec.xMax);
+            float newX = Mathf.Clamp(transSync.networkPos.x + deltaX, mapSpec.xMin, mapSpec.xMax);//TODO
             Vector3 newPosition = new Vector3(newX, mapSpec.yMin + yOffset,1);
             transSync.EnqueueLocalPosition(newPosition, Quaternion.identity);
         }

@@ -3,18 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using static ConstantStrings;
-public class Skill_Tsuruya : SkillManager
+public class Skill_Tsuruya : ISkill
 {
-    public override void LoadInformation()
+    public override ActionSet GetSkillActionSet(SkillManager skm)
     {
-        cooltime = 4f;
-        maxStack = 3;
-    }
-
-    public override void MySkillFunction()
-    {
-        ActionSet mySkill = new ActionSet(gameObject, this);
-        mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
+        ActionSet mySkill = new ActionSet(skm);
+        mySkill.SetParam(SkillParams.UserID, skm.pv.Owner.UserId);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_TSURUYA);
         mySkill.SetParam(SkillParams.Quarternion, Quaternion.identity);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
@@ -44,6 +38,15 @@ public class Skill_Tsuruya : SkillManager
             }
 
         }
-        StartCoroutine(mySkill.Activate());
+        return mySkill;
     }
+
+    public override void LoadInformation(SkillManager skm)
+    {
+        skm.
+           cooltime = 4f; skm.
+            maxStack = 3;
+
+    }
+
 }

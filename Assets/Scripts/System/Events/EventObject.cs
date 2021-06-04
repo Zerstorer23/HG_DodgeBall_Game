@@ -10,6 +10,8 @@ public class EventObject
     public string stringObj;
     public GameObject goData;
     public object objData;
+    public Projectile_DamageDealer sourceDamageDealer;
+    public HealthPoint hitHealthPoint;
     public Vector3 vectorObj;
 
 }

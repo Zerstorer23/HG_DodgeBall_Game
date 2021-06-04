@@ -41,6 +41,7 @@ public class Unit_Player : MonoBehaviourPun
         movement = GetComponent<Unit_Movement>();
         buffManager = GetComponent<BuffManager>();
         circleCollider = GetComponent<CircleCollider2D>();
+        skillManager = GetComponent<SkillManager>();
     }
     private void OnDisable()
     {
@@ -76,7 +77,6 @@ public class Unit_Player : MonoBehaviourPun
     }
     void ParseInstantiationData() {
         myCharacter = (CharacterType)pv.InstantiationData[0];
-        AddSkillManager();
         myPortrait.sprite = ConfigsManager.unitDictionary[myCharacter].portraitImage;
         CheckCustomCharacter();
         int maxLife = (int)pv.InstantiationData[1];
@@ -225,49 +225,10 @@ public class Unit_Player : MonoBehaviourPun
     internal bool FindAttackHistory(int tid)
     {
         foreach (var proj in myProjectiles.Values) {
-            if (proj.damageDealer.attackedIDs.ContainsKey(tid)) return true;
+            if (proj.damageDealer.duplicateDamageChecker.FindAttackHistory(tid)) return true;
         }
         return false;
     }
 
-    public void AddSkillManager() {
-        switch (myCharacter)
-        {
-            case CharacterType.NAGATO:
-                skillManager = gameObject.AddComponent<Skill_Nagato>();
-                break;
-            case CharacterType.HARUHI:
-                skillManager = gameObject.AddComponent<Skill_Haruhi>();
-                break;
-            case CharacterType.MIKURU:
-                skillManager = gameObject.AddComponent<Skill_Mikuru>();
-                break;
-            case CharacterType.KOIZUMI:
-            case CharacterType.KOIHIME:
-                skillManager = gameObject.AddComponent<Skill_Koizumi>();
-                break;
-            case CharacterType.KUYOU:
-                skillManager = gameObject.AddComponent<Skill_Kuyou>();
-                break;
-            case CharacterType.ASAKURA:
-                skillManager = gameObject.AddComponent<Skill_Asakura>();
-                break;
-            case CharacterType.KYOUKO:
-                skillManager = gameObject.AddComponent<Skill_Kyouko>();
-                break;
-            case CharacterType.KIMIDORI:
-                skillManager = gameObject.AddComponent<Skill_Kimidori>();
-                break;
-            case CharacterType.SASAKI:
-                skillManager = gameObject.AddComponent<Skill_Sasaki>();
-                break;
-            case CharacterType.TSURUYA:
-                skillManager = gameObject.AddComponent<Skill_Tsuruya>();
-                break;
-            case CharacterType.YASUMI:
-                skillManager = gameObject.AddComponent<Skill_Yasumi>();
-                break;
-        }
-        //UnityEditorInternal.ComponentUtility.MoveComponentUp(skillManager);
-    }
+   
 }

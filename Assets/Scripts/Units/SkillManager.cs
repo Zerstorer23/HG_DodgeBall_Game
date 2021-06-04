@@ -1,15 +1,18 @@
 ﻿using Photon.Pun;
+using System;
 using UnityEngine;
+using static ConstantStrings;
 
-public abstract class SkillManager : MonoBehaviourPun
+public class SkillManager : MonoBehaviourPun
 {
     public PhotonView pv;
-    protected Unit_Movement unitMovement;
+    internal Unit_Movement unitMovement;
     protected Unit_Player player;
     internal BuffManager buffManager;
     //Data
     public CharacterType myCharacter;
 
+    public ISkill mySkill;
     public int maxStack = 1;
     public float cooltime;
     public bool skillInUse = false;
@@ -24,8 +27,52 @@ public abstract class SkillManager : MonoBehaviourPun
         unitMovement = GetComponent<Unit_Movement>();
         player = GetComponent<Unit_Player>();
         buffManager = GetComponent<BuffManager>();
-        myCharacter = player.myCharacter;
-        LoadInformation();
+
+    }
+    private void OnEnable()
+    {
+        myCharacter = (CharacterType)pv.InstantiationData[0];
+        ParseSkill(myCharacter);
+        InitSkill();
+        if (pv.IsMine)
+        {
+            GameSession.GetInst().skillPanelUI.SetSkillInfo(this);
+            EventManager.StartListening(MyEvents.EVENT_MY_PROJECTILE_HIT, OnProjectileHit);
+            EventManager.StartListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, OnPlayerKilledPlayer);
+            EventManager.StartListening(MyEvents.EVENT_MY_PROJECTILE_MISS, OnProjectileMiss);
+        }
+    }
+
+
+
+    private void OnDisable()
+    {
+        skillInUse = false;
+        if (pv.IsMine)
+        {
+            EventManager.StopListening(MyEvents.EVENT_MY_PROJECTILE_HIT, OnProjectileHit);
+            EventManager.StopListening(MyEvents.EVENT_MY_PROJECTILE_MISS, OnProjectileMiss);
+            EventManager.StopListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, OnProjectileHit);
+        }
+    }
+
+    public void InitSkill()
+    {
+        skillInUse = false;
+        remainingStackTime = cooltime; // a;
+    }
+    private void OnProjectileMiss(EventObject eo)
+    {
+        mySkill.OnMyProjectileMiss(eo);
+    }
+    private void OnPlayerKilledPlayer(EventObject eo)
+    {
+        mySkill.OnPlayerKilledPlayer(eo);
+    }
+
+    private void OnProjectileHit(EventObject eo)
+    {
+        mySkill.OnMyProjectileHit(eo);
     }
 
 
@@ -33,8 +80,8 @@ public abstract class SkillManager : MonoBehaviourPun
     private void CheckSkillActivation()
     {
         if (PhotonNetwork.Time < lastActivated + 0.4) return;
-        if (InputHelper.skillKeyFired() || 
-            (GameSession.IsAutoDriving() && unitMovement.autoDriver.CanAttackTarget())   
+        if (InputHelper.skillKeyFired() ||
+            (GameSession.IsAutoDriving() && unitMovement.autoDriver.CanAttackTarget())
             )
         {
             if (currStack > 0)
@@ -48,21 +95,15 @@ public abstract class SkillManager : MonoBehaviourPun
             }
         }
     }
-    public abstract void MySkillFunction();
-    public abstract void LoadInformation();
-
-    private void OnEnable()
+    void MySkillFunction()
     {
-        InitSkill();
-        if (pv.IsMine)
-        {
-            GameSession.GetInst().skillPanelUI.SetSkillInfo(this);
-        }
+        var actionSet = mySkill.GetSkillActionSet(this);
+        StartCoroutine(actionSet.Activate());
     }
-    public void InitSkill() {
-        skillInUse = false;
-        remainingStackTime = cooltime; // a;
-    }
+    /*public abstract ActionSet MySkillActions(SkillManager skillManager);
+    public abstract void LoadInformation(SkillManager skillManager);*/
+
+
     [PunRPC]
     public void SetSkillInUse(bool startSkill)
     {
@@ -73,7 +114,8 @@ public abstract class SkillManager : MonoBehaviourPun
     {
         currStack += a;
     }
-    public bool SkillIsReady() {
+    public bool SkillIsReady()
+    {
         return (currStack > 0);
     }
     public bool SkillInUse()
@@ -84,10 +126,7 @@ public abstract class SkillManager : MonoBehaviourPun
     {
         return (buffManager.GetTrigger(BuffType.InvincibleFromBullets));
     }
-    private void OnDisable()
-    {
-        skillInUse = false;
-    }
+
     private void Update()
     {
         CheckSkillStack();
@@ -97,7 +136,7 @@ public abstract class SkillManager : MonoBehaviourPun
 
     private void CheckSkillStack()
     {
-       // Debug.Log(currStack + " " + maxStack + " " + skillInUse);
+        // Debug.Log(currStack + " " + maxStack + " " + skillInUse);
         if (currStack < maxStack && !skillInUse)
         {
             remainingStackTime -= Time.deltaTime * buffManager.GetBuff(BuffType.Cooltime);
@@ -112,9 +151,65 @@ public abstract class SkillManager : MonoBehaviourPun
         }
 
     }
-
+    public void ParseSkill(CharacterType character)
+    {
+        myCharacter = character;
+        maxStack = 1;
+        switch (myCharacter)
+        {
+            case CharacterType.NAGATO:
+                mySkill = new Skill_Nagato();
+                break;
+            case CharacterType.HARUHI:
+                mySkill = new Skill_Haruhi();
+                break;
+            case CharacterType.MIKURU:
+                mySkill = new Skill_Mikuru();
+                break;
+            case CharacterType.KOIZUMI:
+            case CharacterType.KOIHIME:
+                mySkill = new Skill_Koizumi();
+                break;
+            case CharacterType.KUYOU:
+                mySkill = new Skill_Kuyou();
+                break;
+            case CharacterType.ASAKURA:
+                mySkill = new Skill_Asakura();
+                break;
+            case CharacterType.KYOUKO:
+                mySkill = new Skill_Kyouko();
+                break;
+            case CharacterType.KIMIDORI:
+                mySkill = new Skill_Kimidori();
+                break;
+            case CharacterType.SASAKI:
+                mySkill = new Skill_Sasaki();
+                break;
+            case CharacterType.TSURUYA:
+                mySkill = new Skill_Tsuruya();
+                break;
+            case CharacterType.YASUMI:
+                mySkill = new Skill_Yasumi();
+                break;
+            case CharacterType.KYONMOUTO:
+                mySkill = new Skill_Kyonmouto();
+                break;
+            case CharacterType.KYONKO:
+            case CharacterType.KYON:
+                mySkill = new Skill_Kyonko();
+                break;
+            case CharacterType.T:
+                mySkill = new Skill_T();
+                break;
+            case CharacterType.Taniguchi:
+                mySkill = new Skill_Taniguchi();
+                break;
+        }
+        mySkill.LoadInformation(this);
+    }
 }
 public enum CharacterType
 {
     NONE, NAGATO, HARUHI, MIKURU, KOIZUMI, KUYOU, ASAKURA, KYOUKO, KIMIDORI, KYONMOUTO, SASAKI, TSURUYA, KOIHIME, YASUMI
+        , KYONKO, KYON, T, Taniguchi
 }

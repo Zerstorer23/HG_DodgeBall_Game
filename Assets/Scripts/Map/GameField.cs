@@ -76,6 +76,7 @@ public class GameField : MonoBehaviour
     public void CheckSuddenDeath(int numAlive, bool timeout = false)
     {
         if (!GameSession.gameModeInfo.callSuddenDeath) return;
+        if (GameSession.instance.devMode) return;
         if (numAlive <= 2 && !suddenDeathCalled)
         {
             suddenDeathCalled = true;

@@ -172,6 +172,7 @@ MonoBehaviour:
   givesDamage: 1
   customBuffs: []
   myCollider: {fileID: 0}
+  damageManifold: 0
 --- !u!114 &187803789871181374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -196,7 +197,6 @@ MonoBehaviour:
   characterUser: 4
   mySprite: {fileID: 3005893680650928229}
   tweenEase: 0
-  synchedInitialCriticalPoint: 0
 --- !u!114 &-8149601233891272938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -241,7 +241,8 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: 0}
   sceneViewId: 2
   InstantiationId: 0
   isRuntimeInstantiated: 0

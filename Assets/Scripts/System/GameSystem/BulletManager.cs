@@ -156,10 +156,10 @@ public class BulletManager : MonoBehaviour
     private void InstantiateBox()
     {
         float randW = Random.Range(1f, maxWidth);
+        float randH = Random.Range(1f, maxWidth);
         Vector3 randPos = gameField.GetRandomPosition();
 
-        UnityEngine.GameObject box = PhotonNetwork.InstantiateRoomObject("Prefabs/Units/BoxObstacle", randPos, Quaternion.identity,0, new object[] { gameField.fieldNo });
-        box.GetComponent<PhotonView>().RPC("SetInformation", RpcTarget.AllBuffered, randW,spawnDelay);
+        GameObject box = PhotonNetwork.InstantiateRoomObject("Prefabs/Units/BoxObstacle", randPos, Quaternion.identity,0, new object[] { gameField.fieldNo, randW,randH,spawnDelay });
        
     }
     void SetProjectileInformation(GameObject spawner, SpawnDirection spawnDir, MoveType moveType, ReactionType reaction)

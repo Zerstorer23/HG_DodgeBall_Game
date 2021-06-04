@@ -1,10 +1,6 @@
 ﻿using Photon.Pun;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static BulletManager;
-using Random = UnityEngine.Random;
 
 public class BulletSpawner : MonoBehaviourPun
 {
@@ -164,21 +160,3 @@ public class BulletSpawner : MonoBehaviourPun
 
 }
 
-//생성구조
-
-
-/*
- 직선형
- 곡선형
- 경고후생성
-
- 유도탄
- 무유도탄
- 정지 
-
-타obj충돌시
- 산탄
- 바운스
- 제거
-
- */

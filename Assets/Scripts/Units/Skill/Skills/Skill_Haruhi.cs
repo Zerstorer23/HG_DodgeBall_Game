@@ -7,16 +7,14 @@ using UnityEngine.EventSystems;
 using static BulletManager;
 using static ConstantStrings;
 using Random = UnityEngine.Random;
-public class Skill_Haruhi : SkillManager
-{ 
-    
-
-    public override void MySkillFunction()
+public class Skill_Haruhi : ISkill
+{
+    public override ActionSet GetSkillActionSet(SkillManager skm)
     {
-        ActionSet mySkill = new ActionSet(gameObject, this);
+        ActionSet mySkill = new ActionSet( skm);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_HARUHI);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-        mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
+        mySkill.SetParam(SkillParams.UserID, skm.pv.Owner.UserId);
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 1f });
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Height, paramValue = 1f });
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 0.6f });
@@ -29,11 +27,11 @@ public class Skill_Haruhi : SkillManager
         mySkill.Enqueue(new Action_DoDeathAfter());
         mySkill.Enqueue(new Action_Player_InvincibleBuff());
         mySkill.Enqueue(new Action_WaitForSeconds());
-        StartCoroutine(mySkill.Activate());
+        return mySkill;
     }
 
-    public override void LoadInformation()
+    public override void LoadInformation(SkillManager skm)
     {
-        cooltime = 3.3f;
+        skm.cooltime = 3.3f;
     }
 }

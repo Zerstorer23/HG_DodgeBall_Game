@@ -3,24 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using static ConstantStrings;
 
-public class Skill_Kyouko : SkillManager
+public class Skill_Kyouko : ISkill
 {
-    public override void LoadInformation()
+    public override ActionSet GetSkillActionSet(SkillManager skm)
     {
-        cooltime = 3.6f;
-    }
-
-    public override void MySkillFunction()
-    {
-        ActionSet mySkill = new ActionSet(gameObject, this);
-        mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
+        ActionSet mySkill = new ActionSet(skm);
         mySkill.SetParam(SkillParams.MoveSpeed, 16f);
         mySkill.SetParam(SkillParams.Duration, 0.5f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KYOUKO);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
         mySkill.SetParam(SkillParams.RotateAngle, 90f);
         mySkill.SetParam(SkillParams.RotateSpeed, 270f);
-        float angleOffset = unitMovement.GetAim();
+        float angleOffset = skm.unitMovement.GetAim();
         int stepSize = 4;
         for (int n = 0; n < 2; n++)
         {
@@ -46,7 +40,14 @@ public class Skill_Kyouko : SkillManager
             mySkill.Enqueue(new Action_WaitForSeconds());
         }
 
-        StartCoroutine(mySkill.Activate());
+        return mySkill;
     }
+
+
+    public override void LoadInformation(SkillManager skm)
+    {skm.
+        cooltime = 3.6f;
+    }
+
 
 }

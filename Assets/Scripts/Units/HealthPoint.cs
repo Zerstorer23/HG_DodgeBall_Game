@@ -136,7 +136,9 @@ public class HealthPoint : MonoBehaviourPun
             {
                 PhotonNetwork.Instantiate(ConstantStrings.PREFAB_HEAL_1, transform.position, Quaternion.identity, 0);
                 MainCamera.instance.DoShake();
+                #if UNITY_ANDROID && !UNITY_EDITOR
                 Handheld.Vibrate();
+                #endif
                 unitPlayer.PlayHitAudio();
             }
             NotifySourceOfDamage(attackerUserID, instaDeath);
@@ -214,7 +216,7 @@ public class HealthPoint : MonoBehaviourPun
                 {
                     killerUID = attackerUserID;
                     Debug.Log("send id " + attackerUserID);
-                    EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID });
+                    EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID, hitHealthPoint = this });
                     ChatManager.SendNotificationMessage(attackerNickname + " 님이 " + pv.Owner.NickName + "님을 살해했습니다.", "#FF0000");
                 }
             }

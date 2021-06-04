@@ -29,6 +29,9 @@ public class ConfigsManager : MonoBehaviour
     public static CharacterType GetRandomCharacter()
     {
         int rand = Random.Range(1, instance.unitConfigs.Length);
+        while (instance.unitConfigs[rand].noRandom) {
+            rand = Random.Range(1, instance.unitConfigs.Length);
+        }
         return instance.unitConfigs[rand].characterID;
     }
 }

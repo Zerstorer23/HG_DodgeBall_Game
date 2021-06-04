@@ -7,11 +7,17 @@ using UnityEngine.EventSystems;
 using static BulletManager;
 using static ConstantStrings;
 using Random = UnityEngine.Random;
-public class Skill_Nagato : SkillManager
+public class Skill_Nagato : ISkill
 {
-    public override void MySkillFunction()
+    public override void LoadInformation(SkillManager skm)
     {
-        ActionSet mySkill = new ActionSet(gameObject, this);
+        skm.cooltime = 3.3f;
+        skm.maxStack = 5;
+    }
+
+    public override ActionSet GetSkillActionSet(SkillManager skm)
+    {
+        ActionSet mySkill = new ActionSet(skm);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_NAGATO);
         mySkill.SetParam(SkillParams.Duration, 0.4f);
         mySkill.SetParam(SkillParams.MoveSpeed, 22f);
@@ -19,19 +25,12 @@ public class Skill_Nagato : SkillManager
         mySkill.SetParam(SkillParams.Enable, false);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
         mySkill.Enqueue(new Action_InstantiateBulletAt());
-     //   mySkill.Enqueue(new Action_Projectile_ToggleDamage());
+        //   mySkill.Enqueue(new Action_Projectile_ToggleDamage());
         // mySkill.Enqueue(new Action_Player_InvincibleBuff());
         mySkill.Enqueue(new Action_WaitForSeconds());
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Enable, paramValue = true });
-     //   mySkill.Enqueue(new Action_Projectile_ToggleDamage());
+        //   mySkill.Enqueue(new Action_Projectile_ToggleDamage());
         mySkill.Enqueue(new Action_SetProjectileStraight());
-        StartCoroutine(mySkill.Activate());
-    }
-
-    public override void LoadInformation()
-    {
-        cooltime = 3.3f;
-       // if (GameSession.instance.devMode) cooltime = 1f;
-        maxStack = 5;
+        return mySkill;
     }
 }

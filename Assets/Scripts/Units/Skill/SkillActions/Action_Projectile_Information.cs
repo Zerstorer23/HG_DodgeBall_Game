@@ -13,8 +13,8 @@ public class Action_SetProjectileScale : SkillAction
     public override float Activate()
     {
         parent.pv.RPC("SetScale", RpcTarget.AllBuffered,
-            (float)GetParam(SkillParams.Width),
-            (float)GetParam(SkillParams.Height));
+            GetParam<float>(SkillParams.Width),
+            GetParam<float>(SkillParams.Height));
         return 0;
     }
 }
@@ -25,7 +25,7 @@ public class Action_Projectile_ToggleDamage : SkillAction
     public override float Activate()
     {
         if (parent.pv == null) return 0f;
-        bool enable = (bool)GetParam(SkillParams.Enable);
+        bool enable = GetParam<bool>(SkillParams.Enable);
         parent.pv.RPC("ToggleDamage", RpcTarget.AllBuffered, enable);
         return 0f;
     }
@@ -36,7 +36,7 @@ public class Action_SetProjectile_InvincibleFromMapBullets : SkillAction
     public override float Activate()
     {
         if (parent.pv == null) return 0f;
-        bool enable = (bool)GetParam(SkillParams.Enable);
+        bool enable = GetParam<bool>(SkillParams.Enable);
         parent.pv.RPC("SetInvincibleFromMapBullets", RpcTarget.AllBuffered, enable);
         return 0f;
     }
@@ -47,8 +47,8 @@ public class Action_DoScaleTween : SkillAction
     public override float Activate()
     {
         if (parent.pv == null) return 0f;
-        float duration = (float)GetParam(SkillParams.Duration);
-        float scale = (float)GetParam(SkillParams.Width);
+        float duration = GetParam<float>(SkillParams.Duration);
+        float scale = GetParam<float>(SkillParams.Width);
         parent.pv.RPC("DoTweenScale", RpcTarget.AllBuffered, duration, scale);
         return 0f;
     }
@@ -59,7 +59,7 @@ public class Action_DoDeathAfter : SkillAction
     public override float Activate()
     {
         if (parent.pv == null) return 0f;
-        float duration = (float)GetParam(SkillParams.Duration);
+        float duration = GetParam<float>(SkillParams.Duration);
         parent.pv.GetComponent<HealthPoint>().DoDeathAfter(duration);
         return 0f;
     }

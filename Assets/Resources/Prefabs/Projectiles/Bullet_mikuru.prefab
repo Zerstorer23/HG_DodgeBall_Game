@@ -83,7 +83,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!114 &8629071319047820330
 MonoBehaviour:
@@ -104,12 +104,12 @@ MonoBehaviour:
   angleAntiClockBound: 0
   angleStack: 0
   goClockwise: 1
+  AddForce: 1
   moveType: 0
   reactionType: 2
   characterUser: 3
   mySprite: {fileID: 0}
   tweenEase: 0
-  synchedInitialCriticalPoint: 0
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,6 +147,7 @@ MonoBehaviour:
   givesDamage: 1
   customBuffs: []
   myCollider: {fileID: 0}
+  damageManifold: 0
 --- !u!114 &4556413170392631494
 MonoBehaviour:
   m_ObjectHideFlags: 0

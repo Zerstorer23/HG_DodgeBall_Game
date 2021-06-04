@@ -14,7 +14,11 @@ public abstract class SkillAction
     public virtual float Activate() {
         return 0f;
     }
-    public object GetParam(SkillParams key) {
-        return parent.GetParam(key);
+    public T GetParam<T>(SkillParams key) {
+        return parent.GetParam<T>(key);
+    }
+    public T GetParam<T>(SkillParams key, object defaultVal)
+    {
+        return parent.GetParam<T>(key,defaultVal);
     }
 }

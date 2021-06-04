@@ -27,7 +27,7 @@ public class Action_WaitForSeconds : SkillAction
 {
     public override float Activate()
     {
-        float duration = (float)GetParam(SkillParams.Duration);
+        float duration = GetParam<float>(SkillParams.Duration);
         return duration;
     }
 }

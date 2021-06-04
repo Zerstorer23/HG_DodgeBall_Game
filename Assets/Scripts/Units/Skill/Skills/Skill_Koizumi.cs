@@ -3,17 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using static ConstantStrings;
 
-public class Skill_Koizumi : SkillManager
+public class Skill_Koizumi : ISkill
 {
-    public override void LoadInformation()
+    public override ActionSet GetSkillActionSet(SkillManager skm)
     {
-        cooltime = 5f;
-    }
-
-    public override void MySkillFunction()
-    {
-        ActionSet mySkill = new ActionSet(gameObject, this);
-        mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
+        ActionSet mySkill = new ActionSet( skm);
         mySkill.SetParam(SkillParams.Duration, 1.5f); //1.5
                                                       // mySkill.SetParam(SkillParams.Modifier, 0.75f);
         mySkill.SetParam(SkillParams.Color, "#c80000");
@@ -36,6 +30,13 @@ public class Skill_Koizumi : SkillManager
         mySkill.Enqueue(new Action_PlayerChangeSpriteColor());
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 1f });
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Height, paramValue = 1f });
-        StartCoroutine(mySkill.Activate());
+        return mySkill;
     }
+
+
+    public override void LoadInformation(SkillManager skm)
+    {
+        skm.cooltime = 5f;
+    }
+
 }

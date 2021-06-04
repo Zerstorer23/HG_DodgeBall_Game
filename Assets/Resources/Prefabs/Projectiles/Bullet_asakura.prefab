@@ -93,7 +93,6 @@ MonoBehaviour:
   characterUser: 6
   mySprite: {fileID: 2534975670834146036}
   tweenEase: 0
-  synchedInitialCriticalPoint: 0
 --- !u!114 &-6068978053554526307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110,6 +109,8 @@ MonoBehaviour:
   networkPos: {x: 0, y: 0, z: 0}
   networkQuaternion: {x: 0, y: 0, z: 0, w: 0}
   syncRotation: 1
+  syncType: 1
+  syncPeriod: 1
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,17 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using static ConstantStrings;
 
-public class Skill_Kimidori : SkillManager
+public class Skill_Kimidori : ISkill
 {
-    public override void LoadInformation()
+    public override ActionSet GetSkillActionSet(SkillManager skm)
     {
-        cooltime = 2f;
-    }
-
-    public override void MySkillFunction()
-    {
-        ActionSet mySkill = new ActionSet(gameObject, this);
-        mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
+        ActionSet mySkill = new ActionSet(skm);
+        mySkill.SetParam(SkillParams.UserID, skm.pv.Owner.UserId);
         mySkill.SetParam(SkillParams.MoveSpeed, 6f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KIMIDORI);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.Die);
@@ -23,7 +18,15 @@ public class Skill_Kimidori : SkillManager
         mySkill.Enqueue(new Action_InstantiateBullet_FollowPlayer());
         mySkill.Enqueue(new Action_SetProjectile_Orbit());
         mySkill.Enqueue(new Action_SetProjectile_InvincibleFromMapBullets());
-        StartCoroutine(mySkill.Activate());
+        return mySkill;
     }
+
+
+    public override void LoadInformation(SkillManager skm)
+    {
+        skm.
+           cooltime = 2f;
+    }
+
 
 }

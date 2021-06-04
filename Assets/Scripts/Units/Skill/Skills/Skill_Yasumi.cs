@@ -2,17 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Skill_Yasumi : SkillManager
+public class Skill_Yasumi : ISkill
 {
-    public override void LoadInformation()
+    public override ActionSet GetSkillActionSet(SkillManager skm)
     {
-        cooltime = 5f;
-    }
-
-    public override void MySkillFunction()
-    {
-        ActionSet mySkill = new ActionSet(gameObject, this);
-        mySkill.SetParam(SkillParams.UserID, pv.Owner.UserId);
+        ActionSet mySkill = new ActionSet(skm);
         mySkill.SetParam(SkillParams.Width, 2f); ;
         float duration = 8f;
         BuffData buff = new BuffData(BuffType.MirrorDamage, 0f, duration);
@@ -29,6 +23,13 @@ public class Skill_Yasumi : SkillManager
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.BuffData, paramValue = invincible });
         mySkill.Enqueue(new Action_Player_AddBuff());
         mySkill.Enqueue(new Action_WaitForSeconds());
-        StartCoroutine(mySkill.Activate());
+        return mySkill;
     }
+
+    public override void LoadInformation(SkillManager skm)
+    {skm.
+        cooltime = 5f;
+    }
+
+  
 }
