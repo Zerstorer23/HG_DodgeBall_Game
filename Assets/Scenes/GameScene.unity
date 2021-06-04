@@ -5537,7 +5537,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapStepsize: 15
-  mapStepPerPlayer: 5
+  mapStepPerPlayer: 4
   singleField: {fileID: 2159936281926660096}
   tournamentGame: {fileID: 521845415}
   spawnAfter: 12

@@ -36,6 +36,9 @@ public class Projectile_Movement : MonoBehaviourPun
     public MoveType moveType;
     public ReactionType reactionType = ReactionType.Bounce;
     public CharacterType characterUser = CharacterType.NONE;
+
+
+
     internal void SetAssociatedField(int fieldNo)
     {
         mapSpec = GameFieldManager.gameFields[fieldNo].mapSpec;
@@ -218,6 +221,7 @@ public class Projectile_Movement : MonoBehaviourPun
 
     public void Bounce2(ContactPoint2D contact, Vector3 contactPoint)
     {
+
         Vector3 normal = contact.normal;
         float rad = eulerAngle * Mathf.Deg2Rad;
         float dX = Mathf.Cos(rad) * moveSpeed * Time.deltaTime;

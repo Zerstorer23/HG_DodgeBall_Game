@@ -17,7 +17,8 @@ public class Projectile_Homing : MonoBehaviourPun
     public ReactionType homingReaction = ReactionType.None;
     HealthPoint health;
     LayerMask findMask;
-
+    int numBounce = 0;
+    int maxBounce = 3;
     private void OnDrawGizmos()
     {
         if (homingTarget != null)
@@ -36,6 +37,7 @@ public class Projectile_Homing : MonoBehaviourPun
     }
     [PunRPC]
     public void SetHomingTarget(int pvID) {
+        numBounce++;
         homingTarget = PhotonNetwork.GetPhotonView(pvID).gameObject;
     }
     [PunRPC]
@@ -61,7 +63,6 @@ public class Projectile_Homing : MonoBehaviourPun
     private void OnEnable()
     {
         if (photonView.IsMine) {
-
             EventManager.StartListening(MyEvents.EVENT_MY_PROJECTILE_HIT, OnProjectileHit);
         }
     }
@@ -72,7 +73,8 @@ public class Projectile_Homing : MonoBehaviourPun
         if (homingTarget == null || !homingTarget.activeInHierarchy) return;
         if (eo.hitHealthPoint == null || !eo.hitHealthPoint.gameObject.activeInHierarchy) return;
         if (eo.hitHealthPoint.photonView.ViewID != homingTarget.GetComponent<PhotonView>().ViewID) return;
-       // oldtargetID = eo.hitHealthPoint.pv.ViewID;
+        numBounce++;
+        // oldtargetID = eo.hitHealthPoint.pv.ViewID;
         if (homingReaction == ReactionType.Die)
         {
             health.Kill_Immediate();
@@ -96,6 +98,7 @@ public class Projectile_Homing : MonoBehaviourPun
         }
         homingTarget = null;
         oldtargetID = -1;
+        numBounce = 0;
     }
 
     public float AdjustDirection(Vector3 projPosition, float currAngle) {
@@ -135,6 +138,7 @@ public class Projectile_Homing : MonoBehaviourPun
     {
         if (!photonView.IsMine || !homingEnabled) return;
         if (homingDetectRange <= 0) return;
+        if (numBounce >= maxBounce) return;
         bool targetLost = CheckTargetLost();
         if (targetLost) {
             FindNearByObjects();

@@ -149,7 +149,7 @@ public class Unit_Movement : MonoBehaviourPunCallbacks
         networkPosIndicator.position = newPosition;
     }
     Vector3 ClampPosition(Vector3 position, Vector3 direction) {
-        direction = CheckWallContact_Slide(position, direction);
+       // direction = CheckWallContact_Slide(position, direction);
         float newX = Mathf.Clamp(position.x + direction.x, mapSpec.xMin, mapSpec.xMax);
         float newY = Mathf.Clamp(position.y + direction.y, mapSpec.yMin, mapSpec.yMax);
         Vector3 newPos = new Vector3(newX, newY);
