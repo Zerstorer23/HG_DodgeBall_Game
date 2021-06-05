@@ -15,6 +15,6 @@ MonoBehaviour:
   gameMode: 0
   callSuddenDeath: 1
   useDesolator: 1
-  scaleMapByPlayerNum: 0
+  scaleMapByPlayerNum: 1
   isTeamGame: 0
   isCoop: 0

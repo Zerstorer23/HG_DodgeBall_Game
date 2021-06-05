@@ -7,19 +7,18 @@ public class Skill_T : ISkill
 {
     public override void LoadInformation(SkillManager skm)
     {
-        skm.cooltime = 3.5f;
+        skm.cooltime = 3.3f;
         skm.maxStack = 3;
     }
     public override ActionSet GetSkillActionSet(SkillManager skm)
     {
         ActionSet mySkill = new ActionSet(skm);
         float searchRange = 5f;
-        float rotateSpeed = 120f; // 180
+        float rotateSpeed = 130f; // 180
 
-        mySkill.SetParam(SkillParams.MoveSpeed, 10f); //15
+        mySkill.SetParam(SkillParams.MoveSpeed, 12f); //15
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_T);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.Bounce);
-        mySkill.SetParam(SkillParams.Enable, false);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition_AngledOffset());
         mySkill.Enqueue(new Action_InstantiateBulletAt());
         mySkill.Enqueue(new Action_SetProjectileStraight());

@@ -200,6 +200,7 @@ public class BuffManager : MonoBehaviourPun
         {
             buffTriggers.Add(type, 0);
         }
+        //Debug.Log("Num trigger " + buffTriggers[type] + " tpye " + type);
         return buffTriggers[type] > 0;
     }
 

@@ -10,8 +10,8 @@ public class Skill_Kyonmouto : ISkill
         ActionSet mySkill = new ActionSet(skm);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KYONMOUTO);
         mySkill.SetParam(SkillParams.PhotonView, skm.pv);
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.MoveSpeed, paramValue = 8f });
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Distance, paramValue = 5f });
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.MoveSpeed, paramValue = 12f });
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Distance, paramValue = 5.5f });
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.ReactionType, paramValue = ReactionType.None });
 
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition_AngledOffset());
@@ -25,16 +25,15 @@ public class Skill_Kyonmouto : ISkill
         mySkill.Enqueue(new Action_SetProjectile_Homing_Information());
         //----
         //--Scale
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 1f }); 
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 1f });
-        //----
+       mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 3f }); 
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 3f });
         mySkill.Enqueue(new Action_DoScaleTween());
         return mySkill;
     }
 
     public override void LoadInformation(SkillManager skm)
     {
-        skm.cooltime = 3f;
+        skm.cooltime = 3.3f;
         skm.maxStack = 3;
     }
 

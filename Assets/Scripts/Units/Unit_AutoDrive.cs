@@ -18,7 +18,7 @@ public class Unit_AutoDrive : MonoBehaviour
     float findRange;
     public float range_knn = 5f;
     public float range_collision = 3f;
-    float attackRange = 10f;
+    [SerializeField] float attackRange = 10f;
     float escapePadding = 1f;
 
     public GameObject targetEnemy;
@@ -81,10 +81,10 @@ public class Unit_AutoDrive : MonoBehaviour
                 attackRange = 20f;
                 break;
             case CharacterType.KYONMOUTO:
-                attackRange = 5f;
+                attackRange = 5.5f;
                 break;
             default:
-                attackRange = findRange;
+                attackRange = 10f;
                 break;
         }
 
@@ -95,7 +95,7 @@ public class Unit_AutoDrive : MonoBehaviour
     private void OnEnable()
     {
         SetInfo();
-        foundObjects = new Dictionary<int, GameObject>();
+        foundObjects.Clear();
         EventManager.StartListening(MyEvents.EVENT_BOX_SPAWNED, OnBoxSpawned);
         EventManager.StartListening(MyEvents.EVENT_BOX_ENABLED, OnBoxEnabled);
     }
@@ -103,7 +103,8 @@ public class Unit_AutoDrive : MonoBehaviour
     public bool CanAttackTarget()
     {
         if (GameSession.gameModeInfo.isCoop) return true;
-        if (targetEnemy == null)
+        if (targetEnemy == null || 
+            (targetEnemy!=null && Vector2.Distance(targetEnemy.transform.position,transform.position) > attackRange))
         {
             FindNearestPlayer();
         }
@@ -115,7 +116,7 @@ public class Unit_AutoDrive : MonoBehaviour
     }
     private void OnDisable()
     {
-
+        isKamikazeSkill = false;
         EventManager.StopListening(MyEvents.EVENT_BOX_SPAWNED, OnBoxSpawned);
         EventManager.StopListening(MyEvents.EVENT_BOX_ENABLED, OnBoxEnabled);
     }
@@ -227,7 +228,7 @@ public class Unit_AutoDrive : MonoBehaviour
     void FindNearestPlayer()
     {
         playersOnMap = GameFieldManager.gameFields[player.fieldNo].playerSpawner.unitsOnMap;
-        float nearestEnemyDist = 0f;
+        float nearestEnemyDist = float.MaxValue;
         foreach (var p in playersOnMap.Values)
         {
             if (p == null || !p.gameObject.activeInHierarchy) continue;
@@ -236,7 +237,7 @@ public class Unit_AutoDrive : MonoBehaviour
             if (p.buffManager.GetTrigger(BuffType.InvincibleFromBullets)) continue;
             if (p.buffManager.GetTrigger(BuffType.MirrorDamage)) continue;
             float dist = Vector2.Distance(movement.networkPos, p.gameObject.transform.position);
-            if (dist < nearestEnemyDist || targetEnemy == null)
+            if (dist < nearestEnemyDist)
             {
                 nearestEnemyDist = dist;
                 targetEnemy = p.gameObject;
@@ -250,7 +251,7 @@ public class Unit_AutoDrive : MonoBehaviour
         RemoveObjects();
         FindNearByObjects();
         //EvaluateAim();
-        FindNearestPlayer();
+       // FindNearestPlayer();
     }
     private void Update()
     {
@@ -290,7 +291,7 @@ public class Unit_AutoDrive : MonoBehaviour
     Vector3 EvaluateMoves()
     {
         Vector3 move = Vector3.zero;
-        collisionList = new List<GameObject>();
+        collisionList.Clear();
         foreach (GameObject go in foundObjects.Values)
         {
             if (go == null || !go.activeInHierarchy)

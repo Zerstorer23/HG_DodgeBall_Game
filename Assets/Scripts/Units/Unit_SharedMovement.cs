@@ -11,7 +11,7 @@ public class Unit_SharedMovement : MonoBehaviourPun
     PhotonView pv;
     int fieldNo = -1;
     MapSpec mapSpec;
-    float fireSpeed = 0.75f;
+    float fireSpeed = 1.5f;
     [SerializeField]  Transform gunPosition;
     [SerializeField] Image dirFill;
     [SerializeField] Text dirText;

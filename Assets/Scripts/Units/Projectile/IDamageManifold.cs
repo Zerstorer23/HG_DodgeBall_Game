@@ -11,23 +11,23 @@ public interface IDamageManifold
 }
 public class DamageQueue : IDamageManifold
 {
-    Queue<int> damageRecords = new Queue<int>();
+    List<int> damageRecords = new List<int>();
     public bool CheckDuplicateDamage(int tid)
     {
-        if (damageRecords.Count > 0 && damageRecords.Peek() == tid)
+        if (damageRecords.Count > 0 && damageRecords[damageRecords.Count-1] == tid)
         {
             return false;
         }
         else
         {
-            damageRecords.Enqueue(tid);
+            damageRecords.Add(tid);
             return true;
         }
     }
 
     public bool FindAttackHistory(int tid)
     {
-        return (damageRecords.Count > 0 && damageRecords.Peek() == tid);
+        return (damageRecords.Count > 0 && damageRecords.Contains(tid));
     }
 
     public void Reset()

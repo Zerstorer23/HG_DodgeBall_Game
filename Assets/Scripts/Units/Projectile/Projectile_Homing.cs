@@ -37,7 +37,7 @@ public class Projectile_Homing : MonoBehaviourPun
     }
     [PunRPC]
     public void SetHomingTarget(int pvID) {
-        numBounce++;
+    //    numBounce++;
         homingTarget = PhotonNetwork.GetPhotonView(pvID).gameObject;
     }
     [PunRPC]
@@ -72,8 +72,13 @@ public class Projectile_Homing : MonoBehaviourPun
         if (eo.sourceDamageDealer.photonView.ViewID != photonView.ViewID) return;
         if (homingTarget == null || !homingTarget.activeInHierarchy) return;
         if (eo.hitHealthPoint == null || !eo.hitHealthPoint.gameObject.activeInHierarchy) return;
-        if (eo.hitHealthPoint.photonView.ViewID != homingTarget.GetComponent<PhotonView>().ViewID) return;
+        if (numBounce >= maxBounce)
+         {
+            homingTarget = null;
+            return;
+        }
         numBounce++;
+        if (eo.hitHealthPoint.photonView.ViewID != homingTarget.GetComponent<PhotonView>().ViewID) return;
         // oldtargetID = eo.hitHealthPoint.pv.ViewID;
         if (homingReaction == ReactionType.Die)
         {

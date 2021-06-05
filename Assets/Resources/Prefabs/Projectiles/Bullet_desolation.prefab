@@ -124,8 +124,8 @@ MonoBehaviour:
   givesDamage: 0
   customBuffs:
   - buffType: 1
-    modifier: -0.5
-    duration: 1.66
+    modifier: -0.25
+    duration: 2
   myCollider: {fileID: 0}
   damageManifold: 0
 --- !u!114 &4556413170392631494
@@ -159,8 +159,7 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents:
-  - {fileID: 0}
+  ObservedComponents: []
   sceneViewId: 29
   InstantiationId: 0
   isRuntimeInstantiated: 0

@@ -150,9 +150,9 @@ MonoBehaviour:
   canKillBullet: 1
   isMapObject: 0
   givesDamage: 1
-  damageManifold: 0
   customBuffs: []
   myCollider: {fileID: 0}
+  damageManifold: 0
 --- !u!114 &4556413170392631494
 MonoBehaviour:
   m_ObjectHideFlags: 0

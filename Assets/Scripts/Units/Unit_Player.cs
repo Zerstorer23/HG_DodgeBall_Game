@@ -53,7 +53,7 @@ public class Unit_Player : MonoBehaviourPun
             GameFieldManager.ChangeToSpectator();
         }
         circleCollider.radius = 0.33f;
-        myProjectiles = new Dictionary<int, HealthPoint>();
+        myProjectiles.Clear();
         EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_DIED, new EventObject() { stringObj = pv.Owner.UserId, intObj = fieldNo });
     }
     private void OnEnable()
