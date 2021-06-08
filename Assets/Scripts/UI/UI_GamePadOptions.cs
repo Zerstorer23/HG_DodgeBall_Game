@@ -54,8 +54,14 @@ public class UI_GamePadOptions : MonoBehaviour
         {
             padType = PadType.XBOX;
         }
+        try { 
         PlayerPrefs.SetInt(ConstantStrings.PREFS_MY_PAD, (int)padType);
         PlayerPrefs.Save();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning(e.Message);
+        }
     }
 
 }

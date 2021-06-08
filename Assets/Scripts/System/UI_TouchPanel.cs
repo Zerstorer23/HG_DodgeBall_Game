@@ -26,7 +26,7 @@ public class UI_TouchPanel : MonoBehaviour
     public void HandleTouch() {
         if (Input.touchCount <= 0) return;
 
-        Debug.Log("touch count " + Input.touchCount);
+       // Debug.Log("touch count " + Input.touchCount);
         for (int i = 0; i < Input.touchCount; ++i)
         {
             var touch = Input.GetTouch(i);
@@ -35,7 +35,7 @@ public class UI_TouchPanel : MonoBehaviour
             {
                 if (!EventSystem.current.IsPointerOverGameObject(touch.fingerId))
                 {
-                    Debug.Log(i + ": Mousedown " + touch.position + " touch " + EventSystem.current.IsPointerOverGameObject(touch.fingerId));
+                 //   Debug.Log(i + ": Mousedown " + touch.position + " touch " + EventSystem.current.IsPointerOverGameObject(touch.fingerId));
                     isTouching = true;
                     touchVector = touch.position;
                     return;

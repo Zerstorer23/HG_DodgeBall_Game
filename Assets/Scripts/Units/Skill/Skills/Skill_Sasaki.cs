@@ -14,10 +14,10 @@ public class Skill_Sasaki : ISkill
         int steps = 30;
         float dur = 2f;
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = dur });
-        BuffData buff = new BuffData(BuffType.MoveSpeed, 0.3f, dur);
-        mySkill.SetParam(SkillParams.BuffData, buff);
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Modifier, paramValue = 0.3f });
+        mySkill.Enqueue(new Action_Player_MovespeedBuff());
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = dur });
         mySkill.Enqueue(new Action_Player_InvincibleBuff());
-        mySkill.Enqueue(new Action_Player_AddBuff());//
         for (int i = 0; i < steps; i++)
         {
             mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 1f });
@@ -40,8 +40,9 @@ public class Skill_Sasaki : ISkill
 
 
     public override void LoadInformation(SkillManager skm)
-    {skm.
-        cooltime = 4.75f;
+    {
+        skm.cooltime = 4.75f;
+        skm.maxStack = 1;
     }
 
 }

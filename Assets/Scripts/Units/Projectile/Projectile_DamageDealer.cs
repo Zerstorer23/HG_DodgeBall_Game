@@ -50,6 +50,9 @@ public class Projectile_DamageDealer : MonoBehaviourPun
             case DamageManifoldType.Timed:
                 duplicateDamageChecker = new DamageTimed();
                 break;
+            case DamageManifoldType.InAndOout:
+                duplicateDamageChecker = new DamageInAndOut();
+                break;
             default:
                 duplicateDamageChecker = new DamageOnce();
                 break;
@@ -119,7 +122,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     {
         string tag = collision.gameObject.tag;
         ContactPoint2D contact;        
-         // Debug.Log(gameObject.name + "Collision with " + collision.gameObject.name + " / tag " + tag);
+       // Debug.Log(gameObject.name + "Collision with " + collision.gameObject.name + " / tag " + tag);
         switch (tag)
         {
             case TAG_PLAYER:
@@ -131,13 +134,13 @@ public class Projectile_DamageDealer : MonoBehaviourPun
                 }
                 break;
             case TAG_PROJECTILE:
-                DoProjectileCollision(collision.gameObject);
+                bool damageGiven = DoProjectileCollision(collision.gameObject);
                 if (movement.reactionType == ReactionType.Bounce)
                 {
                     contact = collision.GetContact(0);
                     DoBounceCollision(contact, collision.gameObject.transform.position);
                 }
-                else if (movement.reactionType == ReactionType.Die)
+                else if (movement.reactionType == ReactionType.Die && damageGiven)
                 {
                     Projectile_DamageDealer targetdd = collision.gameObject.GetComponent<Projectile_DamageDealer>();
                     if (targetdd.isMapObject && myHealth.invincibleFromMapBullets) break;
@@ -154,6 +157,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
 
         }
     }
+
     bool CheckValidDamageEvaluation(HealthPoint otherHP) {
         if (isMapObject)
         {
@@ -166,12 +170,13 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         return true;
     }
     int hitCount = 0;
-    public void DoProjectileCollision(GameObject targetObj)
+    public bool DoProjectileCollision(GameObject targetObj)
     {
         HealthPoint otherHP = targetObj.GetComponent<HealthPoint>();
         TriggerHit(otherHP);
-        if (!CheckValidTeam(otherHP)) return;
+        if (!CheckValidTeam(otherHP)) return false;
         GiveDamage(otherHP);
+        return true;
     }
 
     public void DoPlayerCollision(GameObject targetObj)
@@ -180,7 +185,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         if(!CheckValidDamageEvaluation(otherHP)) return ;
         if (!CheckManifoldDamage(otherHP)) return;
         TriggerHit(otherHP);
-        if (!CheckValidTeam(otherHP)) return ;
+        if (!CheckValidTeam(otherHP)) return;
         ApplyBuff(otherHP);
         if (!givesDamage) return;
         GiveDamage(otherHP);
@@ -188,28 +193,45 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     bool CheckValidTeam(HealthPoint otherHP) {
         if (GameSession.gameModeInfo.isTeamGame)
         {
-            if (isMapObject) return true;//맵 ->아무거나 무조건 딜
-            if (otherHP.unitType == UnitType.Projectile)
+            if (isMapObject)
             {
-                if (otherHP.damageDealer.isMapObject) return true; //아무거나 -> 맵 무조건 딜
+                return true;//맵 ->아무거나 무조건 딜
+            }
+            if (otherHP.IsMapProjectile())
+            {
+                return true; //아무거나 -> 맵 무조건 딜
             }
             return (otherHP.myTeam != myHealth.myTeam); //그외 팀구분
+
         }
         else if (GameSession.gameModeInfo.isCoop)
         {
 
-            if (isMapObject) return true;//맵 ->아무거나 무조건 딜
-            if (otherHP.unitType == UnitType.Projectile)
+            if (isMapObject)
             {
-                if (otherHP.damageDealer.isMapObject) return true; //아무거나 -> 맵 무조건 딜
+                return true;//맵 ->아무거나 무조건 딜
             }
-            return false;
+            else
+            {
+                return otherHP.IsMapProjectile();//아무거나 -> 맵 무조건 딜
+            }
+
 
         }
-        else if (!isMapObject) {
-            return pv.Owner.UserId != otherHP.pv.Owner.UserId;
+        else if (!isMapObject)
+        {
+            if (otherHP.IsMapProjectile())
+            {
+                return true;
+            }
+            else
+            {
+                return pv.Owner.UserId != otherHP.pv.Owner.UserId;
+            }
         }
-        return true;
+        else {
+            return true;
+        }
     }
     bool CheckManifoldDamage(HealthPoint otherHP) {
         if (!givesDamage) return true;
@@ -233,7 +255,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     void DoBounceCollision(ContactPoint2D contact, Vector3 collisionPoint)
     {
         if (movement == null) return;
-        movement.Bounce2(contact, collisionPoint); 
+        movement.Bounce(contact, collisionPoint); 
     }
 
     private void GiveDamage(HealthPoint otherHP)
@@ -248,14 +270,14 @@ public class Projectile_DamageDealer : MonoBehaviourPun
             if (isMapObject) myHealth.Kill_Immediate();
         }
         else if(canKillBullet){
-            if (otherHP.damageDealer.isMapObject )
+
+            if (otherHP.IsMapProjectile())
             {
-//                Debug.Log("Damage Map Proj");
                 otherHP.Kill_Immediate();
             }
             if (movement.reactionType == ReactionType.Die)
             {
-                if (otherHP.damageDealer.isMapObject && myHealth.invincibleFromMapBullets) return;
+                if (otherHP.IsMapProjectile() && myHealth.invincibleFromMapBullets) return;
                 myHealth.Kill_Immediate();
             }
         }

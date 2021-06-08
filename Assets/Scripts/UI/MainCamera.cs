@@ -78,9 +78,15 @@ public class MainCamera : MonoBehaviour
     private void ChangeSpectator()
     {
         if (!instance.isFocusedField || UI_ChatBox.isSelected) return;
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Joystick1Button5) || Input.GetKeyDown(KeyCode.Joystick1Button7))
+        if (!GameSession.gameStarted) return;
+        if (Input.GetKeyDown(KeyCode.Space) 
+            || Input.GetKeyDown(KeyCode.Joystick1Button5) 
+            || Input.GetKeyDown(KeyCode.Joystick1Button7)
+            || (Application.platform == RuntimePlatform.Android && UI_TouchPanel.isTouching)
+            )
         {
             FocusOnAlivePlayer();
+            UI_TouchPanel.isTouching = false;
         }
     }
    public void FocusOnAlivePlayer() {

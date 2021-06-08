@@ -52,7 +52,7 @@ public class GameOverManager : MonoBehaviour
         SetWinnerInfo();
         SetScoreInfo();
         SetGameInfo();
-        CheckGoogleEvents();
+       GameSession.instance.StartCoroutine(CheckGoogleEvents());
     }
     private void FixedUpdate()
     {
@@ -80,15 +80,24 @@ public class GameOverManager : MonoBehaviour
 
     private void SetGameInfo()
     {
-        float gameTime =(float) (PhotonNetwork.Time - UI_Timer.startTime);
+        float gameTime = (float)(PhotonNetwork.Time - UI_Timer.startTime);
         miniWinnerName.text = string.Format("{0}초", gameTime.ToString("0.0"));
-        if (GameSession.gameModeInfo.gameMode == GameMode.PVE) { 
+        if (GameSession.gameModeInfo.gameMode == GameMode.PVE)
+        {
             float prevScore = PlayerPrefs.GetFloat(ConstantStrings.PREFS_TIME_RECORD, 0f);
             GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_pve_time, (int)gameTime);
-            if (gameTime > prevScore) {
+            if (gameTime > prevScore)
+            {
                 miniWinnerName.text = string.Format("<color=#ff00ff>[신기록]{0}초</color>", gameTime.ToString("0.0"));
-                PlayerPrefs.SetFloat(ConstantStrings.PREFS_TIME_RECORD, prevScore);
-                PlayerPrefs.Save();
+                try
+                {
+                    PlayerPrefs.SetFloat(ConstantStrings.PREFS_TIME_RECORD, prevScore);
+                    PlayerPrefs.Save();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning(e.Message);
+                }
             }
         }
     }
@@ -130,7 +139,7 @@ public class GameOverManager : MonoBehaviour
             winnerImage.sprite = ConfigsManager.unitDictionary[character].portraitImage;
             if (GameSession.gameModeInfo.isTeamGame)
             {
-                if (!finalWinner.CustomProperties.ContainsKey("TEAM")) return ;
+                if (!finalWinner.CustomProperties.ContainsKey("TEAM")) return;
                 Team winnerTeam = (Team)finalWinner.CustomProperties["TEAM"];
                 winnerName.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[winnerTeam == Team.HOME ? 0 : 1]);
                 winnerName.text = string.Format("{0}님의 {1}팀", finalWinner.NickName, ConstantStrings.team_name[winnerTeam == Team.HOME ? 0 : 1]);
@@ -146,21 +155,18 @@ public class GameOverManager : MonoBehaviour
         }
     }
 
-    private void CheckGoogleEvents()
+    private IEnumerator CheckGoogleEvents()
     {
-        if (Application.platform != RuntimePlatform.Android) return;
+        if (Application.platform != RuntimePlatform.Android) yield break;
+#if UNITY_ANDROID
         string localID = PhotonNetwork.LocalPlayer.UserId;
         int kills = StatisticsManager.GetStat(StatTypes.KILL, localID);
         int evades = StatisticsManager.GetStat(StatTypes.EVADE, localID);
-        GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_evasions, evades);
-        GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_kills, kills);
-        GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_highest_score, StatisticsManager.GetStat(StatTypes.SCORE, localID));
-        GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_kills, kills);
-        GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_evades, evades);
-        CharacterType characterType = GameSession.GetPlayerCharacter(PhotonNetwork.LocalPlayer);
+        float highestScore = StatisticsManager.GetStat(StatTypes.SCORE, localID);
         string killStatID = null;
         string pickStatID = null;
         string winID = null;
+        CharacterType characterType = GameSession.GetPlayerCharacter(PhotonNetwork.LocalPlayer);
         switch (characterType)
         {
             case CharacterType.NAGATO:
@@ -203,10 +209,10 @@ public class GameOverManager : MonoBehaviour
                 pickStatID = GPGSIds.event_kimidori_pick;
                 winID = GPGSIds.achievement_kimidori_win;
                 break;
-/*            case CharacterType.KYONMOUTO:
-                killStatID = GPGSIds.event_haruhi_kill;
-                pickStatID = GPGSIds.event_haruhi_picks;
-                break;*/
+            /*            case CharacterType.KYONMOUTO:
+                            killStatID = GPGSIds.event_haruhi_kill;
+                            pickStatID = GPGSIds.event_haruhi_picks;
+                            break;*/
             case CharacterType.SASAKI:
                 killStatID = GPGSIds.event_sasaki_kill;
                 pickStatID = GPGSIds.event_sasaki_pick;
@@ -228,12 +234,28 @@ public class GameOverManager : MonoBehaviour
                 winID = GPGSIds.achievement_yasumi_win;
                 break;
         }
-        GooglePlayManager.IncrementEvent(killStatID, (uint)kills);
-        GooglePlayManager.IncrementEvent(pickStatID, 1);
-        if (finalWinner == PhotonNetwork.LocalPlayer) {
-            GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_wins, 1);
-            GooglePlayManager.IncrementAchievement(winID, 1);
+        if (killStatID != null) {
+
+            GooglePlayManager.IncrementEvent(killStatID, (uint)kills);
+            GooglePlayManager.IncrementEvent(pickStatID, 1);
+            yield return new WaitForSeconds(1f);
         }
+        GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_evasions, evades);
+        GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_kills, kills);
+        GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_highest_score, (int)highestScore);
+        yield return new WaitForSeconds(1f);
+        GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_kills, kills);
+        GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_evades, evades);
+        yield return new WaitForSeconds(1f);
+
+        if (finalWinner == PhotonNetwork.LocalPlayer)
+        {
+            GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_wins, 1);
+            if (winID != null) {
+                GooglePlayManager.IncrementAchievement(winID, 1);
+            }
+        }
+#endif
     }
 
 

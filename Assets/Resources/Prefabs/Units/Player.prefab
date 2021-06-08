@@ -463,9 +463,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2236413501766678058}
   - component: {fileID: 7455750648413273146}
-  - component: {fileID: 6345076886338924400}
   - component: {fileID: 8584891622143897514}
-  m_Layer: 13
+  m_Layer: 0
   m_Name: ProjFinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -481,7 +480,7 @@ Transform:
   m_GameObject: {fileID: 3342820050254000494}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 1}
   m_Children: []
   m_Father: {fileID: 7017979528946714355}
   m_RootOrder: 0
@@ -499,22 +498,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 8822352236447964824}
---- !u!58 &6345076886338924400
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3342820050254000494}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 1
 --- !u!212 &8584891622143897514
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1775,6 +1758,7 @@ GameObject:
   - component: {fileID: 8822352236447964827}
   - component: {fileID: 8822352236447964824}
   - component: {fileID: 8822352236447964825}
+  - component: {fileID: -3821255807145872986}
   - component: {fileID: 8822352236447964830}
   - component: {fileID: 8092163232600007844}
   - component: {fileID: 831789703712551272}
@@ -1837,6 +1821,7 @@ MonoBehaviour:
   fieldNo: 0
   characterBodymanager: {fileID: 1743256954223984165}
   evasion: 0
+  isBot: 0
   mainSprite: {fileID: 0}
 --- !u!114 &8822352236447964825
 MonoBehaviour:
@@ -1851,13 +1836,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
+  aimAngle: 0
   oldPosition: {x: 0, y: 0, z: 0}
-  directionIndicator: {fileID: 3604318559537782419}
   autoDriver: {fileID: 5419062539944228608}
+  directionIndicator: {fileID: 3604318559537782419}
   lastChangeToggle: 0
   networkExpectedTime: 0
   networkPos: {x: 0, y: 0, z: 0}
   lastSendTime: 0
+--- !u!114 &-3821255807145872986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8822352236447964826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91621d2571ae9834eb30af642c416f15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight:
+  - 0
+  - 0
+  direction:
+  - {x: 0.000000010604986, y: 0.00000066455965, z: 6.646502e+22}
+  - {x: 0.00000016691128, y: 6.525965e-10, z: 0.00000016987316}
+  - {x: 0.0000000026249833, y: 0.00000066086375, z: -7.621816e-26}
 --- !u!95 &8822352236447964830
 Animator:
   serializedVersion: 3

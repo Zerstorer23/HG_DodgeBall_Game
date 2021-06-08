@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,7 +23,7 @@ public class GameSession : MonoBehaviourPun
 
     private static GameSession prGameSession;
 
-    public static GameModeConfig gameModeInfo ;
+    public static GameModeConfig gameModeInfo;
     public static int LocalPlayer_FieldNumber = -1;
     PhotonView pv;
 
@@ -71,7 +72,7 @@ public class GameSession : MonoBehaviourPun
 
         pv = GetComponent<PhotonView>();
         configsManager = GetComponent<ConfigsManager>();
-        versionText.text = versionCode+" 버전";
+        versionText.text = versionCode + " 버전";
         EventManager.StartListening(MyEvents.EVENT_GAME_STARTED, OnGameStarted);
         EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
     }
@@ -137,6 +138,12 @@ public class GameSession : MonoBehaviourPun
         //PhotonNetwork.RemoveRPCs(PhotonNetwork.LocalPlayer);
         PhotonNetwork.LeaveRoom();
     }
+    public static IEnumerator CheckCoroutine(IEnumerator routine, IEnumerator newRoutine) {
+        if (routine != null) {
+            instance.StopCoroutine(routine);
+        }
+        return newRoutine;
+    }
     public static CharacterType GetPlayerCharacter(Player player)
     {
         if (!player.CustomProperties.ContainsKey("CHARACTER")) return CharacterType.NONE;
@@ -154,13 +161,21 @@ public class GameSession : MonoBehaviourPun
             if (!GooglePlayManager.loggedIn) return;
             if (paused)
             {
+
                 Application.Quit();
             }
         }
     }
     private void OnApplicationQuit()
     {
-        PlayerPrefs.Save();
+        try
+        {
+
+            PlayerPrefs.Save();
+        }
+        catch (Exception e) {
+            Debug.LogWarning(e.Message);
+        }
     }
 
 }

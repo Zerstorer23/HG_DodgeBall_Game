@@ -29,12 +29,13 @@ public class GameFieldManager : MonoBehaviourPun
     public double incrementEverySeconds = 4d;
 
     public static PhotonView pv;
+    public static List<GameField> gameFields = new List<GameField>();
+    public bool gameFinished = false;
     internal static bool CheckSuddenDeathCalled(int fieldNo)
     {
         return gameFields[fieldNo].suddenDeathCalled;
     }
 
-    public static List<GameField> gameFields = new List<GameField>();
 
     internal static int GetRemainingPlayerNumber()
     {
@@ -47,7 +48,7 @@ public class GameFieldManager : MonoBehaviourPun
         EventManager.StartListening(MyEvents.EVENT_GAME_STARTED, OnGameStartRequested);
         pv = GetComponent<PhotonView>();
     }
-
+    
     public static void AddGlobalPlayer(string id, Unit_Player go)
     {
         if (totalUnitsDictionary.ContainsKey(id))
@@ -90,8 +91,7 @@ public class GameFieldManager : MonoBehaviourPun
         }
     }
     public static void SetGameMap(GameMode mode) {
-        gameFields = new List<GameField>();
-        Debug.Log("Received game map " + mode);
+        gameFields.Clear();
         int numRooms = PhotonNetwork.CurrentRoom.PlayerCount + 2;
         switch (mode)
         {
@@ -115,12 +115,14 @@ public class GameFieldManager : MonoBehaviourPun
     }
     private void OnGameStartRequested(EventObject arg0)
     {
+        gameFinished = false;
         StartGame();
     }
-    public List<Player> survivors;
+    public List<Player> survivors = new List<Player>();
     [PunRPC]
     public void NotifyFieldWinner(int fieldNo, Player winner)
     {
+        Debug.Log(fieldNo+" Received notifty field winner " + winner);
         GameField field = gameFields[fieldNo];
         if (field.gameFieldFinished) return;
         field.gameFieldFinished = true;
@@ -133,20 +135,20 @@ public class GameFieldManager : MonoBehaviourPun
     }
     internal static void CheckGameFinished()
     {
-        instance.survivors = new List<Player>();
-        bool finished = instance.CheckOtherFields(instance.survivors);
-        if (!finished) return;
+        instance.survivors.Clear();
+        instance.gameFinished = instance.CheckOtherFields(instance.survivors);
+        if (!instance.gameFinished) return;
         Debug.Log("Found Survivor " + instance.survivors.Count);
         //All Field Finished
         if (instance.survivors.Count >= 2)
         {
-
             instance.StartCoroutine(instance.WaitAndContinueTournament(instance.survivors));
             //Proceed Tournament
         }
         else
         {
-            FinishTheGame(instance.survivors);
+            Player winner = (instance.survivors.Count > 0) ? instance.survivors[0] : null;
+            FinishTheGame(winner);
         }
     }
     bool CheckOtherFields(List<Player> survivors) {
@@ -165,14 +167,26 @@ public class GameFieldManager : MonoBehaviourPun
         }
         return true;
     }
-    private static void FinishTheGame(List<Player> survivors)
+    internal static void QueryGameFinished()
+    {
+        for (int i = 0; i < instance.numActiveFields; i++)
+        {
+            bool finished  = gameFields[i].QueryFieldFinish();
+            if (!finished) return;
+        }
+        instance.gameFinished = true;
+        //All Field Finished
+        Debug.LogWarning("Error game ");
+        ChatManager.SendNotificationMessage("게임 에러");
+        FinishTheGame(null);
+    }
+    private static void FinishTheGame(Player winner)
     {
         if (PhotonNetwork.IsMasterClient)
         {
             GameSession.PushRoomASetting(ConstantStrings.HASH_GAME_STARTED, false);
         }
-        Player survivor = (survivors.Count > 0) ? survivors[0] : null;
-        GameSession.GetInst().gameOverManager.SetPanel(survivor);//이거 먼저 호출하고 팝업하세요
+        GameSession.GetInst().gameOverManager.SetPanel(winner);//이거 먼저 호출하고 팝업하세요
         EventManager.TriggerEvent(MyEvents.EVENT_GAME_FINISHED, null);
         EventManager.TriggerEvent(MyEvents.EVENT_POP_UP_PANEL, new EventObject() { objData = ScreenType.GameOver, boolObj = true });
     }
@@ -210,6 +224,23 @@ public class GameFieldManager : MonoBehaviourPun
             }
         }
         CheckGoogleEvents();
+        if(GameSession.gameModeInfo.gameMode == GameMode.Tournament) {
+            tournamentRoutine = GameSession.CheckCoroutine(tournamentRoutine, TournamentGameChecker());
+            StartCoroutine(tournamentRoutine);
+        }
+    }
+
+    IEnumerator tournamentRoutine;
+    IEnumerator TournamentGameChecker() {
+        yield return new WaitForSeconds(5f);
+        while (!instance.gameFinished) {
+            if (PhotonNetwork.IsMasterClient) {
+                Debug.LogWarning("Check game end ....");
+                QueryGameFinished();
+            }
+            yield return new WaitForSeconds(2f);
+        }
+
     }
 
     private void CheckGoogleEvents()
@@ -291,7 +322,7 @@ public class GameFieldManager : MonoBehaviourPun
         int iteration = 0;
         List<string> namelist = new List<string>(totalUnitsDictionary.Keys);
         if (GameSession.gameModeInfo.useDesolator) {
-          if(gameFields[0].desolator!=null)  namelist.Add("DESOLATOR");
+          if(gameFields[0].playerSpawner.desolator!=null)  namelist.Add("DESOLATOR");
         }
         while (iteration < namelist.Count)
         {
@@ -300,7 +331,7 @@ public class GameFieldManager : MonoBehaviourPun
             instance.playerIterator %= namelist.Count;
             string name = namelist[instance.playerIterator];
             if (name == "DESOLATOR") {
-                return gameFields[0].desolator.gameObject;
+                return gameFields[0].playerSpawner.desolator.gameObject;
             }
             Unit_Player p = totalUnitsDictionary[name];
             if (p != null && p.gameObject.activeInHierarchy)
@@ -321,10 +352,5 @@ public class GameFieldManager : MonoBehaviourPun
         MainCamera.FocusOnField(true);
        // MainCamera.instance.FocusOnAlivePlayer();
     }
-    /*    public static Player GetPlayerByID(string id) {
-            if (totalUnitsDictionary.ContainsKey(id)) {
-                return instance.totalPlayersDictionary[id];
-            }
-            return null;
-        }*/
+
 }

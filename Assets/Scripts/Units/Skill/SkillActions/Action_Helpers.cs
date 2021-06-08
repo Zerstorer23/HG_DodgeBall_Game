@@ -12,6 +12,29 @@ public class Action_SetParameter : SkillAction
         return 0f;
     }
 }
+public class Action_ModifyParameter_Vector3Multiply : SkillAction
+{
+
+    public override float Activate()
+    {
+        Vector3 value = parent.GetParam<Vector3>(paramType);
+        value *= (float)paramValue;
+        parent.SetParam(paramType, value);
+        return 0f;
+    }
+}
+public class Action_ModifyParameter_floatMultiply : SkillAction
+{
+
+    public override float Activate()
+    {
+        float value = parent.GetParam<float>(paramType);
+        value *= (float)paramValue;
+        parent.SetParam(paramType, value);
+        return 0f;
+    }
+}
+
 public class Action_SetAngle : SkillAction
 {
 

@@ -35,6 +35,7 @@ public class Skill_Asakura : ISkill
     public override void LoadInformation(SkillManager skm)
     {
         skm.cooltime = 4f;
+        skm.maxStack = 1;
     }
 
 

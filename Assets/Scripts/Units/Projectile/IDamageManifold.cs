@@ -7,27 +7,37 @@ public interface IDamageManifold
 {
     bool FindAttackHistory(int tid);
     bool CheckDuplicateDamage(int tid);
+    bool RemoveAttackHistory(int tid);
     void Reset();
 }
 public class DamageQueue : IDamageManifold
 {
-    List<int> damageRecords = new List<int>();
+    Queue<int> damageRecords = new Queue<int>();
     public bool CheckDuplicateDamage(int tid)
     {
-        if (damageRecords.Count > 0 && damageRecords[damageRecords.Count-1] == tid)
+        if (damageRecords.Count > 0 && damageRecords.Peek() == tid)
         {
             return false;
         }
         else
         {
-            damageRecords.Add(tid);
+            damageRecords.Enqueue(tid);
             return true;
         }
     }
 
     public bool FindAttackHistory(int tid)
     {
-        return (damageRecords.Count > 0 && damageRecords.Contains(tid));
+        return damageRecords.Contains(tid);
+    }
+
+    public bool RemoveAttackHistory(int tid)
+    {
+        while (damageRecords.Count > 0 && damageRecords.Peek() == tid)
+        {
+            damageRecords.Dequeue();
+        }
+        return false;
     }
 
     public void Reset()
@@ -56,6 +66,15 @@ public class DamageOnce : IDamageManifold
         return damageRecords.Contains(tid);
     }
 
+    public bool RemoveAttackHistory(int tid)
+    {
+        if (damageRecords.Contains(tid)) {
+            damageRecords.Remove(tid);
+            return true;
+        }
+        return false;
+    }
+
     public void Reset()
     {
         damageRecords.Clear();
@@ -68,6 +87,16 @@ public class DamageTimed : IDamageManifold
     public bool FindAttackHistory(int tid)
     {
         return damageRecords.ContainsKey(tid);
+    }
+
+    public bool RemoveAttackHistory(int tid)
+    {
+        if (damageRecords.ContainsKey(tid))
+        {
+            damageRecords.Remove(tid);
+            return true;
+        }
+        return false;
     }
 
     bool IDamageManifold.CheckDuplicateDamage(int tid)
@@ -93,9 +122,13 @@ public class DamageTimed : IDamageManifold
         damageRecords.Clear();
     }
 }
-/*public class DamageInAndOut: IDamageManifold
+public class DamageInAndOut: IDamageManifold
 {
     HashSet<int> damageRecords = new HashSet<int>();
+    public bool FindAttackHistory(int tid)
+    {
+        return damageRecords.Contains(tid);
+    }
     public bool CheckDuplicateDamage(int tid)
     {
         if (damageRecords.Contains(tid))
@@ -113,9 +146,18 @@ public class DamageTimed : IDamageManifold
     {
         damageRecords.Clear();
     }
-}*/
+
+    public bool RemoveAttackHistory(int tid)
+    {
+        if (damageRecords.Contains(tid))
+        {
+            damageRecords.Remove(tid);
+            return true;
+        }
+        return false;
+    }
+}
 public enum DamageManifoldType
 {
-    Once, Queue, Timed
-        //,InAndOout
+    Once, Queue, Timed,InAndOout
 }

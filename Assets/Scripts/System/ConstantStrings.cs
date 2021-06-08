@@ -15,6 +15,7 @@ public class ConstantStrings : MonoBehaviour
     public const string PREFAB_BULLET_NAGATO = "Prefabs/Projectiles/Bullet_nagato";
     public const string PREFAB_BULLET_SASAKI = "Prefabs/Projectiles/Bullet_sasaki";
     public const string PREFAB_BULLET_HARUHI = "Prefabs/Projectiles/Bullet_haruhi";
+    public const string PREFAB_BULLET_MORI = "Prefabs/Projectiles/Bullet_mori";
     public const string PREFAB_BULLET_MIKURU = "Prefabs/Projectiles/Bullet_mikuru";
     public const string PREFAB_BULLET_KOIZUMI = "Prefabs/Projectiles/Bullet_koizumi";
     public const string PREFAB_BULLET_KYOUKO = "Prefabs/Projectiles/Bullet_kyouko";
@@ -36,6 +37,8 @@ public class ConstantStrings : MonoBehaviour
     public const string TAG_BOX_OBSTACLE = "BoxObstacle";
     public const string TAG_BUFF_OBJECT = "BuffObject";
     public const string TAG_WALL = "Wall";
+    public const string TAG_CONVEYER_BELT = "ConveryerBelt";
+    public const string TAG_TELEPORTER = "Teleporter";
 
 
     public const string HASH_MAP_DIFF = "MapDifficulty";

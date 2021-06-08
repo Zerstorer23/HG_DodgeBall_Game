@@ -18,7 +18,7 @@ public class Action_InstantiateBullet : SkillAction
             );
         parent.spawnedObject = obj;
         // Debug.Log("instantiate " + obj);
-        parent.pv = parent.spawnedObject.GetComponent<PhotonView>();
+        parent.projectilePV = parent.spawnedObject.GetComponent<PhotonView>();
 
      //   parent.pv.RPC("SetParentTransform", RpcTarget.AllBuffered);
        // parent.pv.RPC("SetOwnerPlayer", RpcTarget.AllBuffered, fieldNumber, parent.casterPV.Owner.UserId);
@@ -34,15 +34,17 @@ public class Action_InstantiateBullet_FollowPlayer : SkillAction
     public override float Activate()
     {
         int fieldNumber = parent.castingPlayer.fieldNo;
+        float angle = parent.caster.GetComponent<Unit_Movement>().GetAim();
+        Quaternion rotation = Quaternion.Euler(0, 0, angle);
         GameObject obj = PhotonNetwork.Instantiate(
             GetParam<string>(SkillParams.PrefabName),
             parent.caster.transform.position,
-            parent.caster.transform.rotation, 0
+            rotation, 0
             , new object[] { fieldNumber, parent.casterPV.Owner.UserId, true
             }
             );
         parent.spawnedObject = obj;
-        parent.pv = parent.spawnedObject.GetComponent<PhotonView>();
+        parent.projectilePV = parent.spawnedObject.GetComponent<PhotonView>();
 
 
         return 0f;
@@ -57,12 +59,29 @@ public class Action_InstantiateBulletAt : SkillAction
         int fieldNumber = parent.castingPlayer.fieldNo;
         Vector3 pos = GetParam<Vector3>(SkillParams.Vector3);
         Quaternion angle = GetParam<Quaternion>(SkillParams.Quarternion);
-
+    
         GameObject obj = PhotonNetwork.Instantiate(
           GetParam<string>(SkillParams.PrefabName), pos, angle, 0
             , new object[] { fieldNumber, parent.casterPV.Owner.UserId, false });
         parent.spawnedObject = obj;
-        parent.pv = parent.spawnedObject.GetComponent<PhotonView>();
+        parent.projectilePV = parent.spawnedObject.GetComponent<PhotonView>();
+        return 0;
+    }
+}
+public class Action_InstantiateBulletAt_Mikuru : SkillAction
+{
+
+    public override float Activate()
+    {
+
+        int fieldNumber = parent.castingPlayer.fieldNo;
+        Vector3 pos = GetParam<Vector3>(SkillParams.Vector3);
+        Quaternion angle = GetParam<Quaternion>(SkillParams.Quarternion);
+            GameObject obj = PhotonNetwork.Instantiate(
+              GetParam<string>(SkillParams.PrefabName), pos, angle, 0
+                , new object[] { fieldNumber, parent.casterPV.Owner.UserId, false,PhotonNetwork.Time + ((double)PhotonNetwork.GetPing()/1000)});
+        parent.spawnedObject = obj;
+        parent.projectilePV = parent.spawnedObject.GetComponent<PhotonView>();
         return 0;
     }
 }
@@ -72,7 +91,7 @@ public class Action_Projectile_ResetAngle : SkillAction
 
     public override float Activate()
     {
-        parent.pv.RPC("ResetRotation", RpcTarget.AllBuffered);
+        parent.projectilePV.RPC("ResetRotation", RpcTarget.AllBuffered);
         return 0;
     }
 
@@ -86,6 +105,18 @@ public class Action_GetCurrentPlayerPosition : SkillAction
         parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, angle));
         parent.SetParam(SkillParams.EulerAngle, angle);
         parent.SetParam(SkillParams.Vector3, parent.caster.transform.position);
+        return 0;
+    }
+}
+public class Action_Player_GetAim : SkillAction
+{
+
+    public override float Activate()
+    {
+        float angle = parent.caster.GetComponent<Unit_Movement>().GetAim();
+        parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, angle));
+        parent.SetParam(SkillParams.EulerAngle, angle);
+        parent.SetParam(SkillParams.Vector3, ConstantStrings.GetAngledVector(angle,1f));
         return 0;
     }
 }

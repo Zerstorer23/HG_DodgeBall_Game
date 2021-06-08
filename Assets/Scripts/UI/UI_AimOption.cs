@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,7 +16,13 @@ public class UI_AimOption : MonoBehaviour
     }
     public void OnToggleChanged() {
         aimManual = toggle.isOn;
+        try { 
         PlayerPrefs.SetInt(ConstantStrings.PREFS_MANUAL_AIM, (aimManual) ? 1 : 0);
         PlayerPrefs.Save();
+    }  
+        catch (Exception e)
+            {
+                Debug.LogWarning(e.Message);
+            }
     }
 }

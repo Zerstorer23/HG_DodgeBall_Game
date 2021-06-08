@@ -33,5 +33,6 @@ public class Skill_Haruhi : ISkill
     public override void LoadInformation(SkillManager skm)
     {
         skm.cooltime = 3.3f;
+        skm.maxStack = 1;
     }
 }

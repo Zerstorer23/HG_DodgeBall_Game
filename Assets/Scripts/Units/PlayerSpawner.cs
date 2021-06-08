@@ -12,6 +12,7 @@ public class PlayerSpawner : MonoBehaviour
     internal SortedDictionary<string, Player> playersOnMap = new SortedDictionary<string, Player>();
     int maxLives = 1;
     CharacterType myCharacter = CharacterType.NONE;
+    public Unit_SharedMovement desolator;
     [SerializeField] GameField gameField;
 
 
@@ -31,7 +32,18 @@ public class PlayerSpawner : MonoBehaviour
     public void StartEngine()
     {
         SpawnLocalPlayer();
+       // SpawnBots();
         SpawnDesolator();
+    }
+
+    private void SpawnBots()
+    {
+        if (!GameSession.instance.devMode) return;
+        for (int i = 0; i < 3; i++) {
+            CharacterType botCharacter = ConfigsManager.GetRandomCharacter();
+            Vector3 spawnPos = gameField.GetRandomPosition(1); 
+            PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0, new object[] { botCharacter, maxLives, gameField.fieldNo, true });
+        }
     }
 
     private void SpawnDesolator()
@@ -77,7 +89,7 @@ public class PlayerSpawner : MonoBehaviour
     public void SpawnPlayer()
     {
         Vector3 spawnPos = GetAdjustedPosition();
-        PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0, new object[] { myCharacter, maxLives, gameField.fieldNo });
+        PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0, new object[] { myCharacter, maxLives, gameField.fieldNo,false });
     }
 
 
@@ -138,7 +150,11 @@ public class PlayerSpawner : MonoBehaviour
         Player lastDiedPlayer = playersOnMap[eo.stringObj];
         unitsOnMap[eo.stringObj] = null;
         playersOnMap[eo.stringObj] = null;
-        gameField.AddController(eo.stringObj);
+        if (desolator != null)
+        {
+            desolator.AddController(eo.stringObj);
+        }
+
      //   Debug.Log(gameField.fieldNo + ": null the player " + eo.stringObj);
         GameFieldManager.RemoveDeadPlayer(eo.stringObj);
         GameStatus stat = new GameStatus(unitsOnMap , lastDiedPlayer);//마지막 1인은 남아있어야함

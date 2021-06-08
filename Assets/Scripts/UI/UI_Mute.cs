@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,8 +24,14 @@ public class UI_Mute : MonoBehaviour
 
     public void OnToggleChanged() {
         int on = (muteTogle.isOn)? 1: 0;
+        try { 
         PlayerPrefs.SetInt(ConstantStrings.PREFS_MUTED, on);
         PlayerPrefs.Save();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning(e.Message);
+        }
         SetAudio();
     }
     public void SetAudio() {

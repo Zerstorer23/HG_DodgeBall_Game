@@ -113,7 +113,7 @@ MonoBehaviour:
   networkPos: {x: 0, y: 0, z: 0}
   networkQuaternion: {x: 0, y: 0, z: 0, w: 0}
   syncRotation: 1
-  syncType: 0
+  syncType: 1
   syncPeriod: 1
 --- !u!114 &-8895642817908627982
 MonoBehaviour:

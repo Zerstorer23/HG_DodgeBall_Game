@@ -14,9 +14,9 @@ public class Skill_T : ISkill
     {
         ActionSet mySkill = new ActionSet(skm);
         float searchRange = 5f;
-        float rotateSpeed = 130f; // 180
+        float rotateSpeed = 180f; // 180
 
-        mySkill.SetParam(SkillParams.MoveSpeed, 12f); //15
+        mySkill.SetParam(SkillParams.MoveSpeed, 13f); //15
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_T);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.Bounce);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition_AngledOffset());

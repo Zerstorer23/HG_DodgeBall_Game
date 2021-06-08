@@ -12,7 +12,7 @@ public class ActionSet
     internal Unit_Player castingPlayer;
 
     //Cache
-    internal PhotonView pv,casterPV; 
+    internal PhotonView projectilePV,casterPV; 
 
     //GameObject
     internal UnityEngine.GameObject spawnedObject;

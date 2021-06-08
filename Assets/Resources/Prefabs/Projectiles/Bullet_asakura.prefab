@@ -110,7 +110,7 @@ MonoBehaviour:
   networkQuaternion: {x: 0, y: 0, z: 0, w: 0}
   syncRotation: 1
   syncType: 1
-  syncPeriod: 1
+  syncPeriod: 0.1
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,6 +148,7 @@ MonoBehaviour:
   givesDamage: 1
   customBuffs: []
   myCollider: {fileID: 0}
+  damageManifold: 0
 --- !u!114 &4556413170392631494
 MonoBehaviour:
   m_ObjectHideFlags: 0

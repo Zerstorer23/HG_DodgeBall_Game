@@ -27,8 +27,8 @@ public class Skill_Yasumi : ISkill
     }
 
     public override void LoadInformation(SkillManager skm)
-    {skm.
-        cooltime = 5f;
+    {
+        skm.cooltime = 5f;
     }
 
   

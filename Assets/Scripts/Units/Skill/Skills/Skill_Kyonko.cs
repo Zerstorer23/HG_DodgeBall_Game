@@ -29,7 +29,7 @@ public class Skill_Kyonko : ISkill
     }
     SkillManager original;
 
-/*    public override void OnMyProjectileHit(EventObject eo)
+    public override void OnMyProjectileHit(EventObject eo)
     {
         HealthPoint targetHP = eo.hitHealthPoint;
         if (targetHP.unitType != UnitType.Player) return;
@@ -38,7 +38,8 @@ public class Skill_Kyonko : ISkill
         obtainedSkill = targetHP.unitPlayer.skillManager.mySkill;
         original.maxStack = 1;
         obtainedSkill.LoadInformation(original);
-    }*/
+    }
+    /*
     public override void OnPlayerKilledPlayer(EventObject eo)
     {
         HealthPoint targetHP = eo.hitHealthPoint;
@@ -48,7 +49,7 @@ public class Skill_Kyonko : ISkill
         obtainedSkill = targetHP.unitPlayer.skillManager.mySkill;
         original.maxStack = 1;
         obtainedSkill.LoadInformation(original);
-    }
+    }*/
     public ActionSet GetKyonkoSet(SkillManager skm) {
         ActionSet mySkill = new ActionSet(skm);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KYONKO);

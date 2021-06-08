@@ -141,7 +141,7 @@ public class UI_MapOptions : MonoBehaviourPun
         hash.Add(HASH_GAME_MODE, GameMode.PVP);
         hash.Add(HASH_GAME_STARTED, false);
         hash.Add(HASH_GAME_AUTO, false);
-        hash.Add(HASH_ROOM_RANDOM_SEED, UnityEngine.Random.Range(0,7));
+        hash.Add(HASH_ROOM_RANDOM_SEED, UnityEngine.Random.Range(0,133));
         return hash;
     }
     public void PushRoomSettings()

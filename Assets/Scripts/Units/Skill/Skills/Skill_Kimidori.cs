@@ -24,8 +24,8 @@ public class Skill_Kimidori : ISkill
 
     public override void LoadInformation(SkillManager skm)
     {
-        skm.
-           cooltime = 2f;
+        skm.cooltime = 1.8f;
+        skm.maxStack = 1;
     }
 
 

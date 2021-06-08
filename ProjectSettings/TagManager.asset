@@ -9,6 +9,8 @@ TagManager:
   - Projectile
   - BuffObject
   - Wall
+  - ConveryerBelt
+  - Teleporter
   layers:
   - Default
   - TransparentFX
@@ -26,8 +28,8 @@ TagManager:
   - ProjectileDestroyer
   - BuffObject
   - Wall
-  - 
-  - 
+  - ConveryerBelt
+  - Teleporter
   - 
   - 
   - 

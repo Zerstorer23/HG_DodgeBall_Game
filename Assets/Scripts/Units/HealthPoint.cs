@@ -24,7 +24,6 @@ public class HealthPoint : MonoBehaviourPun
     internal Component movement;
     internal Team myTeam = Team.HOME;
     public int associatedField = 0;
-    bool isMapObject = false;
 
     public string killerUID=null;
 
@@ -34,7 +33,6 @@ public class HealthPoint : MonoBehaviourPun
         buffManager = GetComponent<BuffManager>();
         unitPlayer = GetComponent<Unit_Player>();
         damageDealer = GetComponent<Projectile_DamageDealer>();
-        if (damageDealer != null) isMapObject = damageDealer.isMapObject;
         if (unitType == UnitType.Player)
         {
             movement = GetComponent<Unit_Movement>();
@@ -243,7 +241,11 @@ public class HealthPoint : MonoBehaviourPun
     {
         currentLife += a;
     }
-
+    public bool IsMapProjectile() {
+        if (unitType != UnitType.Projectile) return false;
+        if (damageDealer == null) return false;
+        return damageDealer.isMapObject;
+    }
 
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

@@ -88,19 +88,33 @@ public class StatisticsManager : MonoBehaviourPun
         }
     }
     public  void LoadMyStats() {
-
+        try { 
         int kills = PlayerPrefs.GetInt(ConstantStrings.PREFS_KILLS, 0);
         int wins = PlayerPrefs.GetInt(ConstantStrings.PREFS_WINS, 0);
         int evades = PlayerPrefs.GetInt(ConstantStrings.PREFS_EVADES, 0);
         localStatLibrary.Add(ConstantStrings.PREFS_KILLS, kills);
         localStatLibrary.Add(ConstantStrings.PREFS_WINS, wins);
         localStatLibrary.Add(ConstantStrings.PREFS_EVADES, evades);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning(e.Message);
+        }
     }
-    public void SaveMyStats() {
+    public void SaveMyStats()
+    {
+        try
+        {
+                 
         PlayerPrefs.SetInt(ConstantStrings.PREFS_KILLS, localStatLibrary[ConstantStrings.PREFS_KILLS]);
         PlayerPrefs.SetInt(ConstantStrings.PREFS_WINS, localStatLibrary[ConstantStrings.PREFS_WINS]);
         PlayerPrefs.SetInt(ConstantStrings.PREFS_EVADES, localStatLibrary[ConstantStrings.PREFS_EVADES]);
         PlayerPrefs.Save();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning(e.Message);
+        }
     }
     public void AddToLocalStat(string tag, int value) {
         if (statLibrary == null)

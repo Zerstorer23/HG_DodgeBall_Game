@@ -29,5 +29,6 @@ public class Skill_Kuyou : ISkill
     public override void LoadInformation(SkillManager skm)
     {
         skm.cooltime = 3.25f;
+        skm.maxStack = 1;
     }
 }

@@ -11,20 +11,18 @@ public class GameField : MonoBehaviour
     [SerializeField] public PlayerSpawner playerSpawner;
     [SerializeField] public BulletManager bulletSpawner;
     [SerializeField] public BuffObjectSpawner buffSpawner;
+    [SerializeField] public WallManager wallManager;
     Transform mapTransform;
     public Transform[] map_transforms;
     public Vector3 originalMapSize;
     public bool suddenDeathCalled = false;
     public bool gameFieldFinished = false;
-    public Unit_SharedMovement desolator;
-    internal  Dictionary<string, int> desolator_controllers = new Dictionary<string, int>();
     public int expectedNumPlayer = 0;
 
     private void OnEnable()
     {
         EventManager.StartListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeathTriggered);
         EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
-
         if (suddenDeathTimeoutRoutine != null) {
             StopCoroutine(suddenDeathTimeoutRoutine);
         }
@@ -33,7 +31,6 @@ public class GameField : MonoBehaviour
     }
     private void OnDisable()
     {
-        desolator_controllers = new Dictionary<string, int>();
         EventManager.StopListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeathTriggered);
         EventManager.StopListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
 
@@ -56,18 +53,26 @@ public class GameField : MonoBehaviour
         }
         gameObject.SetActive(false);
     }
-    internal void CheckFieldConditions(GameStatus stat)
+    public void CheckFieldConditions(GameStatus stat)
     {
         if (gameFieldFinished) return;
         CheckSuddenDeath(stat.alive);
         Debug.Log(stat.ToString());
-        bool fieldFinished = GameSession.gameModeInfo.IsFieldFinished(stat);
-        if (!fieldFinished) return;
+        bool gameFinished = GameSession.gameModeInfo.IsFieldFinished(stat);
+        if (!gameFinished) return;
 
         Player winner = stat.lastSurvivor;
         Debug.Log("GAME FISNISHED / master: " + (winner == PhotonNetwork.LocalPlayer) + " winner "+winner);
         GameFieldManager.pv.RPC("NotifyFieldWinner", RpcTarget.AllBufferedViaServer,fieldNo, winner);
        // NotifyFieldWinner(winner);
+    }
+
+    public bool QueryFieldFinish()
+    {
+        if (gameFieldFinished) return true;
+        GameStatus stat = new GameStatus(playerSpawner.unitsOnMap, null);
+        bool finished = GameSession.gameModeInfo.IsFieldFinished(stat);
+        return finished;
     }
 
     public Player fieldWinner = null;
@@ -150,7 +155,7 @@ public class GameField : MonoBehaviour
         playerSpawner.StartEngine();
         bulletSpawner.StartEngine(mapDIfficulty);
         buffSpawner.StartEngine();
-
+        wallManager.SetWalls();
         //EventManager.TriggerEvent(MyEvents.EVENT_FIELD_STARTED, new EventObject(){ });
     }
     void ResetFieldProperties() {
@@ -252,12 +257,6 @@ public class GameField : MonoBehaviour
         Debug.Log("start units " + mapSpec.xMin + "," + mapSpec.yMin);
         Debug.Log("Indicated location " + location);*/
         return location;
-    }
-    public void AddController(string userid)
-    {
-        if (desolator == null || !desolator.gameObject.activeInHierarchy) return;
-        Debug.Assert(!desolator_controllers.ContainsKey(userid), "Duplicate player");
-        desolator_controllers.Add(userid, 0);
     }
 
 

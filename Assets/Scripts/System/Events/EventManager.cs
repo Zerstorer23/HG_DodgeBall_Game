@@ -47,8 +47,6 @@ public class EventManager : MonoBehaviour
 
     }
     public void AddEvent(string eventName, EventOneArg thisEvent) {
-
-
         eventDictionary.Add(eventName, thisEvent);
     }
 

@@ -4,15 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Action_PlayerChangeSpriteColor : SkillAction
-{
-    public override float Activate()
-    {
-        string col = GetParam<string>(SkillParams.Color);
-        parent.casterPV.RPC("ChangePortraitColor", RpcTarget.AllBuffered,col);
-        return 0f;
-    }
-}
+
 public class Action_PlayerDoGunAnimation : SkillAction
 {
     public override float Activate()
@@ -45,6 +37,18 @@ public class Action_GunObject_SetAngle : SkillAction
     {
         float euler = GetParam<float>(SkillParams.EulerAngle);
         parent.casterPV.RPC("SetGunAngle", Photon.Pun.RpcTarget.AllBuffered, euler);
+        return 0f;
+    }
+}
+public class Action_Projectile_AddGravity : SkillAction
+{
+    // Start is called before the first frame update
+    public override float Activate()
+    {
+        if (parent.casterPV == null) return 0f;
+        Vector3 direction = GetParam<Vector3>(SkillParams.Vector3, Vector3.zero);
+        float weight = GetParam<float>(SkillParams.Modifier, 0f);
+        parent.casterPV.RPC("AddMovementForce", RpcTarget.AllBuffered, direction,weight);
         return 0f;
     }
 }

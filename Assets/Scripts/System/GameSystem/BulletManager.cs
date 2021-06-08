@@ -146,10 +146,8 @@ public class BulletManager : MonoBehaviour
             }
         }
         if (yasumiCount > players.Length / 2) {
-            if (PhotonNetwork.IsMasterClient) {
-                ChatManager.SendNotificationMessage("야스미가 너무 많습니다");
-                activeMax = 96;
-            }
+            ChatManager.SendLocalMessage("야스미가 너무 많습니다");
+            activeMax = 96;
         }
     }
 

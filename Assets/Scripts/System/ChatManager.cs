@@ -114,6 +114,12 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 		}
 	}
 
+	public static void SendLocalMessage(string message)
+	{
+		if (string.IsNullOrEmpty(message)) return;
+		string msg = string.Format("<color=#ff00ff>[{0}]</color> {1}", MenuManager.GetLocalName(), message);
+		instance.mainChatBox.AddLine(msg);
+	}
 
 
 
@@ -205,7 +211,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
 	public void OnDisconnected()
 	{
-		AddLine("서버에 연결이 끊어졌습니다.");
+		AddLine("채팅서버에 연결이 끊어졌습니다.");
 	}
 
 	public void OnChatStateChange(ChatState state)

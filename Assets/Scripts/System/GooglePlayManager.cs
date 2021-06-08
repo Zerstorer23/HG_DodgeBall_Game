@@ -24,6 +24,7 @@ public class GooglePlayManager : MonoBehaviour
 #endif
     public static void DoLogin()
     {
+#if UNITY_ANDROID
         try
         {
             if (!Social.localUser.authenticated)
@@ -44,6 +45,7 @@ public class GooglePlayManager : MonoBehaviour
             }
         }
         catch (Exception e) { Debug.Log(e.Message); }
+#endif
     }
     public static void DoLogout()
     {
@@ -53,6 +55,7 @@ public class GooglePlayManager : MonoBehaviour
     }
     public static void AddAchievement(string id, float amount = 100.0f)
     {
+#if UNITY_ANDROID
         if (Application.platform != RuntimePlatform.Android) return;
         if (!loggedIn) return;
         //  PlayGamesPlatform.Instance.Events.IncrementEvent("YOUR_EVENT_ID", 1)
@@ -72,6 +75,7 @@ public class GooglePlayManager : MonoBehaviour
             );
         }
         catch (Exception e) { Debug.Log(e.Message); }
+#endif
     }
 
     //단계적 달성
@@ -99,6 +103,7 @@ public class GooglePlayManager : MonoBehaviour
     }
     public static void AddToLeaderboard(string id, int amount)
     {
+#if UNITY_ANDROID
         if (Application.platform != RuntimePlatform.Android) return;
         if (!loggedIn) return;
         try
@@ -116,6 +121,7 @@ public class GooglePlayManager : MonoBehaviour
             });
         }
         catch (Exception e) { Debug.Log(e.Message); }
+#endif
     }
 
     public static void IncrementEvent(string id, uint amount = 1)
@@ -133,6 +139,7 @@ public class GooglePlayManager : MonoBehaviour
 
     public static void ShowLeaderBoard()
     {
+#if UNITY_ANDROID
         if (Application.platform != RuntimePlatform.Android) return;
         if (!loggedIn) return;
         try
@@ -140,17 +147,20 @@ public class GooglePlayManager : MonoBehaviour
             Social.ShowLeaderboardUI();
         }
         catch (Exception e) { Debug.Log(e.Message); }
+#endif
     }
 
     // 업적보기
     public static void ShowAchievement()
     {
+#if UNITY_ANDROID
         if (!loggedIn) return;
         try
         {
             Social.ShowAchievementsUI();
         }
         catch (Exception e) { Debug.Log(e.Message); }
+#endif
     }
 
     // 업적추가
