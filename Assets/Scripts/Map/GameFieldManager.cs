@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameFieldManager : MonoBehaviourPun
+public partial class GameFieldManager : MonoBehaviourPun
 {
     public float mapStepsize = 10f;
     public int mapStepPerPlayer = 5;
@@ -118,79 +118,7 @@ public class GameFieldManager : MonoBehaviourPun
         gameFinished = false;
         StartGame();
     }
-    public List<Player> survivors = new List<Player>();
-    [PunRPC]
-    public void NotifyFieldWinner(int fieldNo, Player winner)
-    {
-        Debug.Log(fieldNo+" Received notifty field winner " + winner);
-        GameField field = gameFields[fieldNo];
-        if (field.gameFieldFinished) return;
-        field.gameFieldFinished = true;
-        field.fieldWinner = winner;
-        field.winnerName = winner.NickName;
-        //  Debug.Log("FIeld " + fieldNo + " finished with winner " + fieldWinner);
-        EventManager.TriggerEvent(MyEvents.EVENT_FIELD_FINISHED, new EventObject() { intObj = fieldNo });
-        field.gameObject.SetActive(false);
-        CheckGameFinished();
-    }
-    internal static void CheckGameFinished()
-    {
-        instance.survivors.Clear();
-        instance.gameFinished = instance.CheckOtherFields(instance.survivors);
-        if (!instance.gameFinished) return;
-        Debug.Log("Found Survivor " + instance.survivors.Count);
-        //All Field Finished
-        if (instance.survivors.Count >= 2)
-        {
-            instance.StartCoroutine(instance.WaitAndContinueTournament(instance.survivors));
-            //Proceed Tournament
-        }
-        else
-        {
-            Player winner = (instance.survivors.Count > 0) ? instance.survivors[0] : null;
-            FinishTheGame(winner);
-        }
-    }
-    bool CheckOtherFields(List<Player> survivors) {
-        for (int i = 0; i < instance.numActiveFields; i++)
-        {
-            GameField field = gameFields[i];
-            Debug.Log("Field " + i + " finished " + field.gameFieldFinished + " winner " + field.fieldWinner);
-            if (!field.gameFieldFinished)
-            {
-                return false;
-            }
-            if (field.fieldWinner != null)
-            {
-                survivors.Add(field.fieldWinner);
-            }
-        }
-        return true;
-    }
-    internal static void QueryGameFinished()
-    {
-        for (int i = 0; i < instance.numActiveFields; i++)
-        {
-            bool finished  = gameFields[i].QueryFieldFinish();
-            if (!finished) return;
-        }
-        instance.gameFinished = true;
-        //All Field Finished
-        Debug.LogWarning("Error game ");
-        ChatManager.SendNotificationMessage("게임 에러");
-        FinishTheGame(null);
-    }
-    private static void FinishTheGame(Player winner)
-    {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            GameSession.PushRoomASetting(ConstantStrings.HASH_GAME_STARTED, false);
-        }
-        GameSession.GetInst().gameOverManager.SetPanel(winner);//이거 먼저 호출하고 팝업하세요
-        EventManager.TriggerEvent(MyEvents.EVENT_GAME_FINISHED, null);
-        EventManager.TriggerEvent(MyEvents.EVENT_POP_UP_PANEL, new EventObject() { objData = ScreenType.GameOver, boolObj = true });
-    }
-
+   
     private IEnumerator WaitAndContinueTournament(List<Player> survivors)
     {
         float delay = 3f;
@@ -230,18 +158,7 @@ public class GameFieldManager : MonoBehaviourPun
         }
     }
 
-    IEnumerator tournamentRoutine;
-    IEnumerator TournamentGameChecker() {
-        yield return new WaitForSeconds(5f);
-        while (!instance.gameFinished) {
-            if (PhotonNetwork.IsMasterClient) {
-                Debug.LogWarning("Check game end ....");
-                QueryGameFinished();
-            }
-            yield return new WaitForSeconds(2f);
-        }
-
-    }
+ 
 
     private void CheckGoogleEvents()
     {

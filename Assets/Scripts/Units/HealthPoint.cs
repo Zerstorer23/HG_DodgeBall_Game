@@ -52,8 +52,10 @@ public class HealthPoint : MonoBehaviourPun
 
     private void OnFieldFinish(EventObject obj)
     {
+        Debug.Log("receive field finish");
         if (!isDead && obj.intObj == associatedField)
         {
+            Debug.Log("Die");
             Kill_Immediate();
         }
     }

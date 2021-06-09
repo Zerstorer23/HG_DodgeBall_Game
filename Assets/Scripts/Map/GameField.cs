@@ -57,22 +57,23 @@ public class GameField : MonoBehaviour
     {
         if (gameFieldFinished) return;
         CheckSuddenDeath(stat.alive);
-        Debug.Log(stat.ToString());
+        Debug.LogWarning(stat.ToString());
         bool gameFinished = GameSession.gameModeInfo.IsFieldFinished(stat);
         if (!gameFinished) return;
 
         Player winner = stat.lastSurvivor;
-        Debug.Log("GAME FISNISHED / master: " + (winner == PhotonNetwork.LocalPlayer) + " winner "+winner);
+        Debug.Log("GAME FISNISHED /  winner "+winner);
         GameFieldManager.pv.RPC("NotifyFieldWinner", RpcTarget.AllBufferedViaServer,fieldNo, winner);
        // NotifyFieldWinner(winner);
     }
 
-    public bool QueryFieldFinish()
+    public (bool,Player) QueryFieldFinish()
     {
-        if (gameFieldFinished) return true;
-        GameStatus stat = new GameStatus(playerSpawner.unitsOnMap, null);
+        if (gameFieldFinished) return (true, playerSpawner.lastDiedPlayer);
+        GameStatus stat = new GameStatus(playerSpawner.unitsOnMap, playerSpawner.lastDiedPlayer);
+        Debug.LogWarning(stat.ToString());
         bool finished = GameSession.gameModeInfo.IsFieldFinished(stat);
-        return finished;
+        return (finished, stat.lastSurvivor);
     }
 
     public Player fieldWinner = null;

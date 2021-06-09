@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterID: 8
   txt_name: "\uD0A4\uBBF8\uB3C4\uB9AC"
-  colorHex: 
-  txt_skill_desc: "\uD48D\uC120\uC744 \uB744\uC6C1\uB2C8\uB2E4."
+  noRandom: 0
+  txt_skill_desc: "\uC790\uC2E0\uC744 \uACF5\uC804\uD558\uB294 \uD48D\uC120 \uC18C\uD658"
   portraitImage: {fileID: 21300000, guid: 8071db4252fa0c343b928e6789d9222a, type: 3}

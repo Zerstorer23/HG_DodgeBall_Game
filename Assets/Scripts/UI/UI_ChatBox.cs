@@ -63,7 +63,10 @@ public class UI_ChatBox : MonoBehaviour
 		else
 		{
 			string text = inputField.text;
-			if (text[0] == '!') {
+			if (text[0] == '/')
+			{
+				ParseUserCommand(text);
+			}else if (text[0] == '!') {
 				ParseCommand(text);
 			}
 			else {
@@ -75,6 +78,12 @@ public class UI_ChatBox : MonoBehaviour
 		}
 		inputField.text = "";
 
+	}
+	void ParseUserCommand(string text) {
+		if (text.Contains("음소거"))
+		{
+			outputText.enabled = !outputText.enabled;
+		}
 	}
 	private void ParseCommand(string text) {
 
@@ -92,7 +101,7 @@ public class UI_ChatBox : MonoBehaviour
 		}
 		else if (text.Contains("점검"))
 		{
-			ConnectedPlayerManager.ReconnectEveryone();
+			ConnectedPlayerManager.KickEveryoneElse();
 		}
 	}
 	public void AddLine(string lineString)

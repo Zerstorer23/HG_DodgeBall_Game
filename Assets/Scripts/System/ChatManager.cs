@@ -117,7 +117,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 	public static void SendLocalMessage(string message)
 	{
 		if (string.IsNullOrEmpty(message)) return;
-		string msg = string.Format("<color=#ff00ff>[{0}]</color> {1}", MenuManager.GetLocalName(), message);
+		string msg = string.Format("<color=#C8C800>[{0}]</color>", message);
 		instance.mainChatBox.AddLine(msg);
 	}
 

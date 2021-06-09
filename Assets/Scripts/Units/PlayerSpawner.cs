@@ -18,13 +18,12 @@ public class PlayerSpawner : MonoBehaviour
 
     private void OnEnable()
     {
-        //   EventManager.StartListening(MyEvents.EVENT_PLAYER_SPAWNED, OnPlayerSpawned);
+        lastDiedPlayer = null;
         EventManager.StartListening(MyEvents.EVENT_PLAYER_DIED, OnPlayerDied);
 
     }
     private void OnDisable()
     {
-        //  EventManager.StopListening(MyEvents.EVENT_PLAYER_SPAWNED, OnPlayerSpawned);
         EventManager.StopListening(MyEvents.EVENT_PLAYER_DIED, OnPlayerDied);
         ResetPlayerMap();
     }
@@ -138,6 +137,7 @@ public class PlayerSpawner : MonoBehaviour
     {
         //No one died in this field
         if (eo.intObj != gameField.fieldNo) return;
+        lastDiedPlayer = playersOnMap[eo.stringObj];
         if (gameField.gameFieldFinished)
         {
             //최후의 1인. 맵은 이미 지워져있음
@@ -147,7 +147,6 @@ public class PlayerSpawner : MonoBehaviour
         }
         Debug.Assert(unitsOnMap.ContainsKey(eo.stringObj), eo.stringObj + " is not on field!!");
         //   if (!unitsOnMap.ContainsKey(eo.stringObj)) return;
-        Player lastDiedPlayer = playersOnMap[eo.stringObj];
         unitsOnMap[eo.stringObj] = null;
         playersOnMap[eo.stringObj] = null;
         if (desolator != null)
@@ -161,7 +160,7 @@ public class PlayerSpawner : MonoBehaviour
         gameField.CheckFieldConditions(stat);
 
     }
-
+    public Player lastDiedPlayer = null;
 
 
     public Transform GetTransformOfPlayer(string id)
@@ -214,7 +213,6 @@ public class PlayerSpawner : MonoBehaviour
     {
         Transform nearest = null;
         float nearestDistance = 0;
-        int i = 0;
         foreach (var entry in unitsOnMap)
         {
             if (entry.Value == null)

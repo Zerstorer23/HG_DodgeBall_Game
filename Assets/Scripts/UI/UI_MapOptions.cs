@@ -18,13 +18,12 @@ public class UI_MapOptions : MonoBehaviourPun
     PhotonView pv;
 
 
-    [SerializeField] GameObject forceStart;
     [SerializeField] Text mapDiffText;
     [SerializeField] Text playerDiffText;
     [SerializeField] Dropdown mapDiffDropdown;
     [SerializeField] Dropdown livesDropdown;
     [SerializeField] Dropdown gamemodeDropdown;
-
+    [SerializeField] GameObject[] masterOnlyObjects;
    public MapDifficulty mapDiff;
    public int livesIndex =0;
 
@@ -38,7 +37,10 @@ public class UI_MapOptions : MonoBehaviourPun
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
-        forceStart.SetActive(false);
+        foreach (var go in masterOnlyObjects)
+        {
+            go.SetActive(false);
+        }
     }
     private void OnEnable()
     {
@@ -74,11 +76,14 @@ public class UI_MapOptions : MonoBehaviourPun
     public void UpdateSettingsUI()
     {
         bool isMaster = PhotonNetwork.LocalPlayer.IsMasterClient;
+        foreach (var go in masterOnlyObjects) {
+            go.SetActive(isMaster);
+        }
+
 
         mapDiffDropdown.interactable = isMaster;
         livesDropdown.interactable = isMaster;
         gamemodeDropdown.interactable = isMaster;
-        forceStart.SetActive(isMaster);
         mapDiffDropdown.SetValueWithoutNotify((int)mapDiff);
         livesDropdown.SetValueWithoutNotify((int)livesIndex);
         int gmode = 0;
@@ -112,6 +117,14 @@ public class UI_MapOptions : MonoBehaviourPun
         if (UI_PlayerLobbyManager.localPlayerInfo == null) return;
         if (!GameSession.gameModeInfo.isTeamGame) return;
         UI_PlayerLobbyManager.localPlayerInfo.pv.RPC("ToggleTeam", RpcTarget.AllBuffered);
+    }
+    public void OnClick_AnonGame()
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+        HUD_UserName[] users = FindObjectsOfType<HUD_UserName>();
+        foreach (var user in users) {
+            user.pv.RPC("ChangeName", RpcTarget.AllBuffered, "ㅇㅇ");
+        }
     }
     [PunRPC]
     public void SetMapDifficulty(int diff) {
