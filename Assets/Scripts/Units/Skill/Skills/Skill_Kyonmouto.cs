@@ -25,9 +25,9 @@ public class Skill_Kyonmouto : ISkill
         mySkill.Enqueue(new Action_SetProjectile_Homing_Information());
         //----
         //--Scale
-       mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 2f }); 
+/*       mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 2f }); 
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 2f });
-        mySkill.Enqueue(new Action_DoScaleTween());
+        mySkill.Enqueue(new Action_DoScaleTween());*/
         return mySkill;
     }
 

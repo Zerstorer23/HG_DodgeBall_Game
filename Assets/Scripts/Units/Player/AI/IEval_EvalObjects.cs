@@ -184,6 +184,7 @@ public partial class IEvaluationMachine
             case CharacterType.KYONKO:
             case CharacterType.KUYOU:
             case CharacterType.KYOUKO:
+            case CharacterType.KYONMOUTO:
             case CharacterType.T:
             case CharacterType.KYON:
             case CharacterType.MORI:
