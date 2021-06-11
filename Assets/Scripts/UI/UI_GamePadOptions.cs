@@ -8,18 +8,22 @@ public class UI_GamePadOptions : MonoBehaviour
 {
     [SerializeField] GameObject optionPanel;
     [SerializeField] Toggle psToggle, xboxToggle;
+    [SerializeField] Text nowUsingText;
     public static bool useGamepad = false;
     public static PadType padType;
+
+    static UI_GamePadOptions instance;
    private void Awake()
     {
-        EventManager.StartListening(MyEvents.EVENT_SHOW_PANEL, OnPanelOpen);
+        EventManager.StartListening(MyEvents.EVENT_POP_UP_PANEL, OnPanelOpen);
+        instance = this;
     }
 
     private void OnPanelOpen(EventObject arg0)
     {
-        if ((ScreenType)arg0.objData == ScreenType.PreGame) {
-
-                InitInfo();
+        Debug.Log("Catch option open");
+        if ((ScreenType)arg0.objData == ScreenType.Settings) {
+                QueryPadInfo();
         }
     }
 
@@ -29,19 +33,33 @@ public class UI_GamePadOptions : MonoBehaviour
     }
     private void Start()
     {
-        InitInfo();
+        QueryPadInfo();
     }
-    private void OnEnable()
-    {
-        InitInfo();
-    }
-    public void InitInfo() {
-        useGamepad = (Input.GetJoystickNames().Length > 0);
-        optionPanel.SetActive(useGamepad);
+
+    public static void QueryPadInfo() {
+        var names = Input.GetJoystickNames();
+        int count = 0;
+        foreach (var n in names) {
+            if (!String.IsNullOrEmpty(n)) count++;
+        }
+        useGamepad = (count > 0);
+        Debug.Log("Query info : use game pad " + useGamepad);
+        instance.UpdateUI();
         if (useGamepad)
         {
             padType = (PadType)PlayerPrefs.GetInt(ConstantStrings.PREFS_MY_PAD, 0);
         }
+    }
+    public void UpdateUI() {
+        if (useGamepad)
+        {
+            nowUsingText.text = "사용중:게임패드";
+        }
+        else
+        {
+            nowUsingText.text = "사용중:키보드";
+        }
+        optionPanel.SetActive(useGamepad);
     }
 
     public void OnClickToggle_Pad()

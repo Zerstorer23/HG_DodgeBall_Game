@@ -55,6 +55,7 @@ public class ConstantStrings : MonoBehaviour
     public const string PREFS_EVADES = "myTotalEvades";
     public const string PREFS_WINS = "myTotalWins";
     public const string PREFS_MY_PAD = "myPad";
+    public const string PREFS_FORCE_WASD = "forceWASD";
     public const string PREFS_MANUAL_AIM = "manualAim";
     public const string PREFS_TIME_RECORD = "timeRecord";
 

@@ -11,7 +11,7 @@ public class UI_AimOption : MonoBehaviour
     public void Initialise() {
         toggle = GetComponent<Toggle>();
 
-        aimManual = PlayerPrefs.GetInt(ConstantStrings.PREFS_MANUAL_AIM, 0) != 0;
+        aimManual = PlayerPrefs.GetInt(ConstantStrings.PREFS_MANUAL_AIM, 1) != 0;
         toggle.isOn = aimManual;
     }
     public void OnToggleChanged() {

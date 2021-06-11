@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class InputHelper : MonoBehaviour
 {
@@ -24,9 +26,16 @@ public class InputHelper : MonoBehaviour
 
     public static string padXaxis = "RHorizontal";
     public static string padYaxis = "RVertical";
+
+    static string MoveX = "Horizontal";
+    static string MoveY = "Vertical";
+
+    public bool test_ForceWASD = false;
     private void Awake()
     {
         SetInputFunctions();
+        test_ForceWASD = PlayerPrefs.GetInt(ConstantStrings.PREFS_FORCE_WASD, 0) != 0;
+        wasdToggle.isOn = test_ForceWASD;
     }
     void SetInputFunctions()
     {
@@ -47,13 +56,73 @@ public class InputHelper : MonoBehaviour
     }
     float GetKeyInputHorizontal()
     {
-        return Input.GetAxis("Horizontal");
+        if (test_ForceWASD) {
+            return GetAD();
+        }
+        return Input.GetAxis(MoveX);
     }
 
     float GetKeyInputVertical()
     {
-        return Input.GetAxis("Vertical");
+        if (test_ForceWASD)
+        {
+            return GetWS();
+        }
+        return Input.GetAxis(MoveY);
     }
+
+    double fullTime = 0.2d;
+    public double aDown = 0d;
+    public double dDown = 0d;
+    public double wDown = 0d;
+    public double sDown = 0d;
+    float GetAD() {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            aDown = PhotonNetwork.Time;
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            dDown = PhotonNetwork.Time;
+        }
+
+        if (Input.GetKey(KeyCode.A)) {
+            double ratio = ((PhotonNetwork.Time - aDown) / fullTime);
+            return -(float)Math.Min(ratio, 1d);
+        }
+        else if(Input.GetKey(KeyCode.D))
+        {
+            double ratio = ((PhotonNetwork.Time - dDown) / fullTime);
+            return (float)Math.Min(ratio, 1d);
+        }else {
+            return 0f;
+        }
+    }
+    float GetWS() {
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            wDown = PhotonNetwork.Time;
+        }
+        else if (Input.GetKeyDown(KeyCode.S))
+        {
+            sDown = PhotonNetwork.Time;
+        }
+        if (Input.GetKey(KeyCode.W))
+        {
+            double ratio = ((PhotonNetwork.Time - wDown) / fullTime);
+            return (float)Math.Min(ratio, 1d);
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            double ratio = ((PhotonNetwork.Time - sDown) / fullTime);
+            return -(float)Math.Min(ratio, 1d);
+        }
+        else
+        {
+            return 0f;
+        }
+    }
+
     Vector3 GetMousePosition()
     {
         return Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -65,6 +134,16 @@ public class InputHelper : MonoBehaviour
 
     public static void SetAxisNames()
     {
+        UI_GamePadOptions.QueryPadInfo();
+        if (UI_GamePadOptions.useGamepad)
+        {
+            MoveX = "LHorizontal";
+            MoveY = "LVertical";
+        }
+        else {
+            MoveX = "Horizontal";
+            MoveY = "Vertical";
+        }
         switch (UI_GamePadOptions.padType)
         {
             case PadType.PS4:
@@ -87,13 +166,25 @@ public class InputHelper : MonoBehaviour
     {
         return UI_TouchPanel.isTouching;
     }
+    [SerializeField] Toggle wasdToggle;
+    public void OnClick_ForceKeyboard(Toggle toggle ) {
+        test_ForceWASD = toggle.isOn;
+        Debug.Log("Force move " + test_ForceWASD);
+        PlayerPrefs.SetInt(ConstantStrings.PREFS_FORCE_WASD, test_ForceWASD?1:0);
+        PlayerPrefs.Save();
 
-/*    public static void Vibrate(long mills = 1000)
+    }
+
+    private void Update()
     {
-        #if UNITY_ANDROID && !UNITY_EDITOR
-                if (Application.platform == RuntimePlatform.Android) {
-                    AndroidVibrator.Call("vibrate", mills);
-            }
-        #endif
-    }*/
+        //Debug.Log("W: "+Input.Get)
+    }
+    /*    public static void Vibrate(long mills = 1000)
+        {
+            #if UNITY_ANDROID && !UNITY_EDITOR
+                    if (Application.platform == RuntimePlatform.Android) {
+                        AndroidVibrator.Call("vibrate", mills);
+                }
+            #endif
+        }*/
 }

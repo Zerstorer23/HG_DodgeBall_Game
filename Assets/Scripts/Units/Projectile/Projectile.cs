@@ -53,6 +53,10 @@ public class Projectile : MonoBehaviourPun
         gameObject.transform.localRotation = Quaternion.identity;
     }
 
+    [SerializeField] SpriteRenderer bodySprite;
+    public void SetColor(Color color) {
+        bodySprite.color = color;
+    }
 
 
 }

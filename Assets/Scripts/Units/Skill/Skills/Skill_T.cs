@@ -7,13 +7,13 @@ public class Skill_T : ISkill
 {
     public override void LoadInformation(SkillManager skm)
     {
-        skm.cooltime = 3.3f;
+        skm.cooltime = 3.5f;
         skm.maxStack = 3;
     }
     public override ActionSet GetSkillActionSet(SkillManager skm)
     {
         ActionSet mySkill = new ActionSet(skm);
-        float searchRange = 5f;
+        float searchRange = 8f;
         float rotateSpeed = 180f; // 180
 
         mySkill.SetParam(SkillParams.MoveSpeed, 13f); //15

@@ -13,7 +13,7 @@ public class Projectile_Homing : MonoBehaviourPun
     public bool findProjectile = true;
     public bool onlyFollowHostile = false;
     public float homingRotationSpeed = -1f;//Immediate
-
+    Projectile projectile;
     public ReactionType homingReaction = ReactionType.None;
     HealthPoint health;
     LayerMask findMask;
@@ -31,6 +31,7 @@ public class Projectile_Homing : MonoBehaviourPun
     // Update is called once per frame
     private void Awake()
     {
+        projectile = GetComponent<Projectile>();
         health = GetComponent<HealthPoint>();
         findMask = (findProjectile) ? LayerMask.GetMask(TAG_PLAYER, TAG_PROJECTILE)
                                   : LayerMask.GetMask(TAG_PLAYER);
@@ -42,9 +43,11 @@ public class Projectile_Homing : MonoBehaviourPun
         if (targetPv != null)
         {
             homingTarget = targetPv.gameObject;
+            projectile.SetColor(Color.red);
         }
         else {
             homingTarget = null;
+            projectile.SetColor(Color.white);
         }
     }
     [PunRPC]
@@ -82,6 +85,7 @@ public class Projectile_Homing : MonoBehaviourPun
         if (numBounce >= maxBounce)
          {
             homingTarget = null;
+            projectile.SetColor(Color.white);
             return;
         }
         numBounce++;
@@ -178,11 +182,12 @@ public class Projectile_Homing : MonoBehaviourPun
         PhotonView nearestPV = null;
         float nearestDist = 0;
         PhotonView nearestProjPV = null;
-        float nearesProjtDist = 0;
+        float nearesProjtDist = float.MaxValue;
 
         for (int i = 0; i < collisions.Length; i++)
         {
             Collider2D c = collisions[i];
+
             HealthPoint targetHP = c.gameObject.GetComponent<HealthPoint>();
             if (targetHP == null) continue;
             if (targetHP.pv.ViewID == oldtargetID || targetHP.pv.ViewID == photonView.ViewID) continue;
@@ -210,7 +215,7 @@ public class Projectile_Homing : MonoBehaviourPun
                     if (!findProjectile) continue;
                     if (onlyFollowHostile)
                     {
-                        if (!targetHP.damageDealer.isMapObject && targetHP.pv.IsMine) continue;
+                        if (!targetHP.IsMapProjectile() && targetHP.pv.IsMine) continue;
                         if (GameSession.gameModeInfo.isTeamGame && targetHP.myTeam == health.myTeam) continue;
                         if (GameSession.gameModeInfo.isCoop && !targetHP.damageDealer.isMapObject) continue;
                     }
@@ -230,6 +235,10 @@ public class Projectile_Homing : MonoBehaviourPun
         {
             homingTarget = nearestPV.gameObject;
             photonView.RPC("SetHomingTarget", RpcTarget.AllBuffered, nearestPV.ViewID);
+        }
+        else
+        {
+            projectile.SetColor(Color.white);
         }
 
     }

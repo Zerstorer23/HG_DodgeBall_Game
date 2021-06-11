@@ -173,7 +173,7 @@ public partial class IEvaluationMachine
 
     protected Vector3 EscapePlayer(Vector3 directionToTarget, float distance, Unit_Player enemyPlayer)
     {
-        float multiplier = 0;
+        float multiplier;
         switch (enemyPlayer.myCharacter)
         {
             case CharacterType.NAGATO:
@@ -183,6 +183,8 @@ public partial class IEvaluationMachine
             case CharacterType.KOIHIME:
             case CharacterType.KYONKO:
             case CharacterType.KUYOU:
+            case CharacterType.KYOUKO:
+            case CharacterType.T:
             case CharacterType.KYON:
             case CharacterType.MORI:
                 multiplier = -GetMultiplier(distance / 5f);
@@ -222,6 +224,8 @@ public partial class IEvaluationMachine
             case CharacterType.HARUHI:
             case CharacterType.KOIZUMI:
             case CharacterType.KUYOU:
+            case CharacterType.KYOUKO:
+            case CharacterType.T:
             case CharacterType.SASAKI:
             case CharacterType.KOIHIME:
                 if (isKamikazeSkill)
@@ -249,7 +253,6 @@ public partial class IEvaluationMachine
         }
         HealthPoint hp = cachedComponent.Get<HealthPoint>(tid, go);
         Projectile_Movement pMove = (Projectile_Movement)hp.movement;
-        float multiplier = GetMultiplier(distance);
         // float speedMod = GetSpeedModifier(player.movement.GetMovementSpeed(), pMove.moveSpeed);
         if (pMove.characterUser == CharacterType.NAGATO)
         {
@@ -262,22 +265,23 @@ public partial class IEvaluationMachine
         if (pMove.moveSpeed > player.movement.GetMovementSpeed())
         {
             if (!IsApproaching(pMove, distance)) return Vector3.zero;
-
+            /*   
+               return -directionToTarget * GetMultiplier(distance / speedDiff);*/
+            float speedDiff = pMove.moveSpeed * 1.5f / player.movement.GetMovementSpeed();
             if (pMove.moveType == MoveType.Straight)
             {
-                float speedDiff = pMove.moveSpeed*1.5f / player.movement.GetMovementSpeed();
                 Vector3 dir = PerpendicularEscape(pMove, directionToTarget) * GetMultiplier(distance / speedDiff);
                 return dir;
             }
             else
             {
                 //Debug.Log("Back evasion");
-                return -directionToTarget * multiplier;
+                return -directionToTarget * GetMultiplier(distance / speedDiff);
             }
         }
         else
         {
-            return -directionToTarget * multiplier;
+            return -directionToTarget * GetMultiplier(distance);
         }
     }
     public virtual Vector3 GetAwayFromWalls()
@@ -293,7 +297,7 @@ public partial class IEvaluationMachine
 
         walls[0] = new Vector3(movement.networkPos.x, yBound);
         walls[1] = new Vector3(xBound, movement.networkPos.y);
-        float mod = (activeMax == 0) ? 1f : 2f;
+        float mod = 3f;// (activeMax == 0) ? 1f : 2f;
         for (int i = 0; i < 2; i++) {
             if (Vector2.Distance(walls[i], movement.networkPos) <= range_Search)
             {

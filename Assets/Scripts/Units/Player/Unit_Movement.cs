@@ -43,10 +43,8 @@ public class Unit_Movement :
     }
     public override void OnEnable()
     {
-        if (UI_GamePadOptions.useGamepad)
-        {
-            InputHelper.SetAxisNames();
-        }
+
+        InputHelper.SetAxisNames();
         //  if (GameSession.gameModeInfo.gameMode == GameMode.Tournament && PhotonNetwork.CurrentRoom.PlayerCount % 2 == 1 ) MenuManager.auto_drive = false;
 
         autoDriver.StartBot(
