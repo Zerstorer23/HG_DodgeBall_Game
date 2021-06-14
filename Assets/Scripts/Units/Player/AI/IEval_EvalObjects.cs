@@ -40,12 +40,7 @@ public partial class IEvaluationMachine
 
                     break;
                 case TAG_BUFF_OBJECT:
-                    multiplier = GetMultiplier(distance);
-                    BoxCollider2D boxColl = cachedComponent.Get<BoxCollider2D>(tid, go);
-                    if (boxColl.enabled)
-                    {
-                        move += directionToTarget * multiplier * 2;
-                    }
+                    move += EvaluateBuff(go, tid, directionToTarget, distance);
                     break;
                 case TAG_BOX_OBSTACLE:
                     multiplier = GetMultiplier(distance);
@@ -79,6 +74,29 @@ public partial class IEvaluationMachine
         //  Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
         return move;
     }
+
+    protected Vector3 EvaluateBuff(GameObject go, int tid, Vector3 directionToTarget, float distance)
+    {
+        BuffObject bObj = cachedComponent.Get<BuffObject>(tid, go);
+        if (bObj.status == BuffObjectStatus.Enabled)
+        {
+            if (bObj.buffConfig.buffType == BuffType.Boom)
+            {
+                return -directionToTarget * GetMultiplier(distance) * 2;
+            }
+            else
+            {
+                return directionToTarget * GetMultiplier(distance) * 2;
+            }
+
+        }
+        else if (bObj.status == BuffObjectStatus.Starting) {
+            return KeepConstantDistance(directionToTarget, distance, 2f, true);
+        }
+        return Vector3.zero;
+       
+    }
+
     public virtual void DetermineAttackType()
     {
         switch (player.myCharacter)
@@ -202,7 +220,7 @@ public partial class IEvaluationMachine
         return directionToTarget * multiplier;
     }
 
-    protected Vector3 KeepConstantDistance(Vector3 directionToTarget, float distance, float preferredDistance, bool doEscape) {
+    protected Vector3 KeepConstantDistance(Vector3 directionToTarget, float distance, float preferredDistance, bool approachToPreferredDistance) {
         float multiplier = 0;
         if (distance < preferredDistance)
         {
@@ -212,7 +230,7 @@ public partial class IEvaluationMachine
         {
             multiplier = GetMultiplier(distance / 5f);
         }
-        if (doEscape) multiplier *= -1f;
+        if (approachToPreferredDistance) multiplier *= -1f;
         return directionToTarget * multiplier;
 
     }

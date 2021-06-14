@@ -11,10 +11,14 @@ public class PlayerSpawner : MonoBehaviour
     public List<Unit_Player> debugUnitList = new List<Unit_Player>();
     internal SortedDictionary<string, Player> playersOnMap = new SortedDictionary<string, Player>();
     int maxLives = 1;
+    public PlayerSpawnerType spawnerType = PlayerSpawnerType.Once;
     CharacterType myCharacter = CharacterType.NONE;
     public Unit_SharedMovement desolator;
-    [SerializeField] GameField gameField;
-
+    GameField gameField;
+    private void Awake()
+    {
+        gameField = GetComponentInParent<GameField>();
+    }
 
     private void OnEnable()
     {
@@ -31,7 +35,7 @@ public class PlayerSpawner : MonoBehaviour
     public void StartEngine()
     {
         SpawnLocalPlayer();
-       // SpawnBots();
+        //SpawnBots();
         SpawnDesolator();
     }
 
@@ -87,10 +91,18 @@ public class PlayerSpawner : MonoBehaviour
 
     public void SpawnPlayer()
     {
-        Vector3 spawnPos = GetAdjustedPosition();
+        Vector3 spawnPos = gameField.GetPlayerSpawnPosition();
         PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0, new object[] { myCharacter, maxLives, gameField.fieldNo,false });
     }
-
+    [SerializeField] float respawnTime = 5f;
+    IEnumerator RespawnPlayer() {
+        for (int i = 0; i < respawnTime; i++)
+        {
+            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject((respawnTime - i).ToString("0") + " 초후 리스폰"));
+            yield return new WaitForSeconds(1f);
+        }
+        SpawnPlayer();    
+    }
 
     public void RegisterPlayer(string userID, Unit_Player unit)
     {
@@ -108,7 +120,6 @@ public class PlayerSpawner : MonoBehaviour
     {
         if (unitsOnMap.ContainsKey(id))
         {
-            Debug.LogWarning("Duplicate add player at field dictionary");
             unitsOnMap[id] = go;
             playersOnMap[id] = go.pv.Owner;
         }
@@ -120,11 +131,6 @@ public class PlayerSpawner : MonoBehaviour
         }
     }
 
-    private Vector3 GetAdjustedPosition()
-    {
-        int myIndex = ConnectedPlayerManager.GetMyIndex(GameFieldManager.GetPlayersInField(gameField.fieldNo));
-        return gameField.GetRandomPlayerSpawnPosition(myIndex);
-    }
     IEnumerator WaitAndCheck()
     {
         //Enable되는걸 기다려야함 그래야 event듣고 사망
@@ -137,28 +143,29 @@ public class PlayerSpawner : MonoBehaviour
     {
         //No one died in this field
         if (eo.intObj != gameField.fieldNo) return;
-        lastDiedPlayer = playersOnMap[eo.stringObj];
+        string deadID = eo.stringObj;
+        lastDiedPlayer = playersOnMap[deadID];
         if (gameField.gameFieldFinished)
         {
             //최후의 1인. 맵은 이미 지워져있음
-          //  Debug.Log(gameField.fieldNo + ": null the player last, only global " + eo.stringObj);
-            GameFieldManager.RemoveDeadPlayer(eo.stringObj);
+            GameFieldManager.RemoveDeadPlayer(deadID);
             return;
         }
-        Debug.Assert(unitsOnMap.ContainsKey(eo.stringObj), eo.stringObj + " is not on field!!");
-        //   if (!unitsOnMap.ContainsKey(eo.stringObj)) return;
-        unitsOnMap[eo.stringObj] = null;
-        playersOnMap[eo.stringObj] = null;
+        Debug.Assert(unitsOnMap.ContainsKey(deadID), deadID + " is not on field!!");
+        unitsOnMap[deadID] = null;
+        playersOnMap[deadID] = null;
         if (desolator != null)
         {
-            desolator.AddController(eo.stringObj);
+            desolator.AddController(deadID);
         }
 
      //   Debug.Log(gameField.fieldNo + ": null the player " + eo.stringObj);
-        GameFieldManager.RemoveDeadPlayer(eo.stringObj);
+        GameFieldManager.RemoveDeadPlayer(deadID);
         GameStatus stat = new GameStatus(unitsOnMap , lastDiedPlayer);//마지막 1인은 남아있어야함
         gameField.CheckFieldConditions(stat);
-
+        if (spawnerType == PlayerSpawnerType.Respawn && deadID == PhotonNetwork.LocalPlayer.UserId) {
+            StartCoroutine(RespawnPlayer());
+        }
     }
     public Player lastDiedPlayer = null;
 
@@ -243,4 +250,7 @@ public class PlayerSpawner : MonoBehaviour
     }
 
 
+}
+public enum PlayerSpawnerType { 
+    Once,Respawn
 }

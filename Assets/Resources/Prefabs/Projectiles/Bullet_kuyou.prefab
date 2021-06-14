@@ -224,6 +224,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pv: {fileID: 0}
+  bodySprite: {fileID: 0}
 --- !u!114 &5746965195692862891
 MonoBehaviour:
   m_ObjectHideFlags: 0

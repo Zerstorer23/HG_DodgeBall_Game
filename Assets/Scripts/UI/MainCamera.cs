@@ -4,6 +4,7 @@ using UnityEngine;
 using Cinemachine;
 using System;
 using DG.Tweening;
+using Photon.Pun;
 
 public class MainCamera : MonoBehaviour
 {
@@ -171,7 +172,7 @@ public class MainCamera : MonoBehaviour
 
     public void DoShake(float intense = 7f, float time = 0.5f)
     {
-        if(shakeRoutine != null) {
+        if (shakeRoutine != null) {
             StopCoroutine(shakeRoutine);
         }
         shakeRoutine = ProcessShake(intense, time);
@@ -190,7 +191,31 @@ public class MainCamera : MonoBehaviour
         var noise = mainVcam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
         noise.m_AmplitudeGain = amplitudeGain;
         noise.m_FrequencyGain = frequencyGain;
-    }
 
+    }
+    public void DoRotation(float time = 0.5f)
+    {
+        if (rotateRoutine != null)
+        {
+            StopCoroutine(rotateRoutine);
+            mainVcam.m_Lens.Dutch = 0f;
+        }
+        rotateRoutine = ProcessRotate(time);
+        StartCoroutine(rotateRoutine);
+    }
+    IEnumerator rotateRoutine = null;
+    private IEnumerator ProcessRotate(float rotateOver)
+    {
+        double start = PhotonNetwork.Time;
+        double end = start + rotateOver;
+        while(PhotonNetwork.Time < end){
+            double elapsed = PhotonNetwork.Time - start;
+            float angle = 360f * ((float)elapsed / rotateOver) - 180f;
+            mainVcam.m_Lens.Dutch = angle;
+            yield return new WaitForFixedUpdate();
+        }
+        mainVcam.m_Lens.Dutch = 0f;
+
+    }
 
 }

@@ -28,16 +28,32 @@ public class Skill_Kyonko : ISkill
         original = skillManager;
     }
     SkillManager original;
-
+    void CheckYasumi(HealthPoint targetHP)
+    {
+        if (targetHP.unitPlayer.myCharacter == CharacterType.YASUMI)
+        {
+            if (original.pv.IsMine)
+            {
+                original.pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.HideBuffs, 1f, -1d);
+            }
+        }
+        else
+        {
+            BuffData buff = new BuffData(BuffType.HideBuffs, 1f, -1d);
+            original.buffManager.RemoveBuff(buff);
+        }
+    }
     public override void OnMyProjectileHit(EventObject eo)
     {
         HealthPoint targetHP = eo.hitHealthPoint;
         if (targetHP.unitType != UnitType.Player) return;
+        CheckYasumi(targetHP);
         if (targetHP.unitPlayer.myCharacter == CharacterType.KYONKO|| targetHP.unitPlayer.myCharacter == CharacterType.KYONKO) return;
         Debug.Log("Changed skill ");
         obtainedSkill = targetHP.unitPlayer.skillManager.mySkill;
         original.maxStack = 1;
         obtainedSkill.LoadInformation(original);
+        UI_SkillBox.SetSkillInfo(original, targetHP.unitPlayer.myCharacter);
     }
     /*
     public override void OnPlayerKilledPlayer(EventObject eo)

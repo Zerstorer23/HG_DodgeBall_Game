@@ -34,6 +34,7 @@ public class Movement_Force : MonoBehaviourPun
         this.direction[(int)GravityIndex.Dash] = direction;
         this.weight[(int)GravityIndex.Dash] = weight;
     }
+
     private void OnDisable()
     {
         weight = new float[numIndex];

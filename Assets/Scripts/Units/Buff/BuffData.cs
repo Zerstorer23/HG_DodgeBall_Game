@@ -53,6 +53,7 @@ public class BuffData
 public enum BuffType
 { 
     None,MoveSpeed,Cooltime,HealthPoint,InvincibleFromBullets, MirrorDamage,NumDamageReceivedWhileBuff
+        ,HideBuffs,CameraShake,Boom
 }
 
 

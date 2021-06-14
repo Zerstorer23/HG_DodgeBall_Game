@@ -5,16 +5,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BUffObject : MonoBehaviourPun
+public class BuffObject : MonoBehaviourPun
 {
     BuffData buff;
     PhotonView pv;
-    [SerializeField] Text nameText;
+    [SerializeField] Text timeText;
     [SerializeField] Image buffImage;
-    [SerializeField] BuffConfig buffConfig;
+    [SerializeField] public BuffConfig buffConfig;
     [SerializeField] Canvas canvas;
-    BoxCollider2D boxCollider;
+    public BoxCollider2D boxCollider;
     string objectName;
+    Sprite originalBuffImage;
+   [SerializeField] Sprite buffMaskedImage;
+    public BuffObjectStatus status = BuffObjectStatus.Starting;
     int fieldNumber = 0;
     private void Awake()
     {
@@ -26,19 +29,27 @@ public class BUffObject : MonoBehaviourPun
         fieldNumber = (int)pv.InstantiationData[0];
         int index = (int)pv.InstantiationData[1];
         ParseBuffConfig(index);
-        boxCollider.enabled = true;
-        canvas.enabled = true;
+        SetBuffStatus(BuffObjectStatus.Starting);
         transform.SetParent(GameSession.GetBulletHome());
         // fieldNumber = (int)pv.InstantiationData[0];
         EventManager.StartListening(MyEvents.EVENT_FIELD_FINISHED, OnFieldFinished);
-
+        StartCoroutine(WaitAndActivate());
     }
+
+    float waitTime = 3f;
+    IEnumerator WaitAndActivate() {
+        for (int i = 0; i < waitTime; i++) {
+            timeText.text = (waitTime - i).ToString("0");
+            yield return new WaitForSeconds(1f);
+        }
+        SetBuffStatus(BuffObjectStatus.Enabled);
+    }
+
     void ParseBuffConfig(int index) {
         buffConfig = ConfigsManager.instance.buffConfigs[index];
         buff = buffConfig.Build();
         objectName = buffConfig.buff_name;
-        nameText.text = objectName;
-        buffImage.sprite = buffConfig.spriteImage;
+        originalBuffImage = buffConfig.spriteImage;
     }
 
     private void OnFieldFinished(EventObject obj)
@@ -46,13 +57,15 @@ public class BUffObject : MonoBehaviourPun
         if (obj.intObj != fieldNumber) return;
         if (pv.IsMine)
         {
-            if (deathRoutine != null) StopCoroutine(deathRoutine);            
+            if (deathRoutine != null) StopCoroutine(deathRoutine);    
+        
             PhotonNetwork.Destroy(pv);
         }
     }
 
     private void OnDisable()
     {
+        status = BuffObjectStatus.Starting;
         EventManager.StopListening(MyEvents.EVENT_GAME_FINISHED, OnFieldFinished);
     }
 
@@ -66,20 +79,43 @@ public class BUffObject : MonoBehaviourPun
             buffManager.pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)buff.buffType, buff.modifier, buff.duration);
             GooglePlayManager.IncrementAchievement(GPGSIds.achievement_buff_object_activated, 1);
         }
-        boxCollider.enabled = false;
-        canvas.enabled = false;
+        SetBuffStatus(BuffObjectStatus.Disabled);
         if (pv.IsMine) {
             deathRoutine = WaitAndDie();
             StartCoroutine(deathRoutine);
         }
-        
- 
     }
+    void SetBuffStatus(BuffObjectStatus status) {
+        if (status == BuffObjectStatus.Starting)
+        {
+            boxCollider.enabled = false;
+            canvas.enabled = true;
+            buffImage.sprite = buffMaskedImage;
+        }
+        else if (status == BuffObjectStatus.Enabled)
+        {
+            boxCollider.enabled = true;
+            canvas.enabled = true;
+            buffImage.sprite = originalBuffImage;
+            timeText.text = "";
+        }
+        else {
+
+            boxCollider.enabled = false;
+            canvas.enabled = false;
+        }
+        this.status = status;
+
+    }
+
     IEnumerator deathRoutine;
     IEnumerator WaitAndDie() {
         yield return new WaitForSeconds(1f);
         PhotonNetwork.Destroy(pv);
     }
 
-
+    
+}
+public enum BuffObjectStatus { 
+    Starting,Enabled,Disabled
 }

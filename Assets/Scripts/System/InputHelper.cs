@@ -158,7 +158,7 @@ public class InputHelper : MonoBehaviour
     }
     private bool FireButtonDown_PC()
     {
-        return Input.GetAxis("Fire1") > 0
+        return Input.GetAxis("Fire1") > 0 //TODO GetKeyDown
             || Input.GetKeyDown(KeyCode.Joystick1Button5)
             || Input.GetKeyDown(KeyCode.Joystick1Button7);
     }

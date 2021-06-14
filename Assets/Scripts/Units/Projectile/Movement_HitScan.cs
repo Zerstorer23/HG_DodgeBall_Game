@@ -14,7 +14,8 @@ MonoBehaviourPun
     Rigidbody2D myRigidBody;
     CircleCollider2D myCollider;
     Projectile_Movement pMove;
-
+    //다이나믹 -> 키네마틱 안줌
+    //키네마틱-.다이나믹 줌
     Queue<VelocityVector> velocityQueue = new Queue<VelocityVector>();
     private void Awake()
     {
@@ -28,8 +29,12 @@ MonoBehaviourPun
         velocityQueue.Clear();
      //  networkExpectedTime =(double) photonView.InstantiationData[3];
     }
-
-
+    /*
+     * TODO
+     * Image에서 터치이벤트 받기
+     * 계층기반 터치순서
+     */
+    //Image에 계층기반 ImageClick예제
     private void Update()
     {
       // if (PhotonNetwork.Time < networkExpectedTime) return;
@@ -37,6 +42,7 @@ MonoBehaviourPun
         {
 
             pMove.moveSpeed = moveSpeed;
+            //myRigidBody.AddForce()
             myRigidBody.velocity = GetAngledVector(pMove.eulerAngle, moveSpeed);
             EnqueuePosition(transform.position);
             DequeuePositions();

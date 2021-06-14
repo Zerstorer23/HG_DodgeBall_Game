@@ -142,6 +142,7 @@ public class GameSession : MonoBehaviourPun
         if (routine != null) {
             instance.StopCoroutine(routine);
         }
+
         return newRoutine;
     }
     public static CharacterType GetPlayerCharacter(Player player)

@@ -15,7 +15,8 @@ public partial class GameFieldManager : MonoBehaviourPun
     private SortedDictionary<int, List<Player>> playersInFieldsMap = new SortedDictionary<int, List<Player>>();
 
     [SerializeField] GameField singleField;
-    [SerializeField] TournamentGame tournamentGame;
+    [SerializeField] GameField field_CP;
+    [SerializeField] GameField field_CP_FFA;
 
     [Header("BuffSpawner")]
     public float spawnAfter = 6f;
@@ -53,7 +54,6 @@ public partial class GameFieldManager : MonoBehaviourPun
     {
         if (totalUnitsDictionary.ContainsKey(id))
         {
-            Debug.LogWarning("Duplicate add player>");
             totalUnitsDictionary[id] = go;
         }
         else
@@ -98,19 +98,37 @@ public partial class GameFieldManager : MonoBehaviourPun
             case GameMode.PVP:
             case GameMode.TEAM:
             case GameMode.PVE:
-                SetUpSingleField();
+                SetUpSingleField(instance.singleField);
+                break;
+            case GameMode.TeamCP:
+                SetUp_CP();
                 break;
             case GameMode.Tournament:
-                instance.tournamentGame.SetUpTournament();
+                SetUpTournament();
                 numRooms = 2;
                 break;
         }
         instance.AssignMyRoom(PhotonNetwork.PlayerList, numRooms);
     }
 
-    private static void SetUpSingleField()
+    private static void SetUp_CP()
     {
-        gameFields.Add(instance.singleField);
+        int homeNum = ConnectedPlayerManager.GetNumberInTeam(Team.HOME);
+        int awayNum = ConnectedPlayerManager.GetNumberInTeam(Team.AWAY);
+        if (homeNum == awayNum)
+        {
+            SetUpSingleField(instance.field_CP_FFA);
+        }
+        else
+        {
+           // SetUpSingleField(instance.field_CP_FFA);
+            SetUpSingleField(instance.field_CP);
+        }
+    }
+
+    private static void SetUpSingleField(GameField field)
+    {
+        gameFields.Add(field);
         gameFields[0].InitialiseMap(0);
     }
     private void OnGameStartRequested(EventObject arg0)
@@ -119,21 +137,7 @@ public partial class GameFieldManager : MonoBehaviourPun
         StartGame();
     }
    
-    private IEnumerator WaitAndContinueTournament(List<Player> survivors)
-    {
-        float delay = 3f;
-      //  Debug.Log("Open tourny panel ...");
-        GameSession.instance.tournamentPanel.SetPanel(survivors.ToArray(), delay);
-        EventManager.TriggerEvent(MyEvents.EVENT_POP_UP_PANEL, new EventObject() { objData = ScreenType.TournamentResult, boolObj = true });
-        AssignMyRoom(survivors.ToArray(), 2); 
-        GameSession.instance.tournamentPanel.SetNext(playersInFieldsMap);
-        yield return new WaitForSeconds(delay);
-        StartGame();
-        if (GameSession.LocalPlayer_FieldNumber == -1) {
-            ChangeToSpectator();
-        }
-    }
-
+   
     private void StartGame() {
         var roomSetting = PhotonNetwork.CurrentRoom.CustomProperties;
         MapDifficulty mapDiff = (MapDifficulty)roomSetting[ConstantStrings.HASH_MAP_DIFF];

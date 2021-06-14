@@ -11,9 +11,12 @@ public class BuffObjectSpawner : MonoBehaviour
 
     double lastSpawnTime;
     double startTime;
-    [SerializeField] GameField gameField;
+    GameField gameField;
     string prefabName = "Prefabs/BuffObjects/buffObject";
-
+    private void Awake()
+    {
+        gameField = GetComponentInParent<GameField>();
+    }
     internal void StartEngine()
     {
         startTime = PhotonNetwork.Time;

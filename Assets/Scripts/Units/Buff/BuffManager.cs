@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +23,12 @@ public class BuffManager : MonoBehaviourPun
         pv = GetComponent<PhotonView>();
         healthPoint = GetComponent<HealthPoint>();
         unitPlayer = GetComponent<Unit_Player>();
+    }
+    private void Start()
+    {
+        if (unitPlayer.myCharacter == CharacterType.YASUMI) {
+            pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.HideBuffs, 1f, -1d);
+        }
     }
     private void Update()
     {
@@ -54,7 +61,7 @@ public class BuffManager : MonoBehaviourPun
     void AddBuff(int bType, float mod, double _duration)
     {
         BuffData buff = new BuffData((BuffType) bType,  mod,  _duration);
-   //     buff.PrintContent();
+      //  buff.PrintContent();
         switch (buff.buffType)
         {
             case BuffType.None:
@@ -62,7 +69,16 @@ public class BuffManager : MonoBehaviourPun
             case BuffType.HealthPoint:
                 healthPoint.HealHP(1);
                 break;
+            case BuffType.Boom:
+                HandleBoom();
+                break;
+            case BuffType.CameraShake:
+                if (pv.IsMine) {
+                    pv.RPC("HandleCameraShake", RpcTarget.All, pv.Owner);
+                }
+                break;
             case BuffType.InvincibleFromBullets:
+            case BuffType.HideBuffs:
                 SetTrigger(buff.buffType, true);
                 break;
             case BuffType.MirrorDamage:
@@ -80,6 +96,17 @@ public class BuffManager : MonoBehaviourPun
             UpdateBuffIndicator(buff.buffType, true);
         }
     }
+
+    private void HandleBoom()
+    {
+        if (pv.IsMine)
+        {
+            if (GetTrigger(BuffType.InvincibleFromBullets)) return;
+            healthPoint.HealHP(-1);
+            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject("!!체력손실!!"));
+        }
+    }
+
     public void RemoveBuff(BuffData buff)
     {
         switch (buff.buffType)
@@ -87,6 +114,7 @@ public class BuffManager : MonoBehaviourPun
             case BuffType.None:
                 break;
             case BuffType.InvincibleFromBullets:
+            case BuffType.HideBuffs:
                 SetTrigger(buff.buffType, false);
                 break;
             case BuffType.MirrorDamage:
@@ -110,6 +138,13 @@ public class BuffManager : MonoBehaviourPun
             }
         }
         ToggleStat(BuffType.NumDamageReceivedWhileBuff, false);
+    }
+    [PunRPC]
+    public void HandleCameraShake(Player activator) {
+        if (PhotonNetwork.LocalPlayer == activator) return;
+        float duration = 1.5f;
+        MainCamera.instance.DoShake(time: duration);
+        MainCamera.instance.DoRotation(time: duration);
     }
 
     private void SetTrigger(BuffType type, bool enable)
@@ -205,7 +240,7 @@ public class BuffManager : MonoBehaviourPun
     }
 
     void UpdateBuffIndicator(BuffType changedBuff, bool enable) {
-        if (!pv.IsMine && unitPlayer!= null && unitPlayer.myCharacter == CharacterType.YASUMI)
+        if (!pv.IsMine && unitPlayer!= null && unitPlayer.buffManager.GetTrigger(BuffType.HideBuffs))
         {
             return;
         }

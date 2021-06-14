@@ -4976,6 +4976,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pv: {fileID: 0}
+  bodySprite: {fileID: 0}
 --- !u!95 &1950932548887221410
 Animator:
   serializedVersion: 3

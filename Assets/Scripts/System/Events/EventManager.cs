@@ -28,17 +28,17 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    private Dictionary<string, EventOneArg> eventDictionary;
+    private Dictionary<MyEvents, EventOneArg> eventDictionary;
 
     void Init() {
 
         if (eventDictionary == null)
         {
-            eventDictionary = new Dictionary<string, EventOneArg>();
+            eventDictionary = new Dictionary<MyEvents, EventOneArg>();
         }
     }
 
-    public EventOneArg GetEvent(string eventName) {
+    public EventOneArg GetEvent(MyEvents eventName) {
 
         EventOneArg thisEvent;
         eventDictionary.TryGetValue(eventName, out thisEvent);
@@ -46,11 +46,11 @@ public class EventManager : MonoBehaviour
 //       bool found= eventDictionary.TryGetValue(eventName,out thisEvent);
 
     }
-    public void AddEvent(string eventName, EventOneArg thisEvent) {
+    public void AddEvent(MyEvents eventName, EventOneArg thisEvent) {
         eventDictionary.Add(eventName, thisEvent);
     }
 
-    public static void StartListening(string eventName, UnityAction<EventObject> listener)
+    public static void StartListening(MyEvents eventName, UnityAction<EventObject> listener)
     {
         if (eventManager == null) return;
         EventOneArg thisEvent = eventManager.GetEvent(eventName);
@@ -66,7 +66,7 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    public static void StopListening(string eventName, UnityAction<EventObject> listener)
+    public static void StopListening(MyEvents eventName, UnityAction<EventObject> listener)
     {
         if (eventManager == null) return;
         EventOneArg thisEvent = eventManager.GetEvent(eventName);
@@ -76,7 +76,7 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    public static bool TriggerEvent(string eventName, EventObject variable)
+    public static bool TriggerEvent(MyEvents eventName, EventObject variable)
     {
         if (eventManager == null) {
             Debug.LogWarning("On Destroy no EventManager.");

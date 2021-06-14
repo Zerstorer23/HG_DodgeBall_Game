@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using System;
+using System.Collections;
 using UnityEngine;
 using static ConstantStrings;
 
@@ -36,7 +37,7 @@ public class SkillManager : MonoBehaviourPun
         InitSkill();
         if (pv.IsMine)
         {
-            if(!player.IsBot()) GameSession.GetInst().skillPanelUI.SetSkillInfo(this);
+            if(!player.IsBot())UI_SkillBox.SetSkillInfo(this);
             EventManager.StartListening(MyEvents.EVENT_MY_PROJECTILE_HIT, OnProjectileHit);
             EventManager.StartListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, OnPlayerKilledPlayer);
             EventManager.StartListening(MyEvents.EVENT_MY_PROJECTILE_MISS, OnProjectileMiss);
@@ -96,10 +97,21 @@ public class SkillManager : MonoBehaviourPun
             }
         }
     }
+
+    IEnumerator lastSkillRoutine;
     void MySkillFunction()
     {
         var actionSet = mySkill.GetSkillActionSet(this);
-        StartCoroutine(actionSet.Activate());
+        if (actionSet.isMutualExclusive)
+        {
+            if (lastSkillRoutine != null)
+            {
+                StopCoroutine(lastSkillRoutine);
+                player.KillUnderlings();
+            }
+        }
+        lastSkillRoutine = actionSet.Activate();
+        StartCoroutine(lastSkillRoutine);
     }
     /*public abstract ActionSet MySkillActions(SkillManager skillManager);
     public abstract void LoadInformation(SkillManager skillManager);*/
@@ -168,8 +180,10 @@ public class SkillManager : MonoBehaviourPun
                 mySkill = new Skill_Mikuru();
                 break;
             case CharacterType.KOIZUMI:
-            case CharacterType.KOIHIME:
                 mySkill = new Skill_Koizumi();
+                break;
+            case CharacterType.KOIHIME:
+                mySkill = new Skill_Koihime();
                 break;
             case CharacterType.KUYOU:
                 mySkill = new Skill_Kuyou();

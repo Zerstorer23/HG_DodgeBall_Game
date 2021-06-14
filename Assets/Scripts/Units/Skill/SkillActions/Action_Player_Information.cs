@@ -40,7 +40,7 @@ public class Action_GunObject_SetAngle : SkillAction
         return 0f;
     }
 }
-public class Action_Projectile_AddGravity : SkillAction
+public class Action_Player_AddGravity : SkillAction
 {
     // Start is called before the first frame update
     public override float Activate()
@@ -49,6 +49,16 @@ public class Action_Projectile_AddGravity : SkillAction
         Vector3 direction = GetParam<Vector3>(SkillParams.Vector3, Vector3.zero);
         float weight = GetParam<float>(SkillParams.Modifier, 0f);
         parent.casterPV.RPC("AddMovementForce", RpcTarget.AllBuffered, direction,weight);
+        return 0f;
+    }
+}
+public class Action_Player_ResetGravity : SkillAction
+{
+    // Start is called before the first frame update
+    public override float Activate()
+    {
+        if (parent.casterPV == null) return 0f;
+        parent.casterPV.RPC("AddMovementForce", RpcTarget.AllBuffered, Vector3.zero, 0f);
         return 0f;
     }
 }

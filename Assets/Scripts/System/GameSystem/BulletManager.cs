@@ -35,7 +35,11 @@ public class BulletManager : MonoBehaviour
 
     double lastIncrementTime;
 
-    [SerializeField]  GameField gameField;
+    GameField gameField;
+    private void Awake()
+    {
+        gameField = GetComponentInParent<GameField>();
+    }
     private void OnSuddenDeath(EventObject obj)
     {
        // activeMax += 4;

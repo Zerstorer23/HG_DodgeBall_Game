@@ -139,6 +139,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
                 {
                     contact = collision.GetContact(0);
                     DoBounceCollision(contact, collision.gameObject.transform.position);
+                    //boxcast
                 }
                 else if (movement.reactionType == ReactionType.Die && damageGiven)
                 {

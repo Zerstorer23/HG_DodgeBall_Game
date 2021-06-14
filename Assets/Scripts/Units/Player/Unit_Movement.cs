@@ -155,7 +155,10 @@ public class Unit_Movement :
             networkPos = transform.position;
             networkExpectedTime = PhotonNetwork.Time + GameSession.STANDARD_PING;
         }
-        networkPosIndicator.position = newPosition;
+        if (!unitPlayer.IsBot()) {
+
+            networkPosIndicator.position = newPosition;
+        }
     }
     Vector3 ClampPosition(Vector3 position, Vector3 direction) {
        // direction = CheckWallContact_Slide(position, direction);

@@ -38,7 +38,7 @@ public partial class GameFieldManager : MonoBehaviourPun
         else
         {
             Player winner = (instance.survivors.Count > 0) ? instance.survivors[0] : null;
-            FinishTheGame(winner);
+            instance.FinishTheGame(winner);
         }
     }
     bool CheckOtherFields(List<Player> survivors)
@@ -91,7 +91,8 @@ public partial class GameFieldManager : MonoBehaviourPun
         EventManager.TriggerEvent(MyEvents.EVENT_GAME_FINISHED, null);
         EventManager.TriggerEvent(MyEvents.EVENT_POP_UP_PANEL, new EventObject() { objData = ScreenType.GameOver, boolObj = true });
     }
-    private static void FinishTheGame(Player winner)
+    [PunRPC]
+    public void FinishTheGame(Player winner)
     {
         if (PhotonNetwork.IsMasterClient)
         {

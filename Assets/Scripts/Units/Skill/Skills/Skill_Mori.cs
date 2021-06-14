@@ -29,12 +29,10 @@ public class Skill_Mori : ISkill
         mySkill.Enqueue(new Action_Player_GetAim());
         mySkill.Enqueue(new Action_ModifyParameter_Vector3Multiply() { paramType = SkillParams.Vector3, paramValue = dashSpeed});
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Modifier, paramValue = 9f });
-        mySkill.Enqueue(new Action_Projectile_AddGravity());
+        mySkill.Enqueue(new Action_Player_AddGravity());
         mySkill.Enqueue(new Action_Player_InvincibleBuff());
         mySkill.Enqueue(new Action_WaitForSeconds());
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Modifier, paramValue = 0f }); 
-        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Vector3, paramValue = Vector3.zero }); 
-        mySkill.Enqueue(new Action_Projectile_AddGravity());
+        mySkill.Enqueue(new Action_Player_ResetGravity());
         return mySkill;
     }
 

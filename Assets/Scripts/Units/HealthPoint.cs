@@ -106,13 +106,13 @@ public class HealthPoint : MonoBehaviourPun
 
     internal void HealHP(int amount)
     {
-        if (currentLife < maxLife)
+        if (amount > 0 && currentLife >= maxLife) return;
+
+        if (pv.IsMine)
         {
-            if (pv.IsMine)
-            {
-                pv.RPC("ChangeHP", RpcTarget.AllBuffered, amount);
-            }
+            pv.RPC("ChangeHP", RpcTarget.AllBuffered, amount);
         }
+        
     }
     public bool IsInvincible() {
         return (invincibleFromBullets || buffManager.GetTrigger(BuffType.InvincibleFromBullets));    

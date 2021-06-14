@@ -13,5 +13,16 @@ public class EventObject
     public Projectile_DamageDealer sourceDamageDealer;
     public HealthPoint hitHealthPoint;
     public Vector3 vectorObj;
-
+    public EventObject() { 
+    
+    }
+    public EventObject(object obj) {
+        this.objData = obj;
+    }
+    public EventObject(string str) {
+        this.stringObj = str;
+    }
+    public T Get<T>() {
+        return (T)objData; 
+    }
 }

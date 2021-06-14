@@ -141,6 +141,20 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
             return null;
         }
     }
+    public static Player GetPlayerOfTeam(Team team)
+    {
+        instance.Init();
+        foreach (var p in instance.playerDict.Values)
+        {
+            if (!p.CustomProperties.ContainsKey("TEAM")) continue;
+            Team pTeam = (Team)p.CustomProperties["TEAM"];
+            if (pTeam == team)
+            {
+                return p;
+            }
+        }
+        return null;
+    }
 
     internal static int GetNumberInTeam(Team myTeam)
     {
@@ -149,9 +163,9 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         return instance.teamCount[myTeam];
     }
 
-    Dictionary<Team, int> teamCount = new Dictionary<Team, int>();
+    readonly Dictionary<Team, int> teamCount = new Dictionary<Team, int>();
     public static void CountPlayersInTeam() {
-        instance.teamCount = new Dictionary<Team, int>();
+        instance.teamCount.Clear();
         foreach (var p in instance.playerDict.Values)
         {
             if (!p.CustomProperties.ContainsKey("TEAM")) continue;

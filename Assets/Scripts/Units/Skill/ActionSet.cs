@@ -18,7 +18,7 @@ public class ActionSet
     internal UnityEngine.GameObject spawnedObject;
 
     private Dictionary<SkillParams, object> parameters = new Dictionary<SkillParams, object>();
-
+    public bool isMutualExclusive = false;
     internal T GetParam<T>(SkillParams key)
     {
         Debug.Assert(parameters.ContainsKey(key), " missing param : "+key);

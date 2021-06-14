@@ -17,13 +17,13 @@ public class Projectile_Homing : MonoBehaviourPun
     public ReactionType homingReaction = ReactionType.None;
     HealthPoint health;
     LayerMask findMask;
-    int numBounce = 0;
+    [SerializeField] int numBounce = 0;
     int maxBounce = 3;
     private void OnDrawGizmos()
     {
         if (homingTarget != null)
         {
-            Gizmos.color = Color.blue;
+            Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(homingTarget.transform.position, 0.8f);
         }
         Gizmos.DrawWireSphere(transform.position, homingDetectRange);
@@ -213,9 +213,9 @@ public class Projectile_Homing : MonoBehaviourPun
                     break;
                 case TAG_PROJECTILE:
                     if (!findProjectile) continue;
+                    if (!targetHP.IsMapProjectile() && targetHP.pv.IsMine) continue;
                     if (onlyFollowHostile)
                     {
-                        if (!targetHP.IsMapProjectile() && targetHP.pv.IsMine) continue;
                         if (GameSession.gameModeInfo.isTeamGame && targetHP.myTeam == health.myTeam) continue;
                         if (GameSession.gameModeInfo.isCoop && !targetHP.damageDealer.isMapObject) continue;
                     }

@@ -30,6 +30,10 @@ public class GameModeConfig : ScriptableObject
             case GameMode.Tournament:
                 fieldFinished = (stat.alive <= 1);
                 break;
+
+            case GameMode.TeamCP:
+                fieldFinished = false;
+                break;
         }
         return fieldFinished;
     }

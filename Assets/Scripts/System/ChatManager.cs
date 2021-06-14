@@ -63,7 +63,9 @@ public class ChatManager : MonoBehaviour, IChatClientListener
     void Start()
 	{
 		Application.runInBackground = true;
-
+		ConnectToChat();
+	}
+	public void ConnectToChat() {
 		userName = System.Environment.UserName;
 		currentChannelName = "Channel 001";
 
@@ -79,8 +81,6 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 		}
 		chatClient.Connect(chatAppSettings.AppIdChat, "1.0", new AuthenticationValues(userName));
 		AddLine(string.Format("연결시도", userName));
-
-
 	}
 
 	public void AddLine(string lineString)
@@ -190,7 +190,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 	{
 		if (level == ExitGames.Client.Photon.DebugLevel.ERROR)
 		{
-			Debug.LogError(message);
+			Debug.LogWarning(message);
 		}
 		else if (level == ExitGames.Client.Photon.DebugLevel.WARNING)
 		{
@@ -205,13 +205,26 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 	public void OnConnected()
 	{
 		AddLine("서버에 연결되었습니다.");
-
+		currTry = 0;
 		chatClient.Subscribe(new string[] { currentChannelName }, 10);
 	}
-
+	int maxTry = 10;
+	int currTry = 0;
 	public void OnDisconnected()
 	{
-		AddLine("채팅서버에 연결이 끊어졌습니다.");
+		AddLine("채팅서버에 연결이 끊어졌습니다. 재연결 시도 : "+currTry);
+		if (Application.isPlaying) {
+			StartCoroutine(RetryRoutine());
+		}
+	}
+	IEnumerator RetryRoutine() {
+		if (currTry < maxTry)
+		{
+			yield return new WaitForSeconds(5f);
+			ConnectToChat();
+			currTry++;
+		}
+
 	}
 
 	public void OnChatStateChange(ChatState state)

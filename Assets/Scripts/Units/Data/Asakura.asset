@@ -15,5 +15,5 @@ MonoBehaviour:
   characterID: 6
   txt_name: "\uC544\uC0AC\uCFE0\uB77C"
   noRandom: 0
-  txt_skill_desc: "360\uB3C4 \uD0C4\uB9C9\uACF5\uACA9"
+  txt_skill_desc: "\uC2DC\uACC4\uBC29\uD5A5\uC73C\uB85C \uCE7C\uC744 \uB358\uC9D1\uB2C8\uB2E4."
   portraitImage: {fileID: 21300000, guid: 000a92f51f19ed44d8cee7a9ca2aea5c, type: 3}

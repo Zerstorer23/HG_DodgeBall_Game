@@ -12,11 +12,21 @@ public class UI_SkillBox : MonoBehaviour
     [SerializeField] Text desc;
     [SerializeField] Text stackText;
     [SerializeField] Text colltimeText;
-    public void SetSkillInfo(SkillManager skm) {
-        skill = skm;
-        portrait.sprite = ConfigsManager.unitDictionary[skm.myCharacter].portraitImage;
-        desc.text = ConfigsManager.unitDictionary[skm.myCharacter].txt_skill_desc;
-    
+    private static UI_SkillBox instance;
+    private void Awake()
+    {
+        instance = this;
+    }
+    public static void SetSkillInfo(SkillManager skm) {
+        instance.skill = skm;
+        instance.portrait.sprite = ConfigsManager.unitDictionary[skm.myCharacter].portraitImage;
+        instance.desc.text = ConfigsManager.unitDictionary[skm.myCharacter].txt_skill_desc;
+    }
+    public static void SetSkillInfo(SkillManager skm, CharacterType character)
+    {
+        instance.skill = skm;
+        instance.portrait.sprite = ConfigsManager.unitDictionary[character].portraitImage;
+        instance.desc.text = ConfigsManager.unitDictionary[character].txt_skill_desc;
     }
     private void FixedUpdate()
     {

@@ -156,7 +156,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         }
     }
     public bool CheckTeamValidity() {
-        if (!GameSession.gameModeInfo.isTeamGame) return true;
+        if (!GameSession.gameModeInfo.isTeamGame || GameSession.instance.devMode) return true;
         Team masterTeam = (Team)PhotonNetwork.LocalPlayer.CustomProperties["TEAM"];
         Player[] players = PhotonNetwork.PlayerList;
         foreach (Player p in players)

@@ -12,12 +12,14 @@ public class Skill_Kyon : ISkill
     */
 
     ISkill obtainedSkill = null;
-    public override ActionSet GetSkillActionSet(SkillManager skillManager) {
+    public override ActionSet GetSkillActionSet(SkillManager skillManager)
+    {
         if (obtainedSkill == null)
         {
             return GetKyonkoSet(skillManager);
         }
-        else {
+        else
+        {
             return obtainedSkill.GetSkillActionSet(skillManager);
         }
     }
@@ -29,34 +31,52 @@ public class Skill_Kyon : ISkill
     }
     SkillManager original;
 
-/*    public override void OnMyProjectileHit(EventObject eo)
-    {
-        HealthPoint targetHP = eo.hitHealthPoint;
-        if (targetHP.unitType != UnitType.Player) return;
-        if (targetHP.unitPlayer.myCharacter == CharacterType.KYONKO|| targetHP.unitPlayer.myCharacter == CharacterType.KYONKO) return;
-        Debug.Log("Changed skill ");
-        obtainedSkill = targetHP.unitPlayer.skillManager.mySkill;
-        original.maxStack = 1;
-        obtainedSkill.LoadInformation(original);
-    }*/
+    /*    public override void OnMyProjectileHit(EventObject eo)
+        {
+            HealthPoint targetHP = eo.hitHealthPoint;
+            if (targetHP.unitType != UnitType.Player) return;
+            if (targetHP.unitPlayer.myCharacter == CharacterType.KYONKO|| targetHP.unitPlayer.myCharacter == CharacterType.KYONKO) return;
+            Debug.Log("Changed skill ");
+            obtainedSkill = targetHP.unitPlayer.skillManager.mySkill;
+            original.maxStack = 1;
+            obtainedSkill.LoadInformation(original);
+        }*/
     public override void OnPlayerKilledPlayer(EventObject eo)
     {
         HealthPoint targetHP = eo.hitHealthPoint;
         if (targetHP.unitType != UnitType.Player) return;
+        CheckYasumi(targetHP);
         if (targetHP.unitPlayer.myCharacter == CharacterType.KYONKO || targetHP.unitPlayer.myCharacter == CharacterType.KYONKO) return;
         Debug.Log("Changed skill ");
         obtainedSkill = targetHP.unitPlayer.skillManager.mySkill;
         original.maxStack = 1;
         obtainedSkill.LoadInformation(original);
+        UI_SkillBox.SetSkillInfo(original, targetHP.unitPlayer.myCharacter);
     }
-    public ActionSet GetKyonkoSet(SkillManager skm) {
+    void CheckYasumi(HealthPoint targetHP)
+    {
+        if (targetHP.unitPlayer.myCharacter == CharacterType.YASUMI)
+        {
+            if (original.pv.IsMine)
+            {
+                original.pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.HideBuffs, 1f, -1d);
+            }
+        }
+        else
+        {
+            BuffData buff = new BuffData(BuffType.HideBuffs, 1f, -1d);
+            original.buffManager.RemoveBuff(buff);
+        }
+    }
+    public ActionSet GetKyonkoSet(SkillManager skm)
+    {
         ActionSet mySkill = new ActionSet(skm);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KYONKO);
         mySkill.SetParam(SkillParams.MoveSpeed, 25f);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
         mySkill.SetParam(SkillParams.Duration, 0.17f);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition());
-       // mySkill.Enqueue(new Action_GetCurrentPlayerPosition_AngledOffset());
+        // mySkill.Enqueue(new Action_GetCurrentPlayerPosition_AngledOffset());
         mySkill.Enqueue(new Action_InstantiateBulletAt());
         mySkill.Enqueue(new Action_SetProjectileStraight());
         mySkill.Enqueue(new Action_DoDeathAfter());

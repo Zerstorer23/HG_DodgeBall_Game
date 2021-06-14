@@ -223,6 +223,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pv: {fileID: 0}
+  bodySprite: {fileID: 0}
 --- !u!114 &8629071319047820328
 MonoBehaviour:
   m_ObjectHideFlags: 0

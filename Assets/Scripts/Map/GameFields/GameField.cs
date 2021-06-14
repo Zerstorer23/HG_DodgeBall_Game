@@ -8,18 +8,25 @@ public class GameField : MonoBehaviour
 {
     public int fieldNo = 0;
     public MapSpec mapSpec = new MapSpec();
-    [SerializeField] public PlayerSpawner playerSpawner;
-    [SerializeField] public BulletManager bulletSpawner;
-    [SerializeField] public BuffObjectSpawner buffSpawner;
-    [SerializeField] public WallManager wallManager;
+    [HideInInspector] public PlayerSpawner playerSpawner;
+    [HideInInspector] public BulletManager bulletSpawner;
+    [HideInInspector] public BuffObjectSpawner buffSpawner;
+    [HideInInspector] public WallManager wallManager;
     Transform mapTransform;
     public Transform[] map_transforms;
     public Vector3 originalMapSize;
     public bool suddenDeathCalled = false;
     public bool gameFieldFinished = false;
     public int expectedNumPlayer = 0;
+    public virtual void Awake()
+    {
+        playerSpawner = GetComponentInChildren<PlayerSpawner>();
+        bulletSpawner = GetComponentInChildren<BulletManager>();
+        buffSpawner = GetComponentInChildren<BuffObjectSpawner>();
+        wallManager = GetComponentInChildren<WallManager>();
+    }
 
-    private void OnEnable()
+    public virtual void OnEnable()
     {
         EventManager.StartListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeathTriggered);
         EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
@@ -29,7 +36,7 @@ public class GameField : MonoBehaviour
         suddenDeathTimeoutRoutine = WaitAndSuddenDeath();
         StartCoroutine(suddenDeathTimeoutRoutine);
     }
-    private void OnDisable()
+    public virtual void OnDisable()
     {
         EventManager.StopListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeathTriggered);
         EventManager.StopListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
@@ -39,8 +46,10 @@ public class GameField : MonoBehaviour
     IEnumerator suddenDeathTimeoutRoutine = null;
     IEnumerator WaitAndSuddenDeath (){
         yield return new WaitForSeconds(GameFieldManager.instance.suddenDeathTime);
-        Debug.Log("Time out do suddendeath");
-        if (!suddenDeathCalled) {
+
+        if (!suddenDeathCalled)
+        {
+            Debug.Log("Time out do suddendeath");
             CheckSuddenDeath(0, true);
         }
     }
@@ -53,7 +62,7 @@ public class GameField : MonoBehaviour
         }
         gameObject.SetActive(false);
     }
-    public void CheckFieldConditions(GameStatus stat)
+    public virtual void CheckFieldConditions(GameStatus stat)
     {
         if (gameFieldFinished) return;
         CheckSuddenDeath(stat.alive);
@@ -216,10 +225,11 @@ public class GameField : MonoBehaviour
     }
 
 
-    public Vector3 GetRandomPlayerSpawnPosition(int pNumber)
+    public virtual Vector3 GetPlayerSpawnPosition()
     {
-        int x = pNumber % w;
-        int y = pNumber / w;
+        int myIndex = ConnectedPlayerManager.GetMyIndex(GameFieldManager.GetPlayersInField(fieldNo));
+        int x = myIndex % w;
+        int y = myIndex / w;
         return GetPoissonPositionNear(x, y);
 
     }
