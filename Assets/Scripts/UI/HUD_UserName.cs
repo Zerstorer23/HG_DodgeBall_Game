@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static ConstantStrings;
 
 public class HUD_UserName : MonoBehaviourPun
 {
@@ -18,20 +19,25 @@ public class HUD_UserName : MonoBehaviourPun
     string playerName = "ㅇㅇ";
     CharacterType selectedCharacter = CharacterType.HARUHI;
     Team myTeam = Team.HOME;
-
+    Controller controller;
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
         teamColorImage = GetComponent<Image>();
+        controller = GetComponent<Controller>();
         teamColorImage.enabled = false;
     }
     private void OnEnable()
     {
         EventManager.StartListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
-        playerName = pv.Owner.NickName;
+        playerName = controller.Owner.NickName;
         isReady = false;
+
+        bool isBot = (bool)pv.InstantiationData[0];
+        string uid = (string)pv.InstantiationData[1];
+        controller.SetControllerInfo(isBot, uid);
         UpdateUI();
-        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_JOINED, new EventObject() { stringObj = pv.Owner.UserId, goData = gameObject });
+        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_JOINED, new EventObject() { stringObj = uid, goData = gameObject });
     }
     private void OnDisable()
     {
@@ -41,10 +47,10 @@ public class HUD_UserName : MonoBehaviourPun
 
     private void OnGamemodeChanged(EventObject arg0)
     {
-        if (pv.IsMine) {
+        if (controller.IsMine) {
             GameModeConfig currMode = (GameModeConfig)arg0.objData;
             if (currMode.isTeamGame) {
-                myTeam = (ConnectedPlayerManager.GetMyIndex(PhotonNetwork.PlayerList) % 2 == 0) ? Team.HOME : Team.AWAY;
+                myTeam = (PlayerManager.GetMyIndex(PlayerManager.GetPlayers()) % 2 == 0) ? Team.HOME : Team.AWAY;
             }
             pv.RPC("SetTeam", RpcTarget.AllBuffered, (int)myTeam);
         }
@@ -54,9 +60,9 @@ public class HUD_UserName : MonoBehaviourPun
     public void SetTeam(int teamNumber)
     {
         myTeam = (Team)teamNumber;
-        if (pv.IsMine)
+        if (controller.IsMine)
         {
-            PushPlayerSetting(pv.Owner, "TEAM", myTeam);
+           controller.Owner.SetCustomProperties("TEAM", myTeam);
         }
         UpdateUI();
     }
@@ -64,9 +70,9 @@ public class HUD_UserName : MonoBehaviourPun
     public void ToggleTeam()
     {
         myTeam = (myTeam == Team.HOME) ? Team.AWAY : Team.HOME;
-        if (pv.IsMine)
+        if (controller.IsMine)
         {
-            PushPlayerSetting(pv.Owner, "TEAM", myTeam);
+            controller.Owner.SetCustomProperties("TEAM", myTeam);
         }
         UpdateUI();
     }
@@ -74,8 +80,9 @@ public class HUD_UserName : MonoBehaviourPun
     public void ChangeCharacter(int character)
     {
         selectedCharacter = (CharacterType)character;
-        if (pv.IsMine) {
-            PushPlayerSetting(pv.Owner, "CHARACTER", selectedCharacter);
+        if (controller.IsMine)
+        {
+            controller.Owner.SetCustomProperties("CHARACTER", selectedCharacter);
         }
         UpdateUI();
     }
@@ -84,7 +91,7 @@ public class HUD_UserName : MonoBehaviourPun
     public void ChangeName(string text)
     {
         playerName = text;
-        if (pv.IsMine) {
+        if (controller.IsLocal) {
             PhotonNetwork.LocalPlayer.NickName = playerName;
         }
         UpdateUI();
@@ -111,17 +118,12 @@ public class HUD_UserName : MonoBehaviourPun
         if (GameSession.gameModeInfo.isTeamGame)
         {
             teamColorImage.enabled = true;
-            teamColorImage.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[myTeam == Team.HOME ? 0 : 1]);
+            teamColorImage.color = GetColorByHex(team_color[(int)myTeam]);
         }
         else
         {
             teamColorImage.enabled = false;
         };
     }
-    public static void PushPlayerSetting(Player p, string key, object value) {
-        ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
-        hash.Add(key, value);
-        p.SetCustomProperties(hash);
-        
-    } 
+
 }

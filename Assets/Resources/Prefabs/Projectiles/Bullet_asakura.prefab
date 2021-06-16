@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -8895642817908627982}
   - component: {fileID: 6212558457632629342}
   - component: {fileID: 4556413170392631494}
+  - component: {fileID: -958052663103056325}
   - component: {fileID: 8629071319047820328}
   m_Layer: 11
   m_Name: Bullet_asakura
@@ -124,6 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitType: 2
+  controller: {fileID: 0}
   currentLife: 0
   invincibleFromBullets: 1
   invincibleFromMapBullets: 0
@@ -162,7 +164,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pv: {fileID: 0}
+  controller: {fileID: 0}
   bodySprite: {fileID: 0}
+--- !u!114 &-958052663103056325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8629071319047820310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6addfcd375ca3641aee785c507548c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controllerType: 0
+  uid: 
 --- !u!114 &8629071319047820328
 MonoBehaviour:
   m_ObjectHideFlags: 0

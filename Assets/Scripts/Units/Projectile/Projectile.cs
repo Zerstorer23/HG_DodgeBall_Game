@@ -11,12 +11,14 @@ public class Projectile : MonoBehaviourPun
     int fieldNo = 0;
     HealthPoint health;
     Projectile_Movement movement;
+    public Controller controller;
 
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
         health = GetComponent<HealthPoint>();
         movement = GetComponent<Projectile_Movement>();
+        controller = GetComponent<Controller>();
     }
     private void OnEnable()
     {
@@ -26,17 +28,20 @@ public class Projectile : MonoBehaviourPun
         movement.SetAssociatedField(fieldNo);
         string playerID = (string)pv.InstantiationData[1];
         bool followPlayer = (bool)pv.InstantiationData[2];
-        player = GameFieldManager.gameFields[fieldNo].playerSpawner.GetPlayerByOwnerID(playerID);
+        player = GameFieldManager.gameFields[fieldNo].playerSpawner.GetUnitByControllerID(playerID);
 
         if (player != null)
         {
+            controller.SetControllerInfo(player.controller.IsBot, playerID);
             if (followPlayer)
             {
                 player.SetMyProjectile(gameObject);
             }
             player.AddProjectile(gameObject.GetInstanceID(), health);
         }
-        else {
+        else
+        {
+            controller.SetControllerInfo(PhotonNetwork.MasterClient);
             transform.SetParent(GameSession.GetBulletHome());
         }
     }

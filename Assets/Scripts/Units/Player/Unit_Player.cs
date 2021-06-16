@@ -21,6 +21,7 @@ public class Unit_Player : MonoBehaviourPun
     [SerializeField]Animator gunAnimator;
     [SerializeField]EnemyIndicator enemyIndicator;
     public GameObject driverIndicator;
+    public Controller controller;
 
     List<GameObject> myUnderlings = new List<GameObject>();
     Dictionary<int, HealthPoint> myProjectiles = new Dictionary<int, HealthPoint>();
@@ -32,8 +33,6 @@ public class Unit_Player : MonoBehaviourPun
 
     CircleCollider2D circleCollider;
     // Start is called before the first frame update
-    public int evasion = 0;
-    [SerializeField] bool isBot = false;
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -43,27 +42,26 @@ public class Unit_Player : MonoBehaviourPun
         buffManager = GetComponent<BuffManager>();
         circleCollider = GetComponent<CircleCollider2D>();
         skillManager = GetComponent<SkillManager>();
+        controller = GetComponent<Controller>();
     }
     private void OnDisable()
     {
-        if (pv.IsMine && !isBot)
+        if (controller.IsLocal)
         {
-            EventManager.StopListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
             EventManager.StopListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, IncrementKill);
+            EventManager.StopListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
             GameFieldManager.ChangeToSpectator();
         }
         circleCollider.radius = 0.33f;
         myProjectiles.Clear();
-        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_DIED, new EventObject() { stringObj = pv.Owner.UserId, intObj = fieldNo });
+        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_DIED, new EventObject() { stringObj = controller.uid, intObj = fieldNo });
     }
     private void OnEnable()
     {
-        evasion = 0;
         myPortrait.color = new Color(1, 1, 1);
         myUnderlings = new List<GameObject>();
-        myTeam = (Team)pv.Owner.CustomProperties["TEAM"];
         ParseInstantiationData();
-        if (pv.IsMine && !isBot)
+        if (controller.IsLocal)
         {
             EventManager.StartListening(MyEvents.EVENT_REQUEST_SUDDEN_DEATH, OnSuddenDeath);
             EventManager.StartListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, IncrementKill);
@@ -72,23 +70,29 @@ public class Unit_Player : MonoBehaviourPun
             ChatManager.SetInputFieldVisibility(false);
             UI_StatDisplay.SetPlayer(this);
         }
-        if (!isBot) {
-            GameFieldManager.gameFields[fieldNo].playerSpawner.RegisterPlayer(pv.Owner.UserId, this);
-            EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_SPAWNED, new EventObject() { stringObj = pv.Owner.UserId, goData = gameObject, intObj = fieldNo });
-        }
+        GameFieldManager.gameFields[fieldNo].playerSpawner.RegisterPlayer(controller.uid, this);
+        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_SPAWNED, new EventObject() { stringObj = controller.uid, goData = gameObject, intObj = fieldNo });
+     
     }
     void ParseInstantiationData() {
         myCharacter = (CharacterType)pv.InstantiationData[0];
         myPortrait.sprite = ConfigsManager.unitDictionary[myCharacter].portraitImage;
         CheckCustomCharacter();
         int maxLife = (int)pv.InstantiationData[1];
+    
+        fieldNo = (int)pv.InstantiationData[2];
+
+        bool isBot = (bool)pv.InstantiationData[3];
+        string uid = (string)pv.InstantiationData[4];
+        controller.SetControllerInfo(isBot, uid);
         if (GameSession.gameModeInfo.isTeamGame)
         {
-            maxLife += GetTeamBalancedLife((Team)pv.Owner.CustomProperties["TEAM"], maxLife);
+            maxLife += GetTeamBalancedLife(controller.Owner.GetProperty("TEAM",Team.HOME), maxLife);
         }
         health.SetMaxLife(maxLife);
-        fieldNo = (int)pv.InstantiationData[2];
-        isBot = (bool)pv.InstantiationData[3];
+        myTeam = controller.Owner.GetProperty("TEAM",Team.HOME);
+
+
         if (fieldNo < GameFieldManager.gameFields.Count) {
             movement.SetMapSpec(GameFieldManager.gameFields[fieldNo].mapSpec);
         }
@@ -118,9 +122,7 @@ public class Unit_Player : MonoBehaviourPun
 
     private void OnSuddenDeath(EventObject obj)
     {
-        if (pv.IsMine && !isBot) {
-            enemyIndicator.SetTargetAsNearestEnemy();
-        }
+        enemyIndicator.SetTargetAsNearestEnemy();
     }
     [PunRPC]
     public void SetBodySize(float radius)
@@ -130,21 +132,19 @@ public class Unit_Player : MonoBehaviourPun
     [PunRPC]
     public void TriggerMessage(string msg)
     {
-        if (!pv.IsMine || isBot) return;
-        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = msg });
+        if (!controller.IsLocal) return;
+        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(msg));
     }
     void Start()
     {
-        StatisticsManager.RPC_AddToStat(StatTypes.KILL, pv.Owner.UserId, 0);
-        StatisticsManager.RPC_AddToStat(StatTypes.SCORE, pv.Owner.UserId, 0);
-        StatisticsManager.RPC_AddToStat(StatTypes.EVADE, pv.Owner.UserId, 0);
-
-
+        StatisticsManager.RPC_AddToStat(StatTypes.KILL, controller.uid, 0);
+        StatisticsManager.RPC_AddToStat(StatTypes.SCORE, controller.uid, 0);
+        StatisticsManager.RPC_AddToStat(StatTypes.EVADE, controller.uid, 0);
     }  // Update is called once per frame
 
     private int GetTeamBalancedLife(Team myTeam, int maxLife) {
-        int numMyTeam = ConnectedPlayerManager.GetNumberInTeam(myTeam);
-        int otherTeam = ConnectedPlayerManager.GetNumberInTeam((myTeam == Team.HOME) ? Team.AWAY : Team.HOME);
+        int numMyTeam = PlayerManager.GetNumberInTeam(myTeam);
+        int otherTeam = PlayerManager.GetNumberInTeam((myTeam == Team.HOME) ? Team.AWAY : Team.HOME);
         int underdogged = (otherTeam - numMyTeam) * maxLife;
         if (underdogged <= 0) return 0; //같거나 우리팀이 더 많음
         return underdogged / numMyTeam; //차이 /우리팀수 
@@ -166,15 +166,14 @@ public class Unit_Player : MonoBehaviourPun
         obj.transform.localPosition = Vector3.zero;
 
     }
-    public bool IsBot() => isBot;
     public void PlayHitAudio()
     {
-        if (!pv.IsMine || isBot) return;
+        if (!health.controller.IsLocal) return;
         AudioManager.PlayAudioOneShot(hitAudio);
     }
     public void PlayShootAudio()
     {
-        if (!pv.IsMine || isBot) return;
+        if (!health.controller.IsLocal) return;
         AudioManager.PlayAudioOneShot(shootAudio);
 
     }
@@ -195,21 +194,21 @@ public class Unit_Player : MonoBehaviourPun
     }
     public void IncrementKill(EventObject eo)
     {
-        if (eo.stringObj == pv.Owner.UserId) {
-            StatisticsManager.RPC_AddToStat(StatTypes.KILL, pv.Owner.UserId, 1);
-            StatisticsManager.RPC_AddToStat(StatTypes.SCORE, pv.Owner.UserId, 16);
+        if (controller.IsSame(eo.stringObj)) {
+            StatisticsManager.RPC_AddToStat(StatTypes.KILL,  controller.uid, 1);
+            StatisticsManager.RPC_AddToStat(StatTypes.SCORE, controller.uid, 16);
             StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_KILLS, 1);
         }
-
     }
     public void IncrementEvasion()
     {
-        if (pv.IsMine && !isBot)
+        if (controller.IsMine)
         {
-            evasion++;
-            StatisticsManager.RPC_AddToStat(StatTypes.EVADE, pv.Owner.UserId, 1);
-            StatisticsManager.RPC_AddToStat(StatTypes.SCORE, pv.Owner.UserId, 1);
-            StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_EVADES, 1);
+            if (controller.IsLocal) {
+                StatisticsManager.RPC_AddToStat(StatTypes.EVADE, controller.uid, 1);
+                StatisticsManager.RPC_AddToStat(StatTypes.SCORE, controller.uid, 1);
+                StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_EVADES, 1);
+            }
             pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.Cooltime, 0.2f, 5d);       //(int bType, float mod, double _duration)
         }
     }

@@ -30,10 +30,9 @@ public class UI_StatDisplay : MonoBehaviour
         myPlayer = p;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (myPlayer == null) return;
-        int evades = myPlayer.evasion;
-        displayText.text = string.Format("{0}...{1}킬 {2}회피", PhotonNetwork.NickName, kills.ToString(), evades.ToString());
+        displayText.text = string.Format("{0}...{1}킬 {2}회피", PhotonNetwork.NickName, kills.ToString(),StatisticsManager.GetStat(StatTypes.EVADE,PhotonNetwork.LocalPlayer.UserId));
     }
 }

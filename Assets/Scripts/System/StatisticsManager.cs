@@ -87,6 +87,17 @@ public class StatisticsManager : MonoBehaviourPun
             statLibrary[head][tag] += amount;
         }
     }
+    internal static void SetBotProperty_Broadcast(string uid, string v, object value)
+    {
+        instance.pv.RPC("SetBotProperty", RpcTarget.OthersBuffered, uid, v, value);
+    }
+    [PunRPC]
+    public void SetBotProperty(string uid, string key, object value)
+    {
+        var player = PlayerManager.GetPlayerByID(uid);
+        player.SetCustomProperties(key, value, false);
+    }
+
     public  void LoadMyStats() {
         try { 
         int kills = PlayerPrefs.GetInt(ConstantStrings.PREFS_KILLS, 0);
@@ -146,7 +157,7 @@ public class StatisticsManager : MonoBehaviourPun
         {
            return instance.statLibrary[stype][playerID];
         }
-        else return 0;
+       return 0;
     }
 
 

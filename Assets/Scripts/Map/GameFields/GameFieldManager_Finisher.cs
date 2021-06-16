@@ -8,12 +8,13 @@ using UnityEngine;
 
 public partial class GameFieldManager : MonoBehaviourPun
 {
-    public List<Player> survivors = new List<Player>();
+    public List<UniversalPlayer> survivors = new List<UniversalPlayer>();
     [PunRPC]
-    public void NotifyFieldWinner(int fieldNo, Player winner)
+    public void NotifyFieldWinner(int fieldNo, string winnerID)
     {
         GameField field = gameFields[fieldNo];
-        if (field.gameFieldFinished) return; 
+        if (field.gameFieldFinished) return;
+        UniversalPlayer winner = PlayerManager.GetPlayerByID(winnerID);
         Debug.Log(fieldNo + " Received notifty field winner " + winner);
         field.gameFieldFinished = true;
         field.fieldWinner = winner;
@@ -37,11 +38,11 @@ public partial class GameFieldManager : MonoBehaviourPun
         }
         else
         {
-            Player winner = (instance.survivors.Count > 0) ? instance.survivors[0] : null;
-            instance.FinishTheGame(winner);
+            UniversalPlayer winner = (instance.survivors.Count > 0) ? instance.survivors[0] : null;
+            instance.FinishTheGame(winner.uid);
         }
     }
-    bool CheckOtherFields(List<Player> survivors)
+    bool CheckOtherFields(List<UniversalPlayer> survivors)
     {
         for (int i = 0; i < instance.numActiveFields; i++)
         {
@@ -60,10 +61,10 @@ public partial class GameFieldManager : MonoBehaviourPun
     }
     internal static void QueryGameFinished()
     {
-        Player winner = null;
+        UniversalPlayer winner = null;
         for (int i = 0; i < instance.numActiveFields; i++)
         {
-            (bool,Player) finishedStat = gameFields[i].QueryFieldFinish();
+            (bool,UniversalPlayer) finishedStat = gameFields[i].QueryFieldFinish();
             Debug.Log("Finished " + finishedStat.Item1 + " winner " + finishedStat.Item2);
             if (!finishedStat.Item1) return;
             winner =finishedStat.Item2;
@@ -72,10 +73,10 @@ public partial class GameFieldManager : MonoBehaviourPun
         //All Field Finished
         Debug.LogWarning("Error game ");
         ChatManager.SendNotificationMessage("게임 에러");
-        instance.photonView.RPC("EjectGame",RpcTarget.AllBuffered, winner);
+        instance.photonView.RPC("EjectGame",RpcTarget.AllBuffered, winner.uid);
     }
     [PunRPC]
-    public void EjectGame(Player winner)
+    public void EjectGame(string winnerID)
     {
         for (int i = 0; i < instance.numActiveFields; i++)
         {
@@ -87,17 +88,19 @@ public partial class GameFieldManager : MonoBehaviourPun
         {
             GameSession.PushRoomASetting(ConstantStrings.HASH_GAME_STARTED, false);
         }
+        UniversalPlayer winner = PlayerManager.GetPlayerByID(winnerID);
         GameSession.GetInst().gameOverManager.SetPanel(winner);//이거 먼저 호출하고 팝업하세요
         EventManager.TriggerEvent(MyEvents.EVENT_GAME_FINISHED, null);
         EventManager.TriggerEvent(MyEvents.EVENT_POP_UP_PANEL, new EventObject() { objData = ScreenType.GameOver, boolObj = true });
     }
     [PunRPC]
-    public void FinishTheGame(Player winner)
+    public void FinishTheGame(string winnerID)
     {
         if (PhotonNetwork.IsMasterClient)
         {
             GameSession.PushRoomASetting(ConstantStrings.HASH_GAME_STARTED, false);
         }
+        UniversalPlayer winner = PlayerManager.GetPlayerByID(winnerID);
         GameSession.GetInst().gameOverManager.SetPanel(winner);//이거 먼저 호출하고 팝업하세요
         EventManager.TriggerEvent(MyEvents.EVENT_GAME_FINISHED, null);
         EventManager.TriggerEvent(MyEvents.EVENT_POP_UP_PANEL, new EventObject() { objData = ScreenType.GameOver, boolObj = true });

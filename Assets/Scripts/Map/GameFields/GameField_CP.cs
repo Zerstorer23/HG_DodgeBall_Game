@@ -16,7 +16,7 @@ public class GameField_CP : GameField
     }
     public override Vector3 GetPlayerSpawnPosition()
     {
-        Team team = (Team)ConnectedPlayerManager.GetPlayerProperty("TEAM", Team.NONE);
+        Team team = PlayerManager.LocalPlayer.GetProperty("TEAM", Team.NONE);
         if (team == Team.HOME)
         {
             return spawnPositions[0].position;
@@ -53,7 +53,7 @@ public class GameField_CP : GameField
     }
     internal void FinishGame(Team winTeam)
     {
-        Player winner = ConnectedPlayerManager.GetPlayerOfTeam(winTeam);
+        UniversalPlayer winner = PlayerManager.GetPlayerOfTeam(winTeam);
         Debug.Log("GAME FISNISHED /  winner " + winner);
         if (gameFieldFinished) return;
         gameFieldFinished = true;
@@ -62,7 +62,7 @@ public class GameField_CP : GameField
         //  Debug.Log("FIeld " + fieldNo + " finished with winner " + fieldWinner);
         EventManager.TriggerEvent(MyEvents.EVENT_FIELD_FINISHED, new EventObject() { intObj = fieldNo });
         gameObject.SetActive(false);
-        GameFieldManager.pv.RPC("FinishTheGame", RpcTarget.AllBufferedViaServer, winner);
+        GameFieldManager.pv.RPC("FinishTheGame", RpcTarget.AllBufferedViaServer, winner.uid);
     }
     public override void CheckFieldConditions(GameStatus stat)
     {

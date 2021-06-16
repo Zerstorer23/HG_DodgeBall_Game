@@ -14,6 +14,7 @@ public class Unit_Movement :
 
     BuffManager buffManager;
     Unit_Player unitPlayer;
+    Controller controller;
     public Unit_AutoDrive autoDriver;
     [SerializeField] internal GameObject directionIndicator;
     Transform networkPosIndicator;
@@ -38,6 +39,7 @@ public class Unit_Movement :
         unitPlayer = GetComponent<Unit_Player>();
         moveForce = GetComponent<Movement_Force>();
         myRigidBody = GetComponent<Rigidbody2D>();
+        controller = GetComponent<Controller>();
 
         networkPosIndicator = GameSession.GetInst().networkPos;
     }
@@ -48,8 +50,8 @@ public class Unit_Movement :
         //  if (GameSession.gameModeInfo.gameMode == GameMode.Tournament && PhotonNetwork.CurrentRoom.PlayerCount % 2 == 1 ) MenuManager.auto_drive = false;
 
         autoDriver.StartBot(
-            (GameSession.auto_drive_enabled ||unitPlayer.IsBot()),
-            unitPlayer.IsBot());
+            (GameSession.auto_drive_enabled || controller.IsBot),
+            controller.IsBot);
     }
 
 
@@ -60,10 +62,11 @@ public class Unit_Movement :
 
     private void Start()
     {
-        if (pv.IsMine && !unitPlayer.IsBot())
+        if (controller.IsMine)
         {
-
-            directionIndicator.SetActive(true);
+            if (controller.IsLocal) {
+                directionIndicator.SetActive(true);
+            }
             positionQueue = new Queue<TimeVector>();
             networkPos = transform.position;
         }
@@ -80,7 +83,7 @@ public class Unit_Movement :
     }
     public float GetMovementSpeed() => moveSpeed * buffManager.GetBuff(BuffType.MoveSpeed);
     void CheckAutoToggle() {
-        if (pv.IsMine && !unitPlayer.IsBot())
+        if (controller.IsLocal)
         {
             if (Input.GetKeyDown(KeyCode.F) && GameSession.auto_drive_enabled)
             {
@@ -97,13 +100,10 @@ public class Unit_Movement :
     private void Move(float delta)
     {
         float moveSpeedFinal = GetMovementSpeed() * delta;
-        if (unitPlayer.IsBot() && PhotonNetwork.IsMasterClient)
+     
+        if (controller.IsMine)
         {
-            GiveEvaluatedInput(moveSpeedFinal);
-        }
-        else if (pv.IsMine)
-        {
-            if (GameSession.IsAutoDriving())
+            if (GameSession.IsAutoDriving() || controller.IsBot)
             {
                 GiveEvaluatedInput(moveSpeedFinal);
             }
@@ -155,8 +155,7 @@ public class Unit_Movement :
             networkPos = transform.position;
             networkExpectedTime = PhotonNetwork.Time + GameSession.STANDARD_PING;
         }
-        if (!unitPlayer.IsBot()) {
-
+        if (!controller.IsBot) {
             networkPosIndicator.position = newPosition;
         }
     }
@@ -266,7 +265,7 @@ public class Unit_Movement :
 
     public float GetAim()
     {
-        if (GameSession.IsAutoDriving() || unitPlayer.IsBot()) {
+        if (GameSession.IsAutoDriving() || controller.IsBot) {
             return autoDriver.EvaluateAim();
         }
         else if (Application.platform == RuntimePlatform.Android) {

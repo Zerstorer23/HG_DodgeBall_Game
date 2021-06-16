@@ -36,6 +36,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     {
         mapOptions.LoadRoomSettings();
         ExitGames.Client.Photon.Hashtable playerHash = new ExitGames.Client.Photon.Hashtable();
+        //TODO
         playerHash.Add("TEAM", Team.HOME);
         playerHash.Add("CHARACTER", CharacterType.NONE);
         playerHash.Add("SEED", UnityEngine.Random.Range(0, 133));
@@ -51,7 +52,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         else
         {
             //난입유저 바로시작
-            ConnectedPlayerManager.CountPlayersInTeam();
+            PlayerManager.CountPlayersInTeam();
             GameFieldManager.SetGameMap(GameSession.gameModeInfo.gameMode);
             GameFieldManager.ChangeToSpectator();
             Debug.Log("난입세팅끝");
@@ -67,7 +68,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         Debug.Log("Instantiate after regame");
         if (PhotonNetwork.IsMasterClient)
         {
-            Player randomPlayer = ConnectedPlayerManager.GetRandomPlayerExceptMe();
+            Player randomPlayer = PlayerManager.GetRandomPlayerExceptMe();
             if (randomPlayer != null)
                 PhotonNetwork.SetMasterClient(randomPlayer);
         }
@@ -79,11 +80,11 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     private void InstantiateMyself()
     {
         Debug.Assert(localPlayerObject == null, "PLayer obj not removed");
-        localPlayerObject = PhotonNetwork.Instantiate(ConstantStrings.PREFAB_STARTSCENE_PLAYERNAME, Vector3.zero, Quaternion.identity, 0);
+        localPlayerObject = PhotonNetwork.Instantiate(PREFAB_STARTSCENE_PLAYERNAME, Vector3.zero, Quaternion.identity, 0, new object[] { false, PhotonNetwork.LocalPlayer.UserId});
         localPlayerInfo = localPlayerObject.GetComponent<HUD_UserName>();
         string name = PhotonNetwork.NickName;
-        CharacterType character = (CharacterType)ConnectedPlayerManager.GetPlayerProperty("CHARACTER",(GameSession.instance.devMode)?GameSession.instance.debugChara : CharacterType.NONE);
-        Team myTeam = (Team)ConnectedPlayerManager.GetPlayerProperty("TEAM", Team.HOME);
+        CharacterType character = PlayerManager.LocalPlayer.GetProperty("CHARACTER",(GameSession.instance.devMode)?GameSession.instance.debugChara : CharacterType.NONE);
+        Team myTeam = PlayerManager.LocalPlayer.GetProperty("TEAM", Team.HOME);
         localPlayerInfo.pv.RPC("ChangeName", RpcTarget.AllBuffered, name);
         localPlayerInfo.pv.RPC("ChangeCharacter", RpcTarget.AllBuffered, (int)character);
         localPlayerInfo.pv.RPC("SetTeam", RpcTarget.AllBuffered, (int)myTeam);
@@ -187,7 +188,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         //  Debug.Log("Start requested "+ gameStarted);
         if (gameStarted)
         {
-            ConnectedPlayerManager.CountPlayersInTeam();
+            PlayerManager.CountPlayersInTeam();
             GameFieldManager.SetGameMap(GameSession.gameModeInfo.gameMode);
             Debug.Log("RPC Start game");
             StartGame();
@@ -216,7 +217,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     int readyPlayers;
     private void UpdateReadyStatus(EventObject eo = null)
     {
-        totalPlayers = ConnectedPlayerManager.GetPlayerDictionary().Count;
+        totalPlayers = PlayerManager.GetPlayerDictionary().Count;
         readyPlayers = 0;
         foreach (var entry in playerDictionary.Values)
         {
@@ -231,7 +232,6 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         {
             readyButtonText.text = (localPlayerInfo.GetReady()) ? "다른사람을 기다리는 중" : "준비되었음!";
         }
-
     }
 
 

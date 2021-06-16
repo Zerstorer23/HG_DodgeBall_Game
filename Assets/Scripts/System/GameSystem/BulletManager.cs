@@ -35,7 +35,7 @@ public class BulletManager : MonoBehaviour
 
     double lastIncrementTime;
 
-    GameField gameField;
+    [SerializeField] GameField gameField;
     private void Awake()
     {
         gameField = GetComponentInParent<GameField>();

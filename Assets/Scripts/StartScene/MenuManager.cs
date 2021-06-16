@@ -12,16 +12,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
     [SerializeField] GameObject loadingChuu;
     [SerializeField] GameObject[] disableInLoading;
     const string PRIMARY_ROOM = "PrimaryRoom";
-    //  ExitGames.Client.Photon.Hashtable roomSetting = new ExitGames.Client.Photon.Hashtable();
-
-    RectTransform rectTransform;
     [SerializeField] UI_PlayerLobbyManager lobbyManager;
     [SerializeField] UI_MapOptions mapOptions;
-
-    private void Awake()
-    {
-        rectTransform = GetComponent<RectTransform>();
-    }
 
     private void Start()
     {
@@ -33,7 +25,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     private void DoLoading()
     {
         loadingChuu.SetActive(true);
-        foreach (UnityEngine.GameObject go in disableInLoading)
+        foreach (GameObject go in disableInLoading)
         {
             go.SetActive(false);
         }
@@ -42,7 +34,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        if (ConnectedPlayerManager.embarkCalled) return;
+        if (PlayerManager.embarkCalled) return;
         JoinRoom();
     }
     public void OnClickLeaderBoard() {
@@ -52,7 +44,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public static void JoinRoom()
     {
 
-        ExitGames.Client.Photon.Hashtable hash = UI_MapOptions.GetInitOptions(); 
+        Hashtable hash = UI_MapOptions.GetInitOptions(); 
         RoomOptions roomOpts = new RoomOptions()
         {
             IsVisible = true,
@@ -102,7 +94,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient) {
             GameSession.PushRoomASetting(HASH_ROOM_RANDOM_SEED, Random.Range(0, 133));
         }
-        HUD_UserName.PushPlayerSetting(PhotonNetwork.LocalPlayer, "SEED", Random.Range(0, 133));
+        PlayerManager.LocalPlayer.SetCustomProperties("SEED", Random.Range(0, 133));
         mapOptions.UpdateSettingsUI(); //Player Leave room
     }
 

@@ -9,12 +9,12 @@ public class PlayerSpawner : MonoBehaviour
 {
     internal SortedDictionary<string, Unit_Player> unitsOnMap = new SortedDictionary<string, Unit_Player>();
     public List<Unit_Player> debugUnitList = new List<Unit_Player>();
-    internal SortedDictionary<string, Player> playersOnMap = new SortedDictionary<string, Player>();
+    internal SortedDictionary<string, UniversalPlayer> playersOnMap = new SortedDictionary<string, UniversalPlayer>();
     int maxLives = 1;
     public PlayerSpawnerType spawnerType = PlayerSpawnerType.Once;
     CharacterType myCharacter = CharacterType.NONE;
     public Unit_SharedMovement desolator;
-    GameField gameField;
+    [SerializeField] GameField gameField;
     private void Awake()
     {
         gameField = GetComponentInParent<GameField>();
@@ -34,49 +34,43 @@ public class PlayerSpawner : MonoBehaviour
 
     public void StartEngine()
     {
+        var roomHash = PhotonNetwork.CurrentRoom.CustomProperties;
+        int livesIndex = (int)roomHash[ConstantStrings.HASH_PLAYER_LIVES];
+        maxLives = UI_MapOptions.lives[livesIndex];
+
         SpawnLocalPlayer();
-        //SpawnBots();
+        SpawnBots();
         SpawnDesolator();
     }
 
     private void SpawnBots()
     {
-        if (!GameSession.instance.devMode) return;
-        for (int i = 0; i < 3; i++) {
-            CharacterType botCharacter = ConfigsManager.GetRandomCharacter();
-            Vector3 spawnPos = gameField.GetRandomPosition(1); 
-            PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0, new object[] { botCharacter, maxLives, gameField.fieldNo, true });
+        if (!PhotonNetwork.IsMasterClient) return;
+        UniversalPlayer[] botPlayers = PlayerManager.GetBotPlayers();
+        foreach(var player in botPlayers)
+        {
+            SpawnPlayer(player);
         }
     }
 
     private void SpawnDesolator()
     {
         if (!PhotonNetwork.IsMasterClient || !GameSession.gameModeInfo.useDesolator) return;
-
-        PhotonNetwork.Instantiate(ConstantStrings.PREFAB_DESOLATOR, transform.position, Quaternion.identity, 0,
-        new object[] { gameField.fieldNo});
+        PhotonNetwork.InstantiateRoomObject(ConstantStrings.PREFAB_DESOLATOR, transform.position, Quaternion.identity, 0, new object[] { gameField.fieldNo});
 
     }
 
     private void SpawnLocalPlayer()
     {
-        var hash = PhotonNetwork.LocalPlayer.CustomProperties;
-        var roomHash = PhotonNetwork.CurrentRoom.CustomProperties;
-        int livesIndex = (int)roomHash[ConstantStrings.HASH_PLAYER_LIVES];
-        maxLives = UI_MapOptions.lives[livesIndex];
+        Debug.Log("Spawn local");
+        UniversalPlayer localPlayer = PlayerManager.LocalPlayer;
         if (GameSession.LocalPlayer_FieldNumber != gameField.fieldNo)
         {
             return;
         }
-        if (hash.ContainsKey("CHARACTER"))
+        if (localPlayer.HasProperty("CHARACTER"))
         {
-            myCharacter = (CharacterType)hash["CHARACTER"];
-            if (myCharacter == CharacterType.NONE)
-            {
-                myCharacter = ConfigsManager.GetRandomCharacter();
-                HUD_UserName.PushPlayerSetting(PhotonNetwork.LocalPlayer, "ACTUAL_CHARACTER", myCharacter);
-            }
-            SpawnPlayer();
+            SpawnPlayer(localPlayer);
         }
         else
         {
@@ -89,25 +83,44 @@ public class PlayerSpawner : MonoBehaviour
     }
 
 
-    public void SpawnPlayer()
+    public void SpawnPlayer(UniversalPlayer player)
     {
-        Vector3 spawnPos = gameField.GetPlayerSpawnPosition();
-        PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0, new object[] { myCharacter, maxLives, gameField.fieldNo,false });
+        Debug.Log("Spawn player");
+        CharacterType character = player.GetProperty("CHARACTER", CharacterType.NONE);
+        Vector3 spawnPos;
+        if (character == CharacterType.NONE)
+        {
+            character = ConfigsManager.GetRandomCharacter();
+            player.SetCustomProperties("ACTUAL_CHARACTER", character);
+        }
+        if (player.IsHuman)
+        {
+            spawnPos = gameField.GetPlayerSpawnPosition();
+        }
+        else {
+            spawnPos = gameField.GetRandomPosition(1);
+        }
+
+        PhotonNetwork.InstantiateRoomObject(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0,
+            new object[] { character, maxLives, gameField.fieldNo, player.IsBot, player.uid });
     }
     [SerializeField] float respawnTime = 5f;
-    IEnumerator RespawnPlayer() {
+    IEnumerator RespawnPlayer(UniversalPlayer player) {
         for (int i = 0; i < respawnTime; i++)
         {
-            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject((respawnTime - i).ToString("0") + " 초후 리스폰"));
+            if (player.IsLocal)
+            {
+                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject((respawnTime - i).ToString("0") + " 초후 리스폰"));
+            }
             yield return new WaitForSeconds(1f);
         }
-        SpawnPlayer();    
+        SpawnPlayer(player);    
     }
 
-    public void RegisterPlayer(string userID, Unit_Player unit)
+    public void RegisterPlayer(string uid, Unit_Player unit)
     {
-        AddUnitToMap(userID, unit);
-        GameFieldManager.AddGlobalPlayer(userID, unit);
+        AddUnitToMap(uid, unit);
+        GameFieldManager.AddGlobalPlayer(uid, unit);
         if (unitsOnMap.Count == gameField.expectedNumPlayer)
         {
             //Everyone is spawned
@@ -121,13 +134,13 @@ public class PlayerSpawner : MonoBehaviour
         if (unitsOnMap.ContainsKey(id))
         {
             unitsOnMap[id] = go;
-            playersOnMap[id] = go.pv.Owner;
+            playersOnMap[id] = go.controller.Owner;
         }
         else
         {
             debugUnitList.Add(go);
             unitsOnMap.Add(id, go);
-            playersOnMap.Add(id, go.pv.Owner);
+            playersOnMap.Add(id, go.controller.Owner);
         }
     }
 
@@ -154,7 +167,7 @@ public class PlayerSpawner : MonoBehaviour
         Debug.Assert(unitsOnMap.ContainsKey(deadID), deadID + " is not on field!!");
         unitsOnMap[deadID] = null;
         playersOnMap[deadID] = null;
-        if (desolator != null)
+        if (desolator != null && !lastDiedPlayer.IsBot)
         {
             desolator.AddController(deadID);
         }
@@ -163,11 +176,11 @@ public class PlayerSpawner : MonoBehaviour
         GameFieldManager.RemoveDeadPlayer(deadID);
         GameStatus stat = new GameStatus(unitsOnMap , lastDiedPlayer);//마지막 1인은 남아있어야함
         gameField.CheckFieldConditions(stat);
-        if (spawnerType == PlayerSpawnerType.Respawn && deadID == PhotonNetwork.LocalPlayer.UserId) {
-            StartCoroutine(RespawnPlayer());
+        if (spawnerType == PlayerSpawnerType.Respawn && lastDiedPlayer.AmController()) {
+            StartCoroutine(RespawnPlayer(lastDiedPlayer));
         }
     }
-    public Player lastDiedPlayer = null;
+    public UniversalPlayer lastDiedPlayer = null;
 
 
     public Transform GetTransformOfPlayer(string id)
@@ -181,7 +194,7 @@ public class PlayerSpawner : MonoBehaviour
             return null;
         }
     }
-    public Unit_Player GetPlayerByOwnerID(string id)
+    public Unit_Player GetUnitByControllerID(string id)
     {
         if (id == null) return null;
         if (unitsOnMap.ContainsKey(id))//check null id
@@ -228,7 +241,7 @@ public class PlayerSpawner : MonoBehaviour
             }
             if (entry.Value.gameObject.activeInHierarchy)
             {
-                if (entry.Value.pv.Owner.UserId == exclusionID) continue;
+                if (entry.Value.controller.IsSame(exclusionID)) continue;
                 Transform trans = entry.Value.gameObject.transform;
                 float dist = Vector3.Distance(position, trans.position);
                 if (nearest == null || dist < nearestDistance)
@@ -244,9 +257,9 @@ public class PlayerSpawner : MonoBehaviour
 
     public void ResetPlayerMap()
     {
-        unitsOnMap = new SortedDictionary<string, Unit_Player>();
-        debugUnitList = new List<Unit_Player>();
-        playersOnMap = new SortedDictionary<string, Player>();
+        unitsOnMap.Clear();
+        debugUnitList.Clear();
+        playersOnMap.Clear();
     }
 
 

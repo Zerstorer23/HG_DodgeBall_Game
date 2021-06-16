@@ -38,7 +38,7 @@ public class Projectile_CustomDamageDealer : MonoBehaviour
         for (int i = 0; i < playerList.Count; i++) {
             string key = playerList[i];
             Unit_Player player = playerDict[key];
-            if (key == proj.pv.Owner.UserId || player == null) continue;
+            if (proj.controller.IsSame(key) || player == null) continue;
             //if (!foundTargets.Contains(key))
           //  {
                 float dist = Vector2.Distance(gameObject.transform.position, player.transform.position);
@@ -59,7 +59,7 @@ public class Projectile_CustomDamageDealer : MonoBehaviour
         for (int i = 0; i < playerList.Count; i++) {
             string key = playerList[i];
             Unit_Player player = playerDict[key];
-            if (key == proj.pv.Owner.UserId || player == null) continue;
+            if (proj.controller.IsSame(key) || player == null) continue;
             float dist = Vector2.Distance(gameObject.transform.position, player.transform.position);
             // Debug.Log(entry.Value.pv.Owner.NickName+": "+ entry.Key+ " dist: " + dist +" vs "+colliderRadius);
             if (foundTargets.ContainsKey(key))

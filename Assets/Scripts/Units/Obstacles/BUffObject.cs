@@ -73,7 +73,7 @@ public class BuffObject : MonoBehaviourPun
     {
         BuffManager buffManager = collision.gameObject.GetComponent<BuffManager>();
         if (buffManager == null) return;
-        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = string.Format("{0}님이 {1} 효과를 받았습니다..!", buffManager.pv.Owner.NickName, objectName) });
+        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = string.Format("{0}님이 {1} 효과를 받았습니다..!", buffManager.controller.Owner.NickName, objectName) });
         if (buffManager.pv.IsMine)
         {
             buffManager.pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)buff.buffType, buff.modifier, buff.duration);

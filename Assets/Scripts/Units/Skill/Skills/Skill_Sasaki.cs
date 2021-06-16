@@ -41,7 +41,7 @@ public class Skill_Sasaki : ISkill
 
     public override void LoadInformation(SkillManager skm)
     {
-        skm.cooltime = 4.75f;
+        skm.cooltime = 4.5f;
         skm.maxStack = 1;
     }
 

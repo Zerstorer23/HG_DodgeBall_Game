@@ -3,6 +3,7 @@ using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public partial class GameFieldManager : MonoBehaviourPun
@@ -12,7 +13,7 @@ public partial class GameFieldManager : MonoBehaviourPun
     //public static float xMin, xMax, yMin, yMax, xMid, yMid;
     private static GameFieldManager prGameFieldManager;
     private static SortedDictionary<string, Unit_Player> totalUnitsDictionary = new SortedDictionary<string, Unit_Player>();
-    private SortedDictionary<int, List<Player>> playersInFieldsMap = new SortedDictionary<int, List<Player>>();
+    private SortedDictionary<int, List<UniversalPlayer>> playersInFieldsMap = new SortedDictionary<int, List<UniversalPlayer>>();
 
     [SerializeField] GameField singleField;
     [SerializeField] GameField field_CP;
@@ -40,8 +41,11 @@ public partial class GameFieldManager : MonoBehaviourPun
 
     internal static int GetRemainingPlayerNumber()
     {
-        GameStatus stat = new GameStatus(totalUnitsDictionary,null);
-        return stat.toKill;
+        var list = from Unit_Player p in totalUnitsDictionary.Values
+                   where (p != null && p.gameObject.activeInHierarchy && !p.controller.IsLocal)
+                   select p;
+
+        return list.Count();
     }
 
     private void Awake()
@@ -92,29 +96,29 @@ public partial class GameFieldManager : MonoBehaviourPun
     }
     public static void SetGameMap(GameMode mode) {
         gameFields.Clear();
-        int numRooms = PhotonNetwork.CurrentRoom.PlayerCount + 2;
         switch (mode)
         {
             case GameMode.PVP:
             case GameMode.TEAM:
             case GameMode.PVE:
                 SetUpSingleField(instance.singleField);
+                instance.AssignSingleRoom(PlayerManager.GetPlayers());
                 break;
             case GameMode.TeamCP:
                 SetUp_CP();
+                instance.AssignSingleRoom(PlayerManager.GetPlayers());
                 break;
             case GameMode.Tournament:
                 SetUpTournament();
-                numRooms = 2;
+                instance.AssignMyRoom(PlayerManager.GetHumanPlayers(), 2);
                 break;
         }
-        instance.AssignMyRoom(PhotonNetwork.PlayerList, numRooms);
     }
 
     private static void SetUp_CP()
     {
-        int homeNum = ConnectedPlayerManager.GetNumberInTeam(Team.HOME);
-        int awayNum = ConnectedPlayerManager.GetNumberInTeam(Team.AWAY);
+        int homeNum = PlayerManager.GetNumberInTeam(Team.HOME);
+        int awayNum = PlayerManager.GetNumberInTeam(Team.AWAY);
         if (homeNum == awayNum)
         {
             SetUpSingleField(instance.field_CP_FFA);
@@ -130,6 +134,7 @@ public partial class GameFieldManager : MonoBehaviourPun
     {
         gameFields.Add(field);
         gameFields[0].InitialiseMap(0);
+        Debug.LogWarning("Add gamefield 0");
     }
     private void OnGameStartRequested(EventObject arg0)
     {
@@ -189,19 +194,20 @@ public partial class GameFieldManager : MonoBehaviourPun
     }
 
     int numActiveFields = 1;
-    public void AssignMyRoom(Player[] playerList, int maxPlayerPerRoom)
+    public void AssignMyRoom(UniversalPlayer[] playerList, int maxPlayerPerRoom)
     {
-        totalUnitsDictionary = new SortedDictionary<string, Unit_Player>();
-        playersInFieldsMap = new SortedDictionary<int, List<Player>>();
+        //TODO Tournament 봇 막기
+        totalUnitsDictionary.Clear();
+        playersInFieldsMap.Clear();
 
         int randomOffset = (int)PhotonNetwork.CurrentRoom.CustomProperties[ConstantStrings.HASH_ROOM_RANDOM_SEED];
         numActiveFields = Mathf.CeilToInt((float)playerList.Length / maxPlayerPerRoom);
         string o = "<color=#00c8c8>=============Active fields :"+ numActiveFields + "====================</color>\n";
-        SortedDictionary<string, int> indexMap = ConnectedPlayerManager.GetIndexMap(playerList, true);
+        SortedDictionary<string, int> indexMap = PlayerManager.GetIndexMap(playerList, true);
         foreach (var entry in indexMap)
         {
             int assignField = (entry.Value + randomOffset) % numActiveFields;
-            Player player = ConnectedPlayerManager.GetPlayerByID(entry.Key);
+            UniversalPlayer player = PlayerManager.GetPlayerByID(entry.Key);
             o += "Player : " + player+"\n";
             AssociatePlayerToMap(assignField, player);
 
@@ -219,16 +225,37 @@ public partial class GameFieldManager : MonoBehaviourPun
         o+="===================================== \n";
         Debug.Log(o);
     }
+    public void AssignSingleRoom(UniversalPlayer[] playerList)
+    {
+        //TODO Tournament 봇 막기
+        totalUnitsDictionary.Clear();
+        playersInFieldsMap.Clear();
+        numActiveFields = 1;
+        int fieldNo = 0;
+        string o = "<color=#00c8c8>=============Active fields :" + numActiveFields + "====================</color>\n";
+        foreach (var player in playerList)
+        {
+            o += "Player : " + player + "\n";
+            AssociatePlayerToMap(fieldNo, player);
+            if (player.uid == PhotonNetwork.LocalPlayer.UserId)
+            {
+                GameSession.SetLocalPlayerFieldNumber(fieldNo);
+                o += "-MyField : " + fieldNo + " \n";
+            }
+        }
+        o += "===================================== \n";
+        Debug.Log(o);
+    }
 
-    public static Player[] GetPlayersInField(int f) {
+    public static UniversalPlayer[] GetPlayersInField(int f) {
         Debug.Assert(instance.playersInFieldsMap.ContainsKey(f), " No such field");
         return instance.playersInFieldsMap[f].ToArray();
     }
-    private void AssociatePlayerToMap(int field, Player player)
+    private void AssociatePlayerToMap(int field, UniversalPlayer player)
     {
         if (!playersInFieldsMap.ContainsKey(field))
         {
-            playersInFieldsMap.Add(field, new List<Player>());
+            playersInFieldsMap.Add(field, new List<UniversalPlayer>());
         }
         playersInFieldsMap[field].Add(player);
     }

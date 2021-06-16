@@ -12,6 +12,7 @@ public class SkillManager : MonoBehaviourPun
     internal BuffManager buffManager;
     //Data
     public CharacterType myCharacter;
+    Controller controller;
 
     public ISkill mySkill;
     public int maxStack = 1;
@@ -28,6 +29,7 @@ public class SkillManager : MonoBehaviourPun
         unitMovement = GetComponent<Unit_Movement>();
         player = GetComponent<Unit_Player>();
         buffManager = GetComponent<BuffManager>();
+        controller = GetComponent<Controller>();
 
     }
     private void OnEnable()
@@ -37,7 +39,7 @@ public class SkillManager : MonoBehaviourPun
         InitSkill();
         if (pv.IsMine)
         {
-            if(!player.IsBot())UI_SkillBox.SetSkillInfo(this);
+            if(!controller.IsBot)UI_SkillBox.SetSkillInfo(this);
             EventManager.StartListening(MyEvents.EVENT_MY_PROJECTILE_HIT, OnProjectileHit);
             EventManager.StartListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, OnPlayerKilledPlayer);
             EventManager.StartListening(MyEvents.EVENT_MY_PROJECTILE_MISS, OnProjectileMiss);
@@ -80,12 +82,13 @@ public class SkillManager : MonoBehaviourPun
 
     private void CheckSkillActivation()
     {
-        if (PhotonNetwork.Time < lastActivated + 0.4) return;
+      //  if (PhotonNetwork.Time < lastActivated + 0.4) return;
         if (InputHelper.skillKeyFired() ||
             (GameSession.IsAutoDriving() && unitMovement.autoDriver.CanAttackTarget())
-            || player.IsBot()
+            || controller.IsBot
             )
         {
+            if (buffManager.GetTrigger(BuffType.BlockSkill)) return;
             if (currStack > 0)
             {
                 UI_TouchPanel.isTouching = false;

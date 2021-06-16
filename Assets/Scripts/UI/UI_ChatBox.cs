@@ -97,11 +97,11 @@ public class UI_ChatBox : MonoBehaviour
 		}
 		else if (text.Contains("입항"))
 		{
-			ConnectedPlayerManager.ReconnectEveryone();
+			PlayerManager.ReconnectEveryone();
 		}
 		else if (text.Contains("점검"))
 		{
-			ConnectedPlayerManager.KickEveryoneElse();
+			PlayerManager.KickEveryoneElse();
 		}
 	}
 	public void AddLine(string lineString)

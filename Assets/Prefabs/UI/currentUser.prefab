@@ -980,6 +980,7 @@ GameObject:
   - component: {fileID: 6990143947042616908}
   - component: {fileID: 6990143947042616910}
   - component: {fileID: 8197163456268580972}
+  - component: {fileID: 8364891354711953008}
   - component: {fileID: 4854168397501980212}
   m_Layer: 5
   m_Name: currentUser
@@ -1079,8 +1080,21 @@ MonoBehaviour:
   numReadyText: {fileID: 6990143945318655464}
   mapOptions: {fileID: 0}
   charSelector: {fileID: 0}
+  foundPlayers: []
   playerListTransform: {fileID: 6990143946542790326}
   readyButtonText: {fileID: 6990143945768332644}
+--- !u!114 &8364891354711953008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6990143947042616906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d0e2429296285f4bb9f7737cba8861e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4854168397501980212
 MonoBehaviour:
   m_ObjectHideFlags: 0

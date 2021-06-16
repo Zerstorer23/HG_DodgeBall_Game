@@ -9,6 +9,7 @@ public class HealthPoint : MonoBehaviourPun
  // , IPunObservable
 {
     public UnitType unitType;
+    public Controller controller;
     int maxLife = 1;
     public int currentLife;
     bool isDead = false;
@@ -31,6 +32,7 @@ public class HealthPoint : MonoBehaviourPun
     {
         pv = GetComponent<PhotonView>();
         buffManager = GetComponent<BuffManager>();
+        controller = GetComponent<Controller>();
         unitPlayer = GetComponent<Unit_Player>();
         damageDealer = GetComponent<Projectile_DamageDealer>();
         if (unitType == UnitType.Player)
@@ -42,7 +44,7 @@ public class HealthPoint : MonoBehaviourPun
         }
         try
         {
-            myTeam = (Team)pv.Owner.CustomProperties["TEAM"];//TODO
+            myTeam = controller.Owner.GetProperty("TEAM",Team.HOME);
         }
         catch (Exception)
         { 
@@ -147,13 +149,15 @@ public class HealthPoint : MonoBehaviourPun
 
     private void CheckMirrorDamage(string attackerUserID)
     {
-        if (!pv.IsMine) return;
+        if (!controller.IsMine) return;
         if (IsMirrorDamage())
         {
-            Unit_Player unit= GameFieldManager.gameFields[associatedField].playerSpawner.GetPlayerByOwnerID(attackerUserID);
+            Unit_Player unit= GameFieldManager.gameFields[associatedField].playerSpawner.GetUnitByControllerID(attackerUserID);
             if (unit == null) return;
-            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = unit.pv.Owner.NickName + "님에게 피해 반사" });
-            unit.pv.RPC("TriggerMessage", RpcTarget.AllBuffered, "피해가 반사되었습니다!");
+            if (controller.IsLocal) {
+                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = unit.controller.Owner.NickName + "님에게 피해 반사" });
+                unit.pv.RPC("TriggerMessage", RpcTarget.AllBuffered, "피해가 반사되었습니다!");
+            }
             buffManager.AddStat(BuffType.NumDamageReceivedWhileBuff,1);
             unit.pv.RPC("ChangeHP", RpcTarget.AllBuffered, -1);
 //            damageDealer.DoPlayerCollision(unit.gameObject);
@@ -181,16 +185,18 @@ public class HealthPoint : MonoBehaviourPun
 
     void NotifySourceOfDamage(string attackerUserID , bool instaDeath)
     {
-        Player p = ConnectedPlayerManager.GetPlayerByID(attackerUserID);
+        UniversalPlayer p = PlayerManager.GetPlayerByID(attackerUserID);
         string attackerNickname = (p == null) ? "???" : p.NickName;
         bool targetIsDead = (expectedlife <= 0 || instaDeath);
-        if (pv.IsMine)
+        if (controller.IsMine)
         {
             targetIsDead = (currentLife <= 0 || instaDeath);
             if (attackerUserID == null)
             { //AttackedByMapObject
-                
-                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = "회피실패" });
+                if (controller.IsLocal)
+                {
+                    EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = "회피실패" });
+                }
                 if (targetIsDead)
                 {
                     if (killerUID == null)
@@ -200,16 +206,15 @@ public class HealthPoint : MonoBehaviourPun
                     }
                 }
             }
-            else
+            else if (controller.IsLocal)
             {
-               
                 EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = string.Format("{0}에게 피격", attackerNickname) });
             }
 
         }
         else if (PhotonNetwork.LocalPlayer.UserId == attackerUserID)
         {
-            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = string.Format("{0}를 타격..!", pv.Owner.NickName) });
+            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = string.Format("{0}를 타격..!", controller.Owner.NickName) });
             if (targetIsDead)
             {
                 if (killerUID == null)
@@ -217,7 +222,7 @@ public class HealthPoint : MonoBehaviourPun
                     killerUID = attackerUserID;
                     Debug.Log("send id " + attackerUserID);
                     EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID, hitHealthPoint = this });
-                    ChatManager.SendNotificationMessage(attackerNickname + " 님이 " + pv.Owner.NickName + "님을 살해했습니다.", "#FF0000");
+                    ChatManager.SendNotificationMessage(attackerNickname + " 님이 " + controller.Owner.NickName + "님을 살해했습니다.", "#FF0000");
                 }
             }
         }

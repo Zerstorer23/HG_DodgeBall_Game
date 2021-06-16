@@ -8,7 +8,6 @@ public class Skill_Kimidori : ISkill
     public override ActionSet GetSkillActionSet(SkillManager skm)
     {
         ActionSet mySkill = new ActionSet(skm);
-        mySkill.SetParam(SkillParams.UserID, skm.pv.Owner.UserId);
         mySkill.SetParam(SkillParams.MoveSpeed, 6f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KIMIDORI);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.Die);

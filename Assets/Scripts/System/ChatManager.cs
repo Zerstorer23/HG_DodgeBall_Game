@@ -139,44 +139,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 	{
 		instance.mainChatBox.SetInputFieldVisibility(enable);
 	}
-	/*
-	private void DetectMinigame(string msg)
-	{
 
-		bool result = int.TryParse(msg, out int number);
-		if (!result) return;
-		minigameMachine.pv.RPC("AddNumber", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.UserId, number);
-		MinigameCode code = minigameMachine.GetLastCode();
-		string nick = PhotonNetwork.NickName;
-		string loserID;
-
-		switch (code)
-		{
-			case MinigameCode.Pass:
-				SendNotificationMessage(string.Format("{0}: {1}! ", nick, number.ToString()));
-				break;
-			case MinigameCode.Duplicated:
-				SendNotificationMessage(string.Format("{0}: {1}! ", nick, number.ToString()), "#FF0000");
-				SendNotificationMessage(nick + " 님이 졌습니다!!", "#FF0000");
-				loserID = minigameMachine.GetLastCalledPlayer();
-				StatisticsManager.RPC_AddToStat(StatTypes.MINIGAME, loserID, 1);
-				minigameMachine.pv.RPC("ResetGame", RpcTarget.AllBuffered);
-				break;
-			case MinigameCode.GameCannotBegin:
-				SendNotificationMessage("눈치게임은 사망자가 2명 있어야합니다.", "#FF0000");
-				break;
-			case MinigameCode.LastPlayerRemain:
-				SendNotificationMessage(nick + " 님이 우물쭈물거리다 졌습니다!!", "#FF0000");
-				loserID = minigameMachine.GetLastCalledPlayer();
-				StatisticsManager.RPC_AddToStat(StatTypes.MINIGAME, loserID, 1);
-				minigameMachine.pv.RPC("ResetGame", RpcTarget.AllBuffered);
-				break;
-			case MinigameCode.Begin:
-				SendNotificationMessage(nick + " 님이 눈치게임을 시작했습니다.");
-				SendNotificationMessage(string.Format("{0}: {1}! ", nick, number.ToString()));
-				break;
-		}
-	}*/
 	#region photonChat
 	public void OnApplicationQuit()
 	{

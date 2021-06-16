@@ -8,9 +8,9 @@ public class BuffManager : MonoBehaviourPun
 {
     public UnitType unitType;
     public PhotonView pv;
-    HealthPoint healthPoint;
+    internal HealthPoint healthPoint;
     [SerializeField] BuffIndicator buffIndicator;
-
+    public Controller controller;
 
     //COMMON
     [SerializeField] List<BuffData> Buffs_active = new List<BuffData>();
@@ -23,6 +23,7 @@ public class BuffManager : MonoBehaviourPun
         pv = GetComponent<PhotonView>();
         healthPoint = GetComponent<HealthPoint>();
         unitPlayer = GetComponent<Unit_Player>();
+        controller = GetComponent<Controller>();
     }
     private void Start()
     {
@@ -73,12 +74,13 @@ public class BuffManager : MonoBehaviourPun
                 HandleBoom();
                 break;
             case BuffType.CameraShake:
-                if (pv.IsMine) {
-                    pv.RPC("HandleCameraShake", RpcTarget.All, pv.Owner);
+                if (controller.IsMine) {
+                    pv.RPC("HandleCameraShake", RpcTarget.All, controller.uid);
                 }
                 break;
             case BuffType.InvincibleFromBullets:
             case BuffType.HideBuffs:
+            case BuffType.BlockSkill:
                 SetTrigger(buff.buffType, true);
                 break;
             case BuffType.MirrorDamage:
@@ -99,11 +101,14 @@ public class BuffManager : MonoBehaviourPun
 
     private void HandleBoom()
     {
-        if (pv.IsMine)
+        if (controller.IsMine)
         {
             if (GetTrigger(BuffType.InvincibleFromBullets)) return;
             healthPoint.HealHP(-1);
-            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject("!!체력손실!!"));
+
+            if (controller.IsLocal) {
+                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject("!!체력손실!!"));
+            }
         }
     }
 
@@ -115,6 +120,7 @@ public class BuffManager : MonoBehaviourPun
                 break;
             case BuffType.InvincibleFromBullets:
             case BuffType.HideBuffs:
+            case BuffType.BlockSkill:
                 SetTrigger(buff.buffType, false);
                 break;
             case BuffType.MirrorDamage:
@@ -129,7 +135,7 @@ public class BuffManager : MonoBehaviourPun
     private void HandleMirroringBuff(BuffData buff)
     {
         SetTrigger(buff.buffType, false);
-        if (pv.IsMine) {
+        if (controller.IsMine) {
             int numDamage = GetStat(BuffType.NumDamageReceivedWhileBuff);
             if (numDamage <= 0)
             {
@@ -140,8 +146,8 @@ public class BuffManager : MonoBehaviourPun
         ToggleStat(BuffType.NumDamageReceivedWhileBuff, false);
     }
     [PunRPC]
-    public void HandleCameraShake(Player activator) {
-        if (PhotonNetwork.LocalPlayer == activator) return;
+    public void HandleCameraShake(string activatorID) {
+        if (controller.IsSame(activatorID)) return;
         float duration = 1.5f;
         MainCamera.instance.DoShake(time: duration);
         MainCamera.instance.DoRotation(time: duration);
@@ -240,7 +246,7 @@ public class BuffManager : MonoBehaviourPun
     }
 
     void UpdateBuffIndicator(BuffType changedBuff, bool enable) {
-        if (!pv.IsMine && unitPlayer!= null && unitPlayer.buffManager.GetTrigger(BuffType.HideBuffs))
+        if (!controller.IsMine && unitPlayer!= null && unitPlayer.buffManager.GetTrigger(BuffType.HideBuffs))
         {
             return;
         }

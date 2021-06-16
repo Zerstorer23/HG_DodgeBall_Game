@@ -14,7 +14,7 @@ public class UI_TournamentPanel : MonoBehaviour
 
     double startTime;
     double timeoutWait;
-    public void SetPanel(Player[] win,float delay)
+    public void SetPanel(UniversalPlayer[] win,float delay)
     {
         startTime = PhotonNetwork.Time;
         timeoutWait = delay;
@@ -31,7 +31,7 @@ public class UI_TournamentPanel : MonoBehaviour
         }
         winners.text = text;
     }
-    public void SetNext(SortedDictionary<int, List<Player>> dict) {
+    public void SetNext(SortedDictionary<int, List<UniversalPlayer>> dict) {
         
         nextOpponent.text = "";
         if (GameSession.LocalPlayer_FieldNumber != -1)

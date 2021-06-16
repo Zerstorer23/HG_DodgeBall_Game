@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using static ConstantStrings;
 public class GameOverManager : MonoBehaviour
 {
     [SerializeField] Text returnMenuText;
@@ -20,13 +20,13 @@ public class GameOverManager : MonoBehaviour
     [Header("Minigame")]
     [SerializeField] Text miniWinnerName;
 
-    Player finalWinner;
+    UniversalPlayer finalWinner;
 
 
     public double timeoutWait = -1;
 
 
-    public void SetPanel(Player receivedWinner)
+    public void SetPanel(UniversalPlayer receivedWinner)
     {
         timeoutWait = 5;
         finalWinner = receivedWinner;
@@ -34,15 +34,15 @@ public class GameOverManager : MonoBehaviour
         {
             if (GameSession.gameModeInfo.isTeamGame)
             {
-                Team winnerTeam = (Team)finalWinner.CustomProperties["TEAM"];
+                Team winnerTeam = finalWinner.GetProperty<Team>("TEAM");
                 Team myTeam = (Team)PhotonNetwork.LocalPlayer.CustomProperties["TEAM"];
                 if (winnerTeam == myTeam)
                 {
                     StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_WINS, 1);
-                    finalWinner = PhotonNetwork.LocalPlayer;
+                    finalWinner = PlayerManager.GetPlayerByID(PhotonNetwork.LocalPlayer.UserId);
                 }
             }
-            else if (finalWinner.UserId == PhotonNetwork.LocalPlayer.UserId)
+            else if (finalWinner.uid == PhotonNetwork.LocalPlayer.UserId)
             {
                 StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_WINS, 1);
             }
@@ -69,6 +69,7 @@ public class GameOverManager : MonoBehaviour
     IEnumerator WaitAndOut()
     {
         PhotonNetwork.RemoveRPCs(PhotonNetwork.LocalPlayer);
+        PlayerManager.RemoveAllBots();
         yield return new WaitForFixedUpdate();
         if (PhotonNetwork.IsMasterClient)
         {
@@ -104,7 +105,7 @@ public class GameOverManager : MonoBehaviour
     private void SetScoreInfo()
     {
         string winnerUID = StatisticsManager.GetHighestPlayer(StatTypes.SCORE);
-        Player player = ConnectedPlayerManager.GetPlayerByID(winnerUID);
+        UniversalPlayer player = PlayerManager.GetPlayerByID(winnerUID);
         if (player == null)
         {
             subWinnerPanel.SetActive(false);
@@ -139,14 +140,14 @@ public class GameOverManager : MonoBehaviour
             winnerImage.sprite = ConfigsManager.unitDictionary[character].portraitImage;
             if (GameSession.gameModeInfo.isTeamGame)
             {
-                if (!finalWinner.CustomProperties.ContainsKey("TEAM")) return;
-                Team winnerTeam = (Team)finalWinner.CustomProperties["TEAM"];
-                winnerName.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[winnerTeam == Team.HOME ? 0 : 1]);
-                winnerName.text = string.Format("{0}님의 {1}팀", finalWinner.NickName, ConstantStrings.team_name[winnerTeam == Team.HOME ? 0 : 1]);
+                if (!finalWinner.HasProperty("TEAM")) return;
+                Team winnerTeam = finalWinner.GetProperty< Team>("TEAM");
+                winnerName.color = GetColorByHex(team_color[(int)winnerTeam]);
+                winnerName.text = string.Format("{0}님의 {1}팀", finalWinner.NickName, team_name[(int)winnerTeam]);
             }
             else
             {
-                winnerName.color = ConstantStrings.GetColorByHex("#3AFF00");
+                winnerName.color = GetColorByHex("#3AFF00");
             }
         }
         else
@@ -166,7 +167,7 @@ public class GameOverManager : MonoBehaviour
         string killStatID = null;
         string pickStatID = null;
         string winID = null;
-        CharacterType characterType = GameSession.GetPlayerCharacter(PhotonNetwork.LocalPlayer);
+        CharacterType characterType = GameSession.GetPlayerCharacter(ConnectedPlayerManager.GetLocalPlayer());
         switch (characterType)
         {
             case CharacterType.NAGATO:
@@ -248,7 +249,7 @@ public class GameOverManager : MonoBehaviour
         GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_evades, evades);
         yield return new WaitForSeconds(1f);
 
-        if (finalWinner == PhotonNetwork.LocalPlayer)
+        if (finalWinner.IsLocal)
         {
             GooglePlayManager.IncrementAchievement(GPGSIds.achievement_total_wins, 1);
             if (winID != null) {

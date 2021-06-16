@@ -8,10 +8,10 @@ public class GameField : MonoBehaviour
 {
     public int fieldNo = 0;
     public MapSpec mapSpec = new MapSpec();
-    [HideInInspector] public PlayerSpawner playerSpawner;
-    [HideInInspector] public BulletManager bulletSpawner;
-    [HideInInspector] public BuffObjectSpawner buffSpawner;
-    [HideInInspector] public WallManager wallManager;
+    public PlayerSpawner playerSpawner;
+    public BulletManager bulletSpawner;
+    public BuffObjectSpawner buffSpawner;
+    public WallManager wallManager;
     Transform mapTransform;
     public Transform[] map_transforms;
     public Vector3 originalMapSize;
@@ -70,13 +70,13 @@ public class GameField : MonoBehaviour
         bool gameFinished = GameSession.gameModeInfo.IsFieldFinished(stat);
         if (!gameFinished) return;
 
-        Player winner = stat.lastSurvivor;
+        UniversalPlayer winner = stat.lastSurvivor;
         Debug.Log("GAME FISNISHED /  winner "+winner);
-        GameFieldManager.pv.RPC("NotifyFieldWinner", RpcTarget.AllBufferedViaServer,fieldNo, winner);
+        GameFieldManager.pv.RPC("NotifyFieldWinner", RpcTarget.AllBufferedViaServer,fieldNo, winner.uid);
        // NotifyFieldWinner(winner);
     }
 
-    public (bool,Player) QueryFieldFinish()
+    public (bool,UniversalPlayer) QueryFieldFinish()
     {
         if (gameFieldFinished) return (true, playerSpawner.lastDiedPlayer);
         GameStatus stat = new GameStatus(playerSpawner.unitsOnMap, playerSpawner.lastDiedPlayer);
@@ -85,7 +85,7 @@ public class GameField : MonoBehaviour
         return (finished, stat.lastSurvivor);
     }
 
-    public Player fieldWinner = null;
+    public UniversalPlayer fieldWinner = null;
     public string winnerName = null;
 
     public void CheckSuddenDeath(int numAlive, bool timeout = false)
@@ -173,6 +173,7 @@ public class GameField : MonoBehaviour
         fieldWinner = null;
         winnerName = "";
         gameFieldFinished = false;
+      //  Debug.Log("Reset field");
     }
 
     private void InitialiseMapSize()
@@ -227,7 +228,7 @@ public class GameField : MonoBehaviour
 
     public virtual Vector3 GetPlayerSpawnPosition()
     {
-        int myIndex = ConnectedPlayerManager.GetMyIndex(GameFieldManager.GetPlayersInField(fieldNo));
+        int myIndex = PlayerManager.GetMyIndex(GameFieldManager.GetPlayersInField(fieldNo));
         int x = myIndex % w;
         int y = myIndex / w;
         return GetPoissonPositionNear(x, y);

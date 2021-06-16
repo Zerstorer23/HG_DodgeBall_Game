@@ -18,7 +18,7 @@ public partial class GameFieldManager : MonoBehaviourPun
             field.InitialiseMap(i++);
         }
     }
-    private IEnumerator WaitAndContinueTournament(List<Player> survivors)
+    private IEnumerator WaitAndContinueTournament(List<UniversalPlayer> survivors)
     {
         float delay = 3f;
         //  Debug.Log("Open tourny panel ...");

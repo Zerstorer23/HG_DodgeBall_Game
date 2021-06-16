@@ -18,6 +18,7 @@ public class Unit_SharedMovement : MonoBehaviourPun
     [SerializeField] Text dirText;
     Dictionary<string, int> controllers = new Dictionary<string, int>();
     TransformSynchronisation transSync;
+    Controller controller;
     float yOffset = -1.5f;
 
 
@@ -26,11 +27,13 @@ public class Unit_SharedMovement : MonoBehaviourPun
     {
         pv = GetComponent<PhotonView>();
         transSync = GetComponent<TransformSynchronisation>();
- 
+        controller = GetComponent<Controller>();
+        controller.SetControllerInfo(photonView.Owner);
     }
     private void OnEnable()
     {
         fieldNo = (int)pv.InstantiationData[0];
+        Debug.LogWarning(fieldNo);
         GameField myField = GameFieldManager.gameFields[fieldNo];
         myField.playerSpawner.desolator = this;
         mapSpec = myField.mapSpec;

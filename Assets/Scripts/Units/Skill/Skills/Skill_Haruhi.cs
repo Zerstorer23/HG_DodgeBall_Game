@@ -14,7 +14,6 @@ public class Skill_Haruhi : ISkill
         ActionSet mySkill = new ActionSet( skm);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_HARUHI);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-        mySkill.SetParam(SkillParams.UserID, skm.pv.Owner.UserId);
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Width, paramValue = 1f });
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Height, paramValue = 1f });
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.Duration, paramValue = 0.6f });

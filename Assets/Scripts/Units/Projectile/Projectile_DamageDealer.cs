@@ -62,7 +62,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     private void OnDisable()
     {
         if (pv.IsMine && !isMapObject && hitCount <=0) {
-            EventManager.TriggerEvent(MyEvents.EVENT_MY_PROJECTILE_MISS, new EventObject() { stringObj = pv.Owner.UserId });
+            EventManager.TriggerEvent(MyEvents.EVENT_MY_PROJECTILE_MISS, new EventObject() { stringObj = myHealth.controller.uid });
         }
         exclusionPlayerID = "";
         myCollider.enabled = false;
@@ -71,7 +71,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     private void OnEnable()
     {
         if (!isMapObject) {
-            exclusionPlayerID = pv.Owner.UserId;
+            exclusionPlayerID = myHealth.controller.uid;
         }
         myCollider.enabled = true;
         duplicateDamageChecker.Reset();
@@ -227,7 +227,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
             }
             else
             {
-                return pv.Owner.UserId != otherHP.pv.Owner.UserId;
+                return myHealth.controller.uid != otherHP.controller.uid;
             }
         }
         else {
@@ -245,7 +245,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         if (customBuffs.Count <= 0) return;
         BuffManager targetManager = otherHP.buffManager;
         if (targetManager == null || !targetManager.gameObject.activeInHierarchy) return;
-        if (targetManager.pv.Owner.UserId == exclusionPlayerID) return;
+        if (targetManager.healthPoint.controller.uid == exclusionPlayerID) return;
         foreach (BuffData buff in customBuffs)
         {
             targetManager.pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)buff.buffType, buff.modifier, buff.duration);
@@ -259,13 +259,13 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         movement.Bounce(contact, collisionPoint); 
     }
 
-    private void GiveDamage(HealthPoint otherHP)
+    public void GiveDamage(HealthPoint otherHP)
     {
         if (otherHP.unitType == UnitType.Player)
         {
 
-            if (otherHP.pv.Owner.UserId == exclusionPlayerID) return;
-            string sourceID = (isMapObject) ? null : pv.Owner.UserId;
+            if (otherHP.controller.uid == exclusionPlayerID) return;
+            string sourceID = (isMapObject) ? null : myHealth.controller.uid;
       //      Debug.Log("Damage player");
             otherHP.pv.RPC("DoDamage", RpcTarget.AllBuffered, sourceID, false);
             if (isMapObject) myHealth.Kill_Immediate();

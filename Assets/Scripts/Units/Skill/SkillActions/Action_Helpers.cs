@@ -45,7 +45,18 @@ public class Action_SetAngle : SkillAction
         return 0f;
     }
 }
+public class Action_ModifyAngle : SkillAction
+{
 
+    public override float Activate()
+    {
+        float angle = GetParam<float>(SkillParams.EulerAngle);
+        angle += (float)paramValue;
+        parent.SetParam(SkillParams.EulerAngle, angle);
+        parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, (float)angle));
+        return 0f;
+    }
+}
 public class Action_WaitForSeconds : SkillAction
 {
     public override float Activate()

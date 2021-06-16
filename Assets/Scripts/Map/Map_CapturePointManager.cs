@@ -28,15 +28,19 @@ public class Map_CapturePointManager : MonoBehaviourPun
             }
             mapDictionary.Add(cp.captureIndex, cp);
         }
-        awayNext = maxIndex;
-        homeNext = 0;
+
     }
     private void OnEnable()
     {
+        gameFieldCP.gameFieldFinished = false;
         currentPoint = 0;
+        awayNext = maxIndex;
+        homeNext = 0;
         UI_RemainingPlayerDisplay.SetCPManager(this);
         EventManager.StartListening(MyEvents.EVENT_CP_CAPTURED, OnPointCaptured);
-        pointerRoutine = pointCounter();
+        if (pointerRoutine != null) StopCoroutine(pointerRoutine);
+        pointerRoutine = PointCounter();
+      //  Debug.Log("pointer count " + pointerRoutine);
         StartCoroutine(pointerRoutine);
     }
 
@@ -47,10 +51,13 @@ public class Map_CapturePointManager : MonoBehaviourPun
         EventManager.StopListening(MyEvents.EVENT_CP_CAPTURED, OnPointCaptured);
     }
     IEnumerator pointerRoutine;
-    IEnumerator pointCounter() {
+    IEnumerator PointCounter()
+    {
+       // Debug.Log("field finish count " + gameFieldCP.gameFieldFinished);
         while (!gameFieldCP.gameFieldFinished) {
             if (PhotonNetwork.IsMasterClient) {
                 float amount = GetCP_Sum() * pointPerSec;
+              //  Debug.Log("Set point " + amount);
                 photonView.RPC("SetPoint", RpcTarget.AllBuffered, currentPoint + amount);
             }
             yield return new WaitForSeconds(1f);

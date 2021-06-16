@@ -18,19 +18,19 @@ public class Unit_HUD : MonoBehaviour
     private void OnEnable()
     {
        
-        if (player.pv.IsMine)
+        if (player.controller.IsLocal)
         {
             nameText.enabled = false;
         }
         else
         {
             nameText.enabled = true;
-            nameText.text = player.pv.Owner.NickName;
+            nameText.text = player.controller.Owner.NickName;
         }
         if (GameSession.gameModeInfo.isTeamGame)
         {
             teamIndicator.enabled = true;
-            teamIndicator.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[player.myTeam==Team.HOME ? 0 : 1]);
+            teamIndicator.color = ConstantStrings.GetColorByHex(ConstantStrings.team_color[(int)player.myTeam]);
         }
         else
         {

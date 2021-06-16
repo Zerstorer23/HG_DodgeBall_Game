@@ -269,6 +269,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2480895131875863820}
   - component: {fileID: 1316997393031184959}
+  - component: {fileID: 3498570534773096347}
   - component: {fileID: 3390347450338821709}
   - component: {fileID: 8438767592492853387}
   m_Layer: 10
@@ -311,6 +312,20 @@ MonoBehaviour:
   gunPosition: {fileID: 1214196320367156898}
   dirFill: {fileID: 8712921382731223096}
   dirText: {fileID: 5841752581062006759}
+--- !u!114 &3498570534773096347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2480895131875863821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6addfcd375ca3641aee785c507548c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controllerType: 0
+  uid: 
 --- !u!114 &3390347450338821709
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -6,16 +6,17 @@ using UnityEngine;
 public class Explosion : MonoBehaviourPun
 {
     PhotonView pv;
+    public float delay = 1f;
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
     }
     private void OnEnable()
     {
-        StartCoroutine(WaitAndKill(1.5f));
+        StartCoroutine(WaitAndKill());
     }
 
-    IEnumerator WaitAndKill(float delay)
+    IEnumerator WaitAndKill()
     {
         yield return new WaitForSeconds(delay);
         KillMe();

@@ -25,8 +25,8 @@ public class Map_CapturePoint : MonoBehaviourPun
     {
         gameField = GetComponentInParent<GameField_CP>();
         cpManager = GetComponentInParent<Map_CapturePointManager>();
-        homeColor = GetColorByHex(team_color[(int)(Team.HOME) - 1]);
-        awayColor = GetColorByHex(team_color[(int)(Team.AWAY) - 1]);
+        homeColor = GetColorByHex(team_color[(int)(Team.HOME) ]);
+        awayColor = GetColorByHex(team_color[(int)(Team.AWAY) ]);
     }
     private void OnDrawGizmos()
     {
@@ -71,7 +71,9 @@ public class Map_CapturePoint : MonoBehaviourPun
             UpdateFill();
         }
         else {
-            Restore();
+            if (cpManager.serialCaptureRequired) {
+                Restore();
+            }
         }
        // UpdateBanner();
     }
@@ -134,8 +136,8 @@ public class Map_CapturePoint : MonoBehaviourPun
             float dist = Vector2.Distance(transform.position, player.Value.transform.position);
             if (dist < radius)
             {
-                Player p = gameField.playerSpawner.playersOnMap[player.Key];
-                Team team = (Team)ConnectedPlayerManager.GetPlayerProperty(p, "TEAM", Team.NONE);
+                UniversalPlayer p = gameField.playerSpawner.playersOnMap[player.Key];
+                Team team = p.GetProperty("TEAM", Team.NONE);
                 if (team == Team.HOME)
                 {
                     homeHP += player.Value.health.currentLife;
@@ -211,7 +213,7 @@ public class Map_CapturePoint : MonoBehaviourPun
             boundary.color = ownerFlag.color;
         }
         else {
-            ownerFlag.color = GetColorByHex(team_color[((int)owner) - 1]);
+            ownerFlag.color = GetColorByHex(team_color[(int)owner]);
             boundary.color = ownerFlag.color;
         }
         lockImage.enabled = !IsOpen();
@@ -323,7 +325,7 @@ public class Map_CapturePoint : MonoBehaviourPun
             EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(string.Format("{0}번 지역이 중립화되었습니다.",(captureIndex+1))));
         }
         else {
-            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(string.Format("{0}번 지역이 {1}팀에게 점령되었습니다.",(captureIndex+1),team_name[(int)owner-1])));
+            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(string.Format("{0}번 지역이 {1}팀에게 점령되었습니다.",(captureIndex+1),team_name[(int)owner])));
         }
     }
 }

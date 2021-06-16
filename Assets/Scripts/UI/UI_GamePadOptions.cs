@@ -20,8 +20,7 @@ public class UI_GamePadOptions : MonoBehaviour
     }
 
     private void OnPanelOpen(EventObject arg0)
-    {
-        Debug.Log("Catch option open");
+    { 
         if ((ScreenType)arg0.objData == ScreenType.Settings) {
                 QueryPadInfo();
         }
@@ -43,7 +42,6 @@ public class UI_GamePadOptions : MonoBehaviour
             if (!String.IsNullOrEmpty(n)) count++;
         }
         useGamepad = (count > 0);
-        Debug.Log("Query info : use game pad " + useGamepad);
         instance.UpdateUI();
         if (useGamepad)
         {

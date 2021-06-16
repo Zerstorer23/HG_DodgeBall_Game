@@ -14,16 +14,10 @@ public class Action_InstantiateBullet : SkillAction
             GetParam<string>(SkillParams.PrefabName),
             parent.caster.transform.position,
             parent.caster.transform.rotation,0
-            , new object[] {fieldNumber, parent.casterPV.Owner.UserId, false}
+            , new object[] {fieldNumber, parent.castingPlayer.controller.uid, false}
             );
         parent.spawnedObject = obj;
-        // Debug.Log("instantiate " + obj);
         parent.projectilePV = parent.spawnedObject.GetComponent<PhotonView>();
-
-     //   parent.pv.RPC("SetParentTransform", RpcTarget.AllBuffered);
-       // parent.pv.RPC("SetOwnerPlayer", RpcTarget.AllBuffered, fieldNumber, parent.casterPV.Owner.UserId);
-        
-
         return 0f;
     }
 
@@ -40,7 +34,7 @@ public class Action_InstantiateBullet_FollowPlayer : SkillAction
             GetParam<string>(SkillParams.PrefabName),
             parent.caster.transform.position,
             rotation, 0
-            , new object[] { fieldNumber, parent.casterPV.Owner.UserId, true
+            , new object[] { fieldNumber, parent.castingPlayer.controller.uid, true
             }
             );
         parent.spawnedObject = obj;
@@ -62,29 +56,13 @@ public class Action_InstantiateBulletAt : SkillAction
     
         GameObject obj = PhotonNetwork.Instantiate(
           GetParam<string>(SkillParams.PrefabName), pos, angle, 0
-            , new object[] { fieldNumber, parent.casterPV.Owner.UserId, false });
+            , new object[] { fieldNumber, parent.castingPlayer.controller.uid, false });
         parent.spawnedObject = obj;
         parent.projectilePV = parent.spawnedObject.GetComponent<PhotonView>();
         return 0;
     }
 }
-public class Action_InstantiateBulletAt_Mikuru : SkillAction
-{
 
-    public override float Activate()
-    {
-
-        int fieldNumber = parent.castingPlayer.fieldNo;
-        Vector3 pos = GetParam<Vector3>(SkillParams.Vector3);
-        Quaternion angle = GetParam<Quaternion>(SkillParams.Quarternion);
-            GameObject obj = PhotonNetwork.Instantiate(
-              GetParam<string>(SkillParams.PrefabName), pos, angle, 0
-                , new object[] { fieldNumber, parent.casterPV.Owner.UserId, false,PhotonNetwork.Time + ((double)PhotonNetwork.GetPing()/1000)});
-        parent.spawnedObject = obj;
-        parent.projectilePV = parent.spawnedObject.GetComponent<PhotonView>();
-        return 0;
-    }
-}
 
 public class Action_Projectile_ResetAngle : SkillAction
 {

@@ -11,7 +11,7 @@ public class BuffObjectSpawner : MonoBehaviour
 
     double lastSpawnTime;
     double startTime;
-    GameField gameField;
+   [SerializeField] GameField gameField;
     string prefabName = "Prefabs/BuffObjects/buffObject";
     private void Awake()
     {

@@ -8,14 +8,13 @@ public class Skill_Tsuruya : ISkill
     public override ActionSet GetSkillActionSet(SkillManager skm)
     {
         ActionSet mySkill = new ActionSet(skm);
-        mySkill.SetParam(SkillParams.UserID, skm.pv.Owner.UserId);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_TSURUYA);
         mySkill.SetParam(SkillParams.Quarternion, Quaternion.identity);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
         float radius = 15f; //5
         float timeStep = 0.25f; //0.25
         int numStep = 6; //10
-        int shootAtOnce = 8;//10
+        int shootAtOnce = 6;//10
         mySkill.SetParam(SkillParams.Duration, timeStep);
         BuffData buff = new BuffData(BuffType.MoveSpeed, -0.2f, timeStep * (numStep));
         mySkill.SetParam(SkillParams.BuffData, buff);

@@ -22,7 +22,7 @@ public class GameModeConfig : ScriptableObject
                 if (fieldFinished && stat.lastDied == null) fieldFinished = false;
                 break;
             case GameMode.TEAM:
-                fieldFinished = (stat.toKill <= 0 || stat.alive_ourTeam <= 0);
+                fieldFinished = (stat.alive_otherTeam <= 0 || stat.alive_ourTeam <= 0);
                 break;
             case GameMode.PVE:
                 fieldFinished = (stat.alive == 0);

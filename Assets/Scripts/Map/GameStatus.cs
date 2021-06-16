@@ -6,40 +6,33 @@ using UnityEngine;
 
 public class GameStatus
 {
-    public Player lastSurvivor;
-    public Player lastDied;
+    public UniversalPlayer lastSurvivor;
+    public UniversalPlayer lastDied;
     public int total;
     public int alive;
     public int alive_ourTeam;
+    public int alive_otherTeam;
     public int dead;
-    public int toKill;
-    public GameStatus(SortedDictionary<string, Unit_Player> unitDict, Player lastDied)
+    public GameStatus(SortedDictionary<string, Unit_Player> unitDict, UniversalPlayer lastDied)
     {
-        Team myTeam = (Team)ConnectedPlayerManager.GetPlayerProperty("TEAM", Team.HOME);
+        Team myTeam = PlayerManager.LocalPlayer.GetProperty("TEAM", Team.HOME);
         this.lastDied = lastDied;
         foreach (Unit_Player p in unitDict.Values)
         {
             total++;
             if (p != null && p.gameObject.activeInHierarchy)
             {
-                lastSurvivor = p.pv.Owner;
+                lastSurvivor = p.controller.Owner;
                 alive++;
                 if (GameSession.gameModeInfo.isTeamGame)
                 {
                     if (p.myTeam != myTeam)
                     {
-                        toKill++;
+                        alive_otherTeam++;
                     }
                     else
                     {
                         alive_ourTeam++;
-                    }
-                }
-                else
-                {
-                    if (p.pv.Owner.UserId != PhotonNetwork.LocalPlayer.UserId)
-                    {
-                        toKill++;
                     }
                 }
             }
@@ -62,10 +55,10 @@ public class GameStatus
         string o = "<color=#00c8c8>===============GameStat========================</color>\n";
             o+="Game mode : " + GameSession.gameModeInfo.gameMode + "\n";
         o += "Total Players:" + total + "\n";
-        o += "Total Alive:" + alive + "\n";
-        o += "Total Alive in my team:" + ConnectedPlayerManager.GetPlayerProperty("TEAM", Team.HOME) + " ? " + alive + "\n";
+        o += "Total Alive " + alive + "\n";
+        o += "\t \t my team:" + PlayerManager.LocalPlayer.GetProperty("TEAM", Team.HOME) + " ? " + alive_ourTeam + "\n";
+        o += "\t \t other team:" + PlayerManager.LocalPlayer.GetProperty("TEAM", Team.HOME) + " ? " + alive_otherTeam + "\n";
         o += "Total dead:" + dead + "\n";
-        o += "Total to kill:" + toKill + "\n";
         o += "Last survivor:" + lastSurvivor + "\n";
         o += "<color=#00c8c8>===========================================</color>\n";
         return o;

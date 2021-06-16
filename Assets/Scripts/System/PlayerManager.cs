@@ -3,12 +3,13 @@ using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
+public class PlayerManager : MonoBehaviourPunCallbacks
 {
-    private static ConnectedPlayerManager prConnMan;
+    private static PlayerManager prConnMan;
     public int myId = 0;
     public bool init = false;
     //***************//
@@ -18,13 +19,13 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         Init();
     }
 
-    public static ConnectedPlayerManager instance
+    public static PlayerManager instance
     {
         get
         {
             if (!prConnMan)
             {
-                prConnMan = FindObjectOfType<ConnectedPlayerManager>();
+                prConnMan = FindObjectOfType<PlayerManager>();
                 if (!prConnMan)
                 {
                 }
@@ -37,41 +38,60 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         }
     }
 
+    internal static void AddBotPlayer(UniversalPlayer botPlayer)
+    {
+        instance.playerDict.Add(botPlayer.uid, botPlayer);
+        instance.currentPlayerNum++;
+        Debug.LogWarning("Add bot " + botPlayer);
+    }
+    public static void RemoveBotPlayer(string uid) {
+        if (instance.playerDict.ContainsKey(uid)) {
+            instance.playerDict.Remove(uid);
+            instance.currentPlayerNum--;
+            Debug.LogWarning("Remove bot " + uid);
+        }
+    }
 
-    public Dictionary<string, Player> playerDict = new Dictionary<string, Player>();
-    public Dictionary<string, object> roomSettings = new Dictionary<string, object>();
-    public Dictionary<string, object> playerSettings = new Dictionary<string, object>();
+    public Dictionary<string, UniversalPlayer> playerDict = new Dictionary<string, UniversalPlayer>();
+
     public int currentPlayerNum = 0;
     public void Init() {
         if (init) return;
         init = true;
-        playerDict = new Dictionary<string, Player>();
+        playerDict.Clear();
         Player[] players = PhotonNetwork.PlayerList;
-        foreach (Player p in players) { 
-            playerDict.Add(p.UserId,p);
+        foreach (Player p in players) {
+            UniversalPlayer uPlayer = new UniversalPlayer(p);
+            playerDict.Add(p.UserId,uPlayer);
         }
         currentPlayerNum = playerDict.Count;
-        roomSettings = new Dictionary<string, object>();
-        playerSettings = new Dictionary<string, object>();
         Debug.Log("<color=#00ff00>Conn man : current size</color> " + currentPlayerNum);
     }
-    public static Dictionary<string, Player> GetPlayerDictionary() {
+
+   public static int botIDnumber = 0;
+    internal static string PollBotID()
+    {
+        botIDnumber++;
+        return "T-"+PhotonNetwork.LocalPlayer.UserId+"-"+botIDnumber;
+    }
+
+    public static Dictionary<string, UniversalPlayer> GetPlayerDictionary() {
         return instance.playerDict;
     }
 
 
-    internal static int GetMyIndex(Player[] players, bool useRandom = false)
+    internal static int GetMyIndex(UniversalPlayer[] players, bool useRandom = false)
     {
         instance.Init();
         SortedSet<string> myList = new SortedSet<string>();
-        foreach (Player p in players)
+        foreach (UniversalPlayer p in players)
         {
-            int seed = (int)GetPlayerProperty(p, "SEED", 0);
-            string id = (useRandom) ? seed + p.UserId : p.UserId;
+            int seed = p.GetProperty("SEED", 0);
+            string id = (useRandom) ? seed + p.uid : p.uid;
             myList.Add(id);
         }
         int i = 0;
-        int mySeed = (int)GetPlayerProperty("SEED", 0);
+        int mySeed = LocalPlayer.GetProperty("SEED", 0);
         string myID = (useRandom) ? mySeed + PhotonNetwork.LocalPlayer.UserId : PhotonNetwork.LocalPlayer.UserId;
         foreach (var val in myList)
         {
@@ -80,15 +100,15 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         }
         return 0;
     }
-    internal static SortedDictionary<string,int> GetIndexMap(Player[] players, bool useRandom = false)
+    internal static SortedDictionary<string,int> GetIndexMap(UniversalPlayer[] players, bool useRandom = false)
     {
          instance.Init();
         SortedDictionary<string, string> decodeMap = new SortedDictionary<string, string>();
-        foreach (Player p in players)
+        foreach (UniversalPlayer p in players)
         {
-            int seed = (int)GetPlayerProperty(p, "SEED", 0);
-            string id = (useRandom) ? seed + p.UserId : p.UserId;
-            decodeMap.Add(id, p.UserId);
+            int seed = p.GetProperty("SEED", 0);
+            string id = (useRandom) ? seed + p.uid : p.uid;
+            decodeMap.Add(id, p.uid);
         }
         int i = 0;
         SortedDictionary<string, int> indexMap = new SortedDictionary<string, int>();
@@ -98,6 +118,36 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         }
         return indexMap;
     }
+
+    internal static UniversalPlayer[] GetHumanPlayers()
+    {
+        var list = from UniversalPlayer p in instance.playerDict.Values
+                   where p.IsHuman
+                   select p;
+        return list.ToArray();
+    }
+    internal static UniversalPlayer[] GetBotPlayers()
+    {
+        var list = from UniversalPlayer p in instance.playerDict.Values
+                   where p.IsBot
+                   select p;
+        return list.ToArray();
+    }
+    public static void RemoveAllBots()
+    {
+
+        var list = (from UniversalPlayer p in instance.playerDict.Values
+                   where p.IsBot
+                   select p.uid).ToArray();
+        foreach (string s in list) {
+            instance.playerDict.Remove(s);
+        }
+        botIDnumber = 0;
+    }
+    internal static UniversalPlayer[] GetPlayers() {
+        return instance.playerDict.Values.ToArray();
+    }
+
     internal static Player GetRandomPlayerExceptMe()
     {
         Player[] players = PhotonNetwork.PlayerListOthers;
@@ -113,8 +163,10 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        if (!playerDict.ContainsKey(newPlayer.UserId)) {
-            playerDict.Add(newPlayer.UserId, newPlayer);
+        if (!playerDict.ContainsKey(newPlayer.UserId))
+        {
+            UniversalPlayer uPlayer = new UniversalPlayer(newPlayer);
+            playerDict.Add(newPlayer.UserId, uPlayer);
             currentPlayerNum++;
             Debug.Log("<color=#00ff00> Addplayer </color> " + currentPlayerNum);
         }
@@ -129,7 +181,7 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
             Debug.Log("<color=#00ff00> removePlayer </color> " + currentPlayerNum);
         }
     }
-    public static Player GetPlayerByID(string id) {
+    public static UniversalPlayer GetPlayerByID(string id) {
         instance.Init();
         if (id == null) return null;
         if (instance.playerDict.ContainsKey(id))
@@ -141,13 +193,13 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
             return null;
         }
     }
-    public static Player GetPlayerOfTeam(Team team)
+    public static UniversalPlayer GetPlayerOfTeam(Team team)
     {
         instance.Init();
         foreach (var p in instance.playerDict.Values)
         {
-            if (!p.CustomProperties.ContainsKey("TEAM")) continue;
-            Team pTeam = (Team)p.CustomProperties["TEAM"];
+            if (!p.HasProperty("TEAM")) continue;
+            Team pTeam = p.GetProperty<Team>("TEAM");
             if (pTeam == team)
             {
                 return p;
@@ -168,8 +220,8 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
         instance.teamCount.Clear();
         foreach (var p in instance.playerDict.Values)
         {
-            if (!p.CustomProperties.ContainsKey("TEAM")) continue;
-            Team pTeam = (Team)p.CustomProperties["TEAM"];
+            if (!p.HasProperty("TEAM")) continue;
+            Team pTeam = p.GetProperty<Team>("TEAM");
             if (instance.teamCount.ContainsKey(pTeam))
             {
                 instance.teamCount[pTeam]++;
@@ -179,28 +231,8 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
             }
         }
     }
-    public static object GetPlayerProperty(string tag, object value)
-    {
-        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(tag))
-        {
-            return PhotonNetwork.LocalPlayer.CustomProperties[tag];
-        }
-        else
-        {
-            return value;
-        }
-    }
-
-    public static object GetPlayerProperty(Player p, string tag, object value)
-    {
-        if (p.CustomProperties.ContainsKey(tag))
-        {
-            return p.CustomProperties[tag];
-        }
-        else
-        {
-            return value;
-        }
+    public static UniversalPlayer LocalPlayer { 
+        get => instance.playerDict [PhotonNetwork.LocalPlayer.UserId];
     }
     public override void OnDisconnected(DisconnectCause cause)
     {
@@ -239,13 +271,7 @@ public class ConnectedPlayerManager : MonoBehaviourPunCallbacks
     public static void KickEveryoneElse()
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        GameSession.PushRoomASetting(ConstantStrings.HASH_GAME_STARTED, false);
-        var players = PhotonNetwork.PlayerListOthers;
-        foreach (var p in players) {
-            PhotonNetwork.CloseConnection(p);
-        }
-        GameSession.instance.photonView.RPC("LeaveRoom", RpcTarget.Others);
-        instance.StartCoroutine(WaitAndQuit());
+        GameSession.instance.photonView.RPC("QuitGame", RpcTarget.Others);
     }
     /*   public void Disconnect()
        {

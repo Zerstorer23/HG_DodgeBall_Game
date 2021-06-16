@@ -18,7 +18,6 @@ public class UI_MessageBox : MonoBehaviour
     private void OnMessageReceived(EventObject arg0)
     {
         text.text = arg0.stringObj;
-
         if (coroutine != null) {
             StopCoroutine(coroutine);   
         }

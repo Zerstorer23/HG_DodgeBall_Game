@@ -27,6 +27,7 @@ public class ConstantStrings : MonoBehaviour
 
 
     public const string PREFAB_HEAL_1 = "Prefabs/Units/HealParticle";
+    public const string PREFAB_EXPLOSION_1 = "Prefabs/Units/ExplosionParticle";
     public const string PREFAB_PLAYER = "Prefabs/Units/Player";
     public const string PREFAB_DESOLATOR = "Prefabs/Units/Desolator";
     public const string PREFAB_BUFF_OBJECT = "Prefabs/Units/BuffObject";
@@ -59,12 +60,17 @@ public class ConstantStrings : MonoBehaviour
     public const string PREFS_MANUAL_AIM = "manualAim";
     public const string PREFS_TIME_RECORD = "timeRecord";
 
-    public static string[] team_color = { "#0080FF", "#FF8000" };
-    public static string[] team_name = { "파랑", "주황" };
+    public static string[] team_color = { "#C1C1C1", "#0080FF", "#FF8000" };
+    public static string[] team_name = {"중립", "파랑", "주황" };
+
+    private static Dictionary<string, Color> colorCache = new Dictionary<string, Color>();
     public static Color GetColorByHex(string hex)
     {
-        Color newCol;
-        ColorUtility.TryParseHtmlString(hex, out newCol);
+        if (colorCache.ContainsKey(hex)) {
+            return colorCache[hex];
+        }
+        ColorUtility.TryParseHtmlString(hex, out Color newCol);
+        colorCache.Add(hex,newCol);
         return newCol;
     }
     public static float GetAngleBetween(Vector3 from, Vector3 to)

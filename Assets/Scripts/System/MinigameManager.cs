@@ -38,16 +38,6 @@ public class MinigameManager : MonoBehaviourPunCallbacks
         }
     }
 
-/*    public void JoinPlayer(string id) {
-        players.Add(id, false);
-    }
-    public void LeavePlayer(string id)
-    {
-        if (players.ContainsKey(id))
-        {
-            players.Remove(id);
-        }
-    }*/
     [PunRPC]
     public void AddNumber(string uid, int number) {
         if (!GameSession.gameStarted) {

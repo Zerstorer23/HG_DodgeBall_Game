@@ -133,10 +133,16 @@ public class GameSession : MonoBehaviourPun
     [PunRPC]
     public void LeaveRoom()
     {
-        ConnectedPlayerManager.embarkCalled = true;
+        PlayerManager.embarkCalled = true;
         Debug.LogWarning("Leave room");
         //PhotonNetwork.RemoveRPCs(PhotonNetwork.LocalPlayer);
         PhotonNetwork.LeaveRoom();
+    }
+    [PunRPC]
+    public void QuitGame()
+    {
+        PhotonNetwork.LeaveRoom();
+        Application.Quit();
     }
     public static IEnumerator CheckCoroutine(IEnumerator routine, IEnumerator newRoutine) {
         if (routine != null) {
@@ -145,14 +151,14 @@ public class GameSession : MonoBehaviourPun
 
         return newRoutine;
     }
-    public static CharacterType GetPlayerCharacter(Player player)
+    public static CharacterType GetPlayerCharacter(UniversalPlayer player)
     {
-        if (!player.CustomProperties.ContainsKey("CHARACTER")) return CharacterType.NONE;
-        CharacterType character = (CharacterType)player.CustomProperties["CHARACTER"];
+        if (!player.HasProperty("CHARACTER")) return CharacterType.NONE;
+        CharacterType character = player.GetProperty<CharacterType>("CHARACTER");
         if (character == CharacterType.NONE)
         {
-            if (!player.CustomProperties.ContainsKey("ACTUAL_CHARACTER")) return CharacterType.NONE;
-            character = (CharacterType)player.CustomProperties["ACTUAL_CHARACTER"];
+            if (!player.HasProperty("ACTUAL_CHARACTER")) return CharacterType.NONE;
+            character = player.GetProperty<CharacterType>("ACTUAL_CHARACTER");
         }
         return character;
     }

@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: -8895642817908627982}
   - component: {fileID: 6212558457632629342}
   - component: {fileID: 4556413170392631494}
+  - component: {fileID: -3859998481871666203}
   - component: {fileID: 8629071319047820328}
   m_Layer: 11
   m_Name: Bullet_kyonmouto
@@ -133,7 +134,7 @@ Transform:
   m_GameObject: {fileID: 8629071319047820310}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.75, y: 1.75, z: 1}
   m_Children:
   - {fileID: 8629071319339072153}
   - {fileID: 841079445573049445}
@@ -198,6 +199,7 @@ MonoBehaviour:
   onlyFollowHostile: 0
   homingRotationSpeed: -1
   homingReaction: 0
+  numBounce: 0
   homingEnabled: 1
 --- !u!114 &-8895642817908627982
 MonoBehaviour:
@@ -212,6 +214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitType: 2
+  controller: {fileID: 0}
   currentLife: 0
   invincibleFromBullets: 1
   invincibleFromMapBullets: 0
@@ -251,6 +254,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pv: {fileID: 8629071319047820328}
   bodySprite: {fileID: 5391305497484024333}
+--- !u!114 &-3859998481871666203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8629071319047820310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6addfcd375ca3641aee785c507548c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controllerType: 0
+  uid: 
 --- !u!114 &8629071319047820328
 MonoBehaviour:
   m_ObjectHideFlags: 0

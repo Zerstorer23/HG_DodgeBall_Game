@@ -9,13 +9,17 @@ public class Skill_Koihime : ISkill
     {
         ActionSet mySkill = new ActionSet( skm);
         mySkill.isMutualExclusive = true;
-        mySkill.SetParam(SkillParams.Duration, 0.25f); //1.5
+        float duration = 0.33f;
+        mySkill.SetParam(SkillParams.Duration, duration); //1.5
                                                       // mySkill.SetParam(SkillParams.Modifier, 0.75f);
         mySkill.SetParam(SkillParams.Color, "#c80000");
         mySkill.SetParam(SkillParams.Enable, true);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KOIZUMI);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.None);
-       // mySkill.SetParam(SkillParams.Modifier, 0.5f);
+        BuffData blockSkill = new BuffData(BuffType.BlockSkill, 1f,(double) duration);
+        mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.BuffData, paramValue = blockSkill});//
+        mySkill.Enqueue(new Action_Player_AddBuff());//
+                                                            // mySkill.SetParam(SkillParams.Modifier, 0.5f);
         float dashSpeed = 20f;
         mySkill.Enqueue(new Action_InstantiateBullet_FollowPlayer());
         mySkill.Enqueue(new Action_SetProjectileStatic());
