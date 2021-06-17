@@ -29,6 +29,7 @@ public class GameSession : MonoBehaviourPun
 
     public float gameSpeed = 1f;
     public bool devMode = false;
+    public bool useHardBot = false;
     public CharacterType debugChara = CharacterType.NONE;
 
     public static bool auto_drive_enabled = false;

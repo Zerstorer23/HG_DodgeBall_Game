@@ -22,7 +22,7 @@ public class SkillManager : MonoBehaviourPun
     public float remainingStackTime;
     public int currStack;
 
-    double lastActivated = 0d;
+   internal double lastActivated = 0d;
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
@@ -82,10 +82,8 @@ public class SkillManager : MonoBehaviourPun
 
     private void CheckSkillActivation()
     {
-      //  if (PhotonNetwork.Time < lastActivated + 0.4) return;
         if (InputHelper.skillKeyFired() ||
-            (GameSession.IsAutoDriving() && unitMovement.autoDriver.CanAttackTarget())
-            || controller.IsBot
+            ((GameSession.IsAutoDriving() || controller.IsBot) && unitMovement.autoDriver.CanAttackTarget())
             )
         {
             if (buffManager.GetTrigger(BuffType.BlockSkill)) return;

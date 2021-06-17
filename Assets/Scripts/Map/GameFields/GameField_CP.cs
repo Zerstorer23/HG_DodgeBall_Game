@@ -8,15 +8,15 @@ using UnityEngine;
 public class GameField_CP : GameField
 {
     [SerializeField] Transform[] spawnPositions;
-    Map_CapturePointManager cpManager;
+    internal Map_CapturePointManager cpManager;
     public override void Awake()
     {
         base.Awake();
         cpManager = GetComponentInChildren<Map_CapturePointManager>();
     }
-    public override Vector3 GetPlayerSpawnPosition()
+    public override Vector3 GetPlayerSpawnPosition(UniversalPlayer myPlayer)
     {
-        Team team = PlayerManager.LocalPlayer.GetProperty("TEAM", Team.NONE);
+        Team team = myPlayer.GetProperty("TEAM", Team.NONE);
         if (team == Team.HOME)
         {
             return spawnPositions[0].position;
@@ -33,7 +33,7 @@ public class GameField_CP : GameField
         timeoutRoutine = GameSession.CheckCoroutine(timeoutRoutine, WaitAndFinishGame());
        if(!GameSession.instance.devMode) StartCoroutine(timeoutRoutine);
     }
-    float timeout = 360f;
+    public static float timeout = 300f;
     IEnumerator WaitAndFinishGame() {
         yield return new WaitForSeconds(timeout);
         float point = cpManager.currentPoint;
@@ -66,6 +66,7 @@ public class GameField_CP : GameField
     }
     public override void CheckFieldConditions(GameStatus stat)
     {
+        //Intentionally left blank to do nothing
 
     }
 }

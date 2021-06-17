@@ -62,7 +62,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
 
     private void OnEnable()
     {
-        playerDictionary = new Dictionary<string, HUD_UserName>();
+        playerDictionary.Clear();
         if (PhotonNetwork.CurrentRoom == null) return;
         mapOptions.SetGameStarted(false);
         Debug.Log("Instantiate after regame");
@@ -94,9 +94,12 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
 
     internal void OnPlayerLeftRoom(Player newPlayer)
     {
-        string id = newPlayer.UserId;
-        Debug.Assert(playerDictionary.ContainsKey(id), "Removing p doesnt exist");
-        playerDictionary.Remove(id);
+        RemovePlayer(newPlayer.UserId);
+
+    }
+    public void RemovePlayer(string uid) {
+        Debug.Assert(playerDictionary.ContainsKey(uid), "Removing p doesnt exist");
+        playerDictionary.Remove(uid);
         UpdateReadyStatus();
         debugUI();
     }
@@ -121,7 +124,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     }
     void debugUI()
     {
-        foundPlayers = new List<string>();
+        foundPlayers.Clear();
         foreach (var entry in playerDictionary.Keys)
         {
             foundPlayers.Add(entry);
@@ -158,7 +161,18 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     }
     public bool CheckTeamValidity() {
         if (!GameSession.gameModeInfo.isTeamGame || GameSession.instance.devMode) return true;
-        Team masterTeam = (Team)PhotonNetwork.LocalPlayer.CustomProperties["TEAM"];
+        int numHome = PlayerManager.GetNumberInTeam(Team.HOME);
+        int numAway = PlayerManager.GetNumberInTeam(Team.AWAY);
+        if (numHome == 0 || numAway == 0)
+        {
+
+            ChatManager.SendNotificationMessage("최소 한명은 팀이 달라야합니다 장애인들아");
+            return false;
+        }
+        else {
+            return true;
+        }
+/*        Team masterTeam = (Team)PhotonNetwork.LocalPlayer.CustomProperties["TEAM"];
         Player[] players = PhotonNetwork.PlayerList;
         foreach (Player p in players)
         {
@@ -168,7 +182,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
             }
         }
         ChatManager.SendNotificationMessage("최소 한명은 팀이 달라야합니다 장애인들아");
-        return false;
+        return false;*/
     }
     public bool CheckHalfAgreement()
     {

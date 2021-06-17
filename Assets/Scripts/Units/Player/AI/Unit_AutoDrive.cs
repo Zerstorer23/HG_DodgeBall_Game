@@ -15,18 +15,30 @@ public class Unit_AutoDrive : MonoBehaviour
     public GameObject targetEnemy;
     public Unit_Player player;
     internal float aimAngle;
+    public BotType botType = BotType.Easy;
 
     public bool secondPrediction = true;
     IEvaluationMachine machine = new IEvaluationMachine();
     public void StartBot(bool useBot, bool isNormalBot)
     {
+
         gameObject.SetActive(useBot);
         if (!useBot) return;
+        if (GameSession.instance.useHardBot)
+        {
+            isNormalBot = false;
+        }
         if (isNormalBot)
         {
-            machine = new Bot_Normal();
+            botType = BotType.Easy;
+            //machine = new IEvaluationMachine();
+            // Debug.LogWarning("Init hard bot");
+           // machine = new Bot_Normal();
+            machine = new IEvaluationMachine();
         }
-        else {
+        else
+        {
+            botType = BotType.Hard;
             machine = new IEvaluationMachine();
         }
         directionIndicator = player.driverIndicator;
@@ -43,6 +55,10 @@ public class Unit_AutoDrive : MonoBehaviour
 
     public bool CanAttackTarget()
     {
+        if (botType == BotType.Easy)
+        {
+            if (PhotonNetwork.Time < player.skillManager.lastActivated + 1) return false;
+        }
         if (GameSession.gameModeInfo.isCoop) return true;
         if (player.myCharacter == CharacterType.Taniguchi) return false;
         FindNearestPlayer();
@@ -71,43 +87,37 @@ public class Unit_AutoDrive : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, machine.range_Search);
-        foreach (GameObject go in machine.foundObjects.Values)
+        if (player.controller.IsLocal)
         {
-            if (go == null || !go.activeInHierarchy)
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, machine.attackRange);
+            foreach (GameObject go in machine.foundObjects.Values)
             {
-                continue;
+                if (go == null || !go.activeInHierarchy)
+                {
+                    continue;
+                }
+                Gizmos.DrawWireSphere(go.transform.position, 0.5f);
             }
-            Gizmos.DrawWireSphere(go.transform.position, 0.5f);
-        }
-        Gizmos.color = (machine.doApproach) ? Color.cyan : Color.red;
-        Gizmos.DrawWireSphere(transform.position + lastEvaluatedVector, 0.6f);
-/*        Gizmos.DrawWireSphere(xWall, 1f);
-        Gizmos.DrawWireSphere(yWall, 1f);*/
-        if (targetEnemy != null)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(targetEnemy.transform.position, 1f);
-        }
-      /*  Gizmos.color = Color.green;
-        for (int i = 0; i < 360; i++)
-        {
-            if (!blockedAngles[i])
-            {
-                Vector3 pos = transform.position + GetAngledVector(i, range_collision);
-                Gizmos.DrawWireSphere(pos, 0.05f);
-            }
-        }*/
+            Gizmos.color = (machine.doApproach) ? Color.cyan : Color.red;
+            Gizmos.DrawWireSphere(transform.position + lastEvaluatedVector, 0.6f);
+            /*        Gizmos.DrawWireSphere(xWall, 1f);
+                    Gizmos.DrawWireSphere(yWall, 1f);*/
 
+            if (targetEnemy != null)
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireSphere(targetEnemy.transform.position, 1f);
+            }
+        }
     }
     // Update is called once per frame
 
 
-    
+
     void FindNearestPlayer()
     {
-        playersOnMap = GameFieldManager.gameFields[player.fieldNo].playerSpawner.unitsOnMap;
+        playersOnMap = gameFields[player.fieldNo].playerSpawner.unitsOnMap;
         float nearestEnemyDist = float.MaxValue;
         foreach (var p in playersOnMap.Values)
         {
@@ -139,12 +149,18 @@ public class Unit_AutoDrive : MonoBehaviour
     public float EvaluateAim()
     {
         FindNearestPlayer();
-        if (targetEnemy == null) {
+        if (targetEnemy == null)
+        {
             return player.movement.aimAngle;
         }
         Vector3 targetPosition = targetEnemy.transform.position;
-        Vector3 sourcePosition = player.movement.networkPos;
+        Vector3 sourcePosition = transform.position;
         aimAngle = GameSession.GetAngle(sourcePosition, targetPosition);
+        if (botType == BotType.Easy)
+        {
+            float rand = UnityEngine.Random.Range(-30f,30f);
+            aimAngle += rand;
+        }
         directionIndicator.transform.localPosition = GetAngledVector(aimAngle, 1.4f); // new Vector3(dX, dY);
         directionIndicator.transform.localRotation = Quaternion.Euler(0, 0, aimAngle);
         return aimAngle;
@@ -157,4 +173,8 @@ public class Unit_AutoDrive : MonoBehaviour
     }
 
 
+}
+public enum BotType
+{
+    Easy, Hard
 }

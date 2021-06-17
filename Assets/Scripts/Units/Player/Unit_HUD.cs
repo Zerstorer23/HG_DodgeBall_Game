@@ -55,7 +55,7 @@ public class Unit_HUD : MonoBehaviour
 
     private void SetMP()
     {
-        if (!player.pv.IsMine && player.buffManager.GetTrigger(BuffType.HideBuffs)) {
+        if (!player.controller.IsLocal && player.buffManager.GetTrigger(BuffType.HideBuffs)) {
             MP_fillStack.fillAmount = 1;
             return;
         }

@@ -47,8 +47,6 @@ public class Unit_Movement :
     {
 
         InputHelper.SetAxisNames();
-        //  if (GameSession.gameModeInfo.gameMode == GameMode.Tournament && PhotonNetwork.CurrentRoom.PlayerCount % 2 == 1 ) MenuManager.auto_drive = false;
-
         autoDriver.StartBot(
             (GameSession.auto_drive_enabled || controller.IsBot),
             controller.IsBot);

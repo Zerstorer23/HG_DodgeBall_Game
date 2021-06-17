@@ -19,7 +19,7 @@ public partial class IEvaluationMachine
     protected float escapePadding = 1f;
 
     //-----ATTACK PLAYERS-----//
-    protected float attackRange = 10f;
+    public float attackRange = 10f;
     public bool isKamikazeSkill = false;
 
     public List<GameObject> dangerList = new List<GameObject>();
@@ -58,7 +58,7 @@ public partial class IEvaluationMachine
             if (go == null || !go.activeInHierarchy) continue;
             if (go.tag != TAG_PROJECTILE) continue;
             if (Vector2.Distance(go.transform.position, player.transform.position) > range_Collision) continue;
-            if (!CheckIfProjetilcIsDangerous(go.GetInstanceID(), go)) continue;
+            if (!IsProjectileDangerous(go.GetInstanceID(), go)) continue;
             int angleToObj = (int)GetAngleBetween(movement.networkPos, go.transform.position);
             int startAngle = (angleToObj - searchRange);
             if (startAngle < 0) startAngle += 360;
@@ -199,11 +199,17 @@ public partial class IEvaluationMachine
     }
 
 
-    protected bool CheckIfProjetilcIsDangerous(int tid, GameObject go)
+    protected bool IsProjectileDangerous(int tid, GameObject go)
     {
         HealthPoint hp = cachedComponent.Get<HealthPoint>(tid, go);
-        if (!hp.damageDealer.isMapObject && hp.pv.IsMine) return false;
+        if (hp.IsMapProjectile()) return true;
+        if (hp.controller.Equals(player.controller)) return false;
         if (GameSession.gameModeInfo.isTeamGame && hp.myTeam == player.myTeam) return false;
+        return true;
+    }
+    protected bool IsPlayerDangerous(Unit_Player enemyPlayer) {
+        if (GameSession.gameModeInfo.isTeamGame && enemyPlayer.myTeam == player.myTeam) return false;
+        if (GameSession.gameModeInfo.isCoop) return false;
         return true;
     }
 }

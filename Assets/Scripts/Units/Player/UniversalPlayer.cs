@@ -1,4 +1,5 @@
-﻿using Photon.Realtime;
+﻿using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ public class UniversalPlayer
         }
         else
         {
-            return player.IsMasterClient;
+            return PhotonNetwork.IsMasterClient;
         }
     }
     private void SetNickName(string value)
@@ -70,9 +71,17 @@ public class UniversalPlayer
         this.player = player;
         uid = player.UserId;
     }
+
+    public static string[] botNames = {
+        "Langley","Saratoga","Lexington","Hornet","Ranger",
+        "Yorktown","Enterprise","Wasp","Essex","Intrepid",
+    "Franklin","Independence","Princeton","Bunker Hill",
+    "Bataan","Kearsarge","Shangri-La","Midway","Saipan"};
+
     public UniversalPlayer(string uid) {
         controllerType = ControllerType.Bot;
         this.uid = uid;
+        NickName = botNames[UnityEngine.Random.Range(0, botNames.Length)];
     }
 
     public T GetProperty<T>(string key) {
@@ -97,7 +106,7 @@ public class UniversalPlayer
         {
             if (customProperties.ContainsKey(key))
             {
-                return (T)player.CustomProperties[key];
+                return (T)customProperties[key];
             }
         }
         return defaultValue;

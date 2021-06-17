@@ -277,7 +277,6 @@ public class Map_CapturePoint : MonoBehaviourPun
             }
             else
             {
-
                 fillSprite.color = awayColor;
             }
         }

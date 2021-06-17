@@ -23,7 +23,9 @@ public class HealthPoint : MonoBehaviourPun
     internal Unit_Player unitPlayer;
     internal Projectile_DamageDealer damageDealer;
     internal Component movement;
-    internal Team myTeam = Team.HOME;
+    public Team myTeam {
+        get => controller.Owner.GetProperty("TEAM", Team.HOME);
+    }
     public int associatedField = 0;
 
     public string killerUID=null;
@@ -41,15 +43,7 @@ public class HealthPoint : MonoBehaviourPun
         }
         else {
             movement = GetComponent<Projectile_Movement>();
-        }
-        try
-        {
-            myTeam = controller.Owner.GetProperty("TEAM",Team.HOME);
-        }
-        catch (Exception)
-        { 
-        
-        }
+        }  
     }
 
     private void OnFieldFinish(EventObject obj)

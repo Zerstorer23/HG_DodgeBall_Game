@@ -12,6 +12,8 @@ public partial class IEvaluationMachine
 
     public virtual Vector3 EvaluateMoves()
     {
+
+        //1. Heuristic
         Vector3 move = Vector3.zero;
         dangerList.Clear();
         foreach (GameObject go in foundObjects.Values)
@@ -46,15 +48,13 @@ public partial class IEvaluationMachine
                     multiplier = GetMultiplier(distance);
                     move -= directionToTarget * multiplier;
                     break;
-                    /*                case TAG_WALL:
-                                        multiplier = GetMultiplier(distance);
-                                        move -= directionToTarget * multiplier * 0.5f;
-                                        break;*/
             }
-            //  Debug.Log("Inter move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
         }
 
         move += GetAwayFromWalls();
+        move += GetToCapturePoint();
+
+        //2. KNNs
         if (dangerList.Count > 0)
         {
             move += Drive_KNN();
@@ -117,11 +117,14 @@ public partial class IEvaluationMachine
                 break;
             case CharacterType.KYONKO:
             case CharacterType.KYON:
-                attackRange = 5f;
+                attackRange = 4f;
                 break;
             case CharacterType.KOIZUMI:
-            case CharacterType.KOIHIME:
                 attackRange = 10f;
+                isKamikazeSkill = true;
+                break;
+            case CharacterType.KOIHIME:
+                attackRange = 4f;
                 isKamikazeSkill = true;
                 break;
             case CharacterType.SASAKI:
@@ -153,6 +156,7 @@ public partial class IEvaluationMachine
     public virtual Vector3 EvaluatePlayer(GameObject go, int tid, Vector3 directionToTarget, float distance)
     {
         Unit_Player enemyPlayer = cachedComponent.Get<Unit_Player>(tid, go);
+        if (!IsPlayerDangerous(enemyPlayer)) return Vector3.zero;
         bool skillAvailable = skillManager.SkillIsReady();
         bool skillInUse = skillManager.SkillInUse();
         if (isKamikazeSkill && skillInUse)
@@ -324,6 +328,17 @@ public partial class IEvaluationMachine
             }
         }
         //   Debug.Log("Center " + (dirToCenter * GetMultiplier(centerDist)) + " bound " + (-dirToBound * GetMultiplier(boundDist)) + " move " + move);
+        return move;
+    }
+    public virtual Vector3 GetToCapturePoint()
+    {
+        if (GameSession.gameModeInfo.gameMode != GameMode.TeamCP) return Vector3.zero;
+         GameField_CP cpField = (GameField_CP)gameFields[0];
+        Map_CapturePoint nearestCP = cpField.cpManager.GetNearestValidPoint(player.myTeam, player.transform.position);
+        if (nearestCP == null) return Vector3.zero;
+        float distance = Vector2.Distance(player.transform.position, nearestCP.transform.position);
+        if (distance <= 1.5f) return Vector3.zero;
+        Vector3 move = (nearestCP.transform.position - player.transform.position) /GetMultiplier(distance);//.normalized*1.25f;
         return move;
     }
     public virtual float GetMultiplier(float x)

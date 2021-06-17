@@ -7,7 +7,7 @@ public class Bot_Normal : IEvaluationMachine {
     public override void DetermineAttackType()
     {
         range_Search = 10f;
-        attackRange = 5f;
+        attackRange = Random.Range(3f,8f);
     }
     public override Vector3 EvaluateMoves()
     {
@@ -42,6 +42,8 @@ public class Bot_Normal : IEvaluationMachine {
         {
             move += Drive_KNN();
         }
+        move += GetAwayFromWalls();
+        move += GetToCapturePoint();
         // Debug.Log("Wall move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
         if (move.magnitude > 1f)
         {
@@ -56,12 +58,23 @@ public class Bot_Normal : IEvaluationMachine {
     }
     public override Vector3 EvaluatePlayer(GameObject go, int tid, Vector3 directionToTarget, float distance)
     {
+        Unit_Player enemyPlayer = cachedComponent.Get<Unit_Player>(tid, go);
+        if (!IsPlayerDangerous(enemyPlayer)) {
+            return -directionToTarget * GetMultiplier(distance*3); 
+        }
+
         float multiplier = GetMultiplier(distance);
+
         bool skillInUse = skillManager.SkillInUse();
         if (!skillInUse)
         {
-            multiplier *= -1f;
+            multiplier *= -1f; 
+            if (enemyPlayer.controller.IsBot)
+            {
+                multiplier *=0.5f;
+            }
         }
+
         return directionToTarget * multiplier;
     }
     public override Vector3 EvaluateProjectile(int tid, GameObject go, float distance, Vector3 directionToTarget)
@@ -70,6 +83,4 @@ public class Bot_Normal : IEvaluationMachine {
         float multiplier = GetMultiplier(distance);
         return -directionToTarget * multiplier;
     }
-
-
 }

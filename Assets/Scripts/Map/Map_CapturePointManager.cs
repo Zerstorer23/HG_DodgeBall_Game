@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Map_CapturePointManager : MonoBehaviourPun
@@ -63,6 +64,8 @@ public class Map_CapturePointManager : MonoBehaviourPun
             yield return new WaitForSeconds(1f);
         }
     }
+
+
     int GetCP_Sum() {
         int sum = 0;
         foreach (var cp in capturePoints) {
@@ -143,16 +146,6 @@ public class Map_CapturePointManager : MonoBehaviourPun
            if(finishOnAllCapture) gameFieldCP.FinishGame(Team.AWAY);
         }
     }
-    void AdjustIterator() {
-        int diff = (awayNext - homeNext);
-        if (diff < -1)
-        {
-            awayNext++;
-        }
-        else if (diff > 1) {
-            homeNext--;
-        }
-    }
 
     public bool IsValidCapturePoint(Team team, int index) {
         if (!serialCaptureRequired) return true;
@@ -162,6 +155,30 @@ public class Map_CapturePointManager : MonoBehaviourPun
         }
         else {
             return awayNext == index;
+        }
+    }
+
+    public Map_CapturePoint GetNearestValidPoint(Team myTeam, Vector3 position) {
+        if (serialCaptureRequired)
+        {
+            if (myTeam == Team.HOME)
+            {
+                return mapDictionary[homeNext];
+            }
+            else
+            {
+                return mapDictionary[awayNext];
+            }
+        }
+        else {
+            var list = (from Map_CapturePoint cp in mapDictionary.Values
+                        where cp.owner != myTeam
+                        select cp).ToArray();
+            if (list.Length <= 0) return null;
+
+            var nearest = list.Aggregate((x, y) => 
+                Vector2.Distance(position, x.transform.position) < Vector2.Distance(position, y.transform.position) ? x : y);
+            return nearest;
         }
     }
 

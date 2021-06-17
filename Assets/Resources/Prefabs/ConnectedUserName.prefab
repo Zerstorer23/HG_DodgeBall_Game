@@ -68,6 +68,7 @@ MonoBehaviour:
   readySprite: {fileID: 5489524969957038708}
   nameText: {fileID: 2516944095620300610}
   charPortrait: {fileID: 2630837554111074886}
+  controller: {fileID: 0}
 --- !u!114 &4329944963825198863
 MonoBehaviour:
   m_ObjectHideFlags: 0

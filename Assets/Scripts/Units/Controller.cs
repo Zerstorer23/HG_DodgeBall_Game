@@ -58,7 +58,9 @@ public class Controller : MonoBehaviourPun
     public bool IsMine {
          get=> photonView.IsMine;
     }
-    public bool IsSame(string compareID) => this.uid == compareID;
+    public bool Equals(string compareID) => this.uid == compareID;
+    public bool Equals(Controller controller) => this.uid == controller.uid;
+    public bool Equals(UniversalPlayer user) => this.uid == user.uid;
 
 
 

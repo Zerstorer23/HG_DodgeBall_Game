@@ -4958,7 +4958,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 673b0276b7be51347bda3aaf0850345e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  exclusionPlayerID: 
   canKillBullet: 1
   isMapObject: 0
   givesDamage: 1
@@ -4978,6 +4977,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pv: {fileID: 0}
+  controller: {fileID: 0}
   bodySprite: {fileID: 0}
 --- !u!114 &-6196179899235843116
 MonoBehaviour:

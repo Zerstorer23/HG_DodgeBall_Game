@@ -8,7 +8,6 @@ using UnityEngine.EventSystems;
 
 public class Unit_Player : MonoBehaviourPun
 {
-    Animator animator;
     [SerializeField] internal AudioClip hitAudio, shootAudio;
     public PhotonView pv;
     public CharacterType myCharacter;
@@ -35,7 +34,6 @@ public class Unit_Player : MonoBehaviourPun
     // Start is called before the first frame update
     private void Awake()
     {
-        animator = GetComponent<Animator>();
         pv = GetComponent<PhotonView>();
         health = GetComponent<HealthPoint>();
         movement = GetComponent<Unit_Movement>();
@@ -194,7 +192,7 @@ public class Unit_Player : MonoBehaviourPun
     }
     public void IncrementKill(EventObject eo)
     {
-        if (controller.IsSame(eo.stringObj)) {
+        if (controller.Equals(eo.stringObj)) {
             StatisticsManager.RPC_AddToStat(StatTypes.KILL,  controller.uid, 1);
             StatisticsManager.RPC_AddToStat(StatTypes.SCORE, controller.uid, 16);
             StatisticsManager.instance.AddToLocalStat(ConstantStrings.PREFS_KILLS, 1);

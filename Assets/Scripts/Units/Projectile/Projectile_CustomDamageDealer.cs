@@ -38,7 +38,7 @@ public class Projectile_CustomDamageDealer : MonoBehaviour
         for (int i = 0; i < playerList.Count; i++) {
             string key = playerList[i];
             Unit_Player player = playerDict[key];
-            if (proj.controller.IsSame(key) || player == null) continue;
+            if (proj.controller.Equals(key) || player == null) continue;
             //if (!foundTargets.Contains(key))
           //  {
                 float dist = Vector2.Distance(gameObject.transform.position, player.transform.position);

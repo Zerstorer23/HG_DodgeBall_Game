@@ -49,15 +49,13 @@ public partial class IEvaluationMachine
                 case TAG_PLAYER:
                     if (tid != myInstanceID)
                     {
-                        Unit_Player unitPlayer = cachedComponent.Get<Unit_Player>(tid, c.gameObject);
-                        if (GameSession.gameModeInfo.isTeamGame && unitPlayer.myTeam == player.myTeam) continue;
-                        if (GameSession.gameModeInfo.isCoop) continue;
                         AddFoundObject(tid, c.gameObject);
                     }
                     break;
                 case TAG_PROJECTILE:
-                    if (CheckIfProjetilcIsDangerous(tid, c.gameObject))
+                    if (IsProjectileDangerous(tid, c.gameObject))
                     {
+                     //   Debug.LogWarning("Add " + c.gameObject.name);
                         AddFoundObject(tid, c.gameObject);
                     }
                     break;

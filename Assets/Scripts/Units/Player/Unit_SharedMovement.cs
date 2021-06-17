@@ -33,7 +33,6 @@ public class Unit_SharedMovement : MonoBehaviourPun
     private void OnEnable()
     {
         fieldNo = (int)pv.InstantiationData[0];
-        Debug.LogWarning(fieldNo);
         GameField myField = GameFieldManager.gameFields[fieldNo];
         myField.playerSpawner.desolator = this;
         mapSpec = myField.mapSpec;

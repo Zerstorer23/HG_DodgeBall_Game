@@ -13,6 +13,7 @@ public class GameStatus
     public int alive_ourTeam;
     public int alive_otherTeam;
     public int dead;
+    public bool onlyBotsRemain = true;
     public GameStatus(SortedDictionary<string, Unit_Player> unitDict, UniversalPlayer lastDied)
     {
         Team myTeam = PlayerManager.LocalPlayer.GetProperty("TEAM", Team.HOME);
@@ -24,6 +25,9 @@ public class GameStatus
             {
                 lastSurvivor = p.controller.Owner;
                 alive++;
+                if (lastSurvivor.IsHuman) {
+                    onlyBotsRemain = false;
+                }
                 if (GameSession.gameModeInfo.isTeamGame)
                 {
                     if (p.myTeam != myTeam)

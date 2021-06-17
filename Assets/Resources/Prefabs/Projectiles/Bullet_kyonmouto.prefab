@@ -253,6 +253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pv: {fileID: 8629071319047820328}
+  controller: {fileID: 0}
   bodySprite: {fileID: 5391305497484024333}
 --- !u!114 &-3859998481871666203
 MonoBehaviour:

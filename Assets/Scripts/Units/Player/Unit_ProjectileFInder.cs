@@ -13,7 +13,7 @@ public class Unit_ProjectileFInder : MonoBehaviour
     float evasionRadius = 2.5f;
     private void OnEnable()
     {
-        gameObject.SetActive(player.pv.IsMine);
+        gameObject.SetActive(player.controller.IsLocal);
         foundObjects.Clear();
         cachedComponent.Clear();
 

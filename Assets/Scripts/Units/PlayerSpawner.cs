@@ -12,7 +12,6 @@ public class PlayerSpawner : MonoBehaviour
     internal SortedDictionary<string, UniversalPlayer> playersOnMap = new SortedDictionary<string, UniversalPlayer>();
     int maxLives = 1;
     public PlayerSpawnerType spawnerType = PlayerSpawnerType.Once;
-    CharacterType myCharacter = CharacterType.NONE;
     public Unit_SharedMovement desolator;
     [SerializeField] GameField gameField;
     private void Awake()
@@ -71,6 +70,7 @@ public class PlayerSpawner : MonoBehaviour
         if (localPlayer.HasProperty("CHARACTER"))
         {
             SpawnPlayer(localPlayer);
+            Debug.LogWarning("Finish spawn");
         }
         else
         {
@@ -93,16 +93,19 @@ public class PlayerSpawner : MonoBehaviour
             character = ConfigsManager.GetRandomCharacter();
             player.SetCustomProperties("ACTUAL_CHARACTER", character);
         }
-        if (player.IsHuman)
+
+        spawnPos = gameField.GetPlayerSpawnPosition(player);
+        if (player.IsBot)
         {
-            spawnPos = gameField.GetPlayerSpawnPosition();
+
+            PhotonNetwork.InstantiateRoomObject(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0,
+                new object[] { character, maxLives, gameField.fieldNo, true, player.uid });
         }
         else {
-            spawnPos = gameField.GetRandomPosition(1);
-        }
 
-        PhotonNetwork.InstantiateRoomObject(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0,
-            new object[] { character, maxLives, gameField.fieldNo, player.IsBot, player.uid });
+            PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0,
+                new object[] { character, maxLives, gameField.fieldNo, false, player.uid });
+        }
     }
     [SerializeField] float respawnTime = 5f;
     IEnumerator RespawnPlayer(UniversalPlayer player) {
@@ -158,6 +161,7 @@ public class PlayerSpawner : MonoBehaviour
         if (eo.intObj != gameField.fieldNo) return;
         string deadID = eo.stringObj;
         lastDiedPlayer = playersOnMap[deadID];
+        Debug.Assert(lastDiedPlayer!=null, deadID + " is not on field!!");
         if (gameField.gameFieldFinished)
         {
             //최후의 1인. 맵은 이미 지워져있음
@@ -241,7 +245,7 @@ public class PlayerSpawner : MonoBehaviour
             }
             if (entry.Value.gameObject.activeInHierarchy)
             {
-                if (entry.Value.controller.IsSame(exclusionID)) continue;
+                if (entry.Value.controller.Equals(exclusionID)) continue;
                 Transform trans = entry.Value.gameObject.transform;
                 float dist = Vector3.Distance(position, trans.position);
                 if (nearest == null || dist < nearestDistance)

@@ -59,7 +59,6 @@ public class Projectile_Explosion : MonoBehaviourPun
                 case TAG_PLAYER:
                     damageDealer.GiveDamage(healthPoint);
                     if (photonView.IsMine) {
-
                         PhotonNetwork.Instantiate(PREFAB_EXPLOSION_1, transform.position, Quaternion.identity, 0);
                     }
                     //  damageDealer.DoPlayerCollision(c.gameObject);

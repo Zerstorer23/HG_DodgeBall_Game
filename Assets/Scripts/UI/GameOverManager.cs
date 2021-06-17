@@ -167,7 +167,7 @@ public class GameOverManager : MonoBehaviour
         string killStatID = null;
         string pickStatID = null;
         string winID = null;
-        CharacterType characterType = GameSession.GetPlayerCharacter(ConnectedPlayerManager.GetLocalPlayer());
+        CharacterType characterType = GameSession.GetPlayerCharacter(PlayerManager.LocalPlayer);
         switch (characterType)
         {
             case CharacterType.NAGATO:

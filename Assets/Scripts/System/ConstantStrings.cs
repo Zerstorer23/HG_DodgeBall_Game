@@ -32,6 +32,7 @@ public class ConstantStrings : MonoBehaviour
     public const string PREFAB_DESOLATOR = "Prefabs/Units/Desolator";
     public const string PREFAB_BUFF_OBJECT = "Prefabs/Units/BuffObject";
     public const string PREFAB_STARTSCENE_PLAYERNAME = "Prefabs/ConnectedUserName";
+    public const string PREFAB_STARTSCENE_BOTNAME = "Prefabs/BotUserName";
     public const string TAG_PROJECTILE = "Projectile";
     public const string TAG_PLAYER = "Player";
     public const string TAG_BOUNDARY = "MapBoundary";

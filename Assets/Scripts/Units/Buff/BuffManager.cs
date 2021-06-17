@@ -139,7 +139,9 @@ public class BuffManager : MonoBehaviourPun
             int numDamage = GetStat(BuffType.NumDamageReceivedWhileBuff);
             if (numDamage <= 0)
             {
-                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj =" 반사 실패 패널티 -1" });
+                if (controller.IsLocal) {
+                    EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = " 반사 실패 패널티 -1" });
+                }
                 healthPoint.pv.RPC("ChangeHP", RpcTarget.AllBuffered, -1);
             }
         }
@@ -147,7 +149,7 @@ public class BuffManager : MonoBehaviourPun
     }
     [PunRPC]
     public void HandleCameraShake(string activatorID) {
-        if (controller.IsSame(activatorID)) return;
+        if (controller.Equals(activatorID)) return;
         float duration = 1.5f;
         MainCamera.instance.DoShake(time: duration);
         MainCamera.instance.DoRotation(time: duration);
@@ -246,7 +248,7 @@ public class BuffManager : MonoBehaviourPun
     }
 
     void UpdateBuffIndicator(BuffType changedBuff, bool enable) {
-        if (!controller.IsMine && unitPlayer!= null && unitPlayer.buffManager.GetTrigger(BuffType.HideBuffs))
+        if (!controller.IsLocal && unitPlayer!= null && unitPlayer.buffManager.GetTrigger(BuffType.HideBuffs))
         {
             return;
         }

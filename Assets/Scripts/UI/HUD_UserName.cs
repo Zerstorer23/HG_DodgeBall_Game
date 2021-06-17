@@ -19,7 +19,7 @@ public class HUD_UserName : MonoBehaviourPun
     string playerName = "ㅇㅇ";
     CharacterType selectedCharacter = CharacterType.HARUHI;
     Team myTeam = Team.HOME;
-    Controller controller;
+    public Controller controller;
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
@@ -31,11 +31,11 @@ public class HUD_UserName : MonoBehaviourPun
     {
         EventManager.StartListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
         playerName = controller.Owner.NickName;
-        isReady = false;
 
         bool isBot = (bool)pv.InstantiationData[0];
         string uid = (string)pv.InstantiationData[1];
         controller.SetControllerInfo(isBot, uid);
+        isReady = controller.Owner.IsBot;
         UpdateUI();
         EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_JOINED, new EventObject() { stringObj = uid, goData = gameObject });
     }
@@ -50,11 +50,12 @@ public class HUD_UserName : MonoBehaviourPun
         if (controller.IsMine) {
             GameModeConfig currMode = (GameModeConfig)arg0.objData;
             if (currMode.isTeamGame) {
-                myTeam = (PlayerManager.GetMyIndex(PlayerManager.GetPlayers()) % 2 == 0) ? Team.HOME : Team.AWAY;
+             //   var indexMap = PlayerManager.GetIndexMap(PlayerManager.GetPlayers());
+                int index = PlayerManager.GetMyIndex(controller.Owner, PlayerManager.GetPlayers());
+                myTeam = (Team)(index % 2 + 1);
             }
             pv.RPC("SetTeam", RpcTarget.AllBuffered, (int)myTeam);
         }
-
     }
     [PunRPC]
     public void SetTeam(int teamNumber)
@@ -91,8 +92,9 @@ public class HUD_UserName : MonoBehaviourPun
     public void ChangeName(string text)
     {
         playerName = text;
-        if (controller.IsLocal) {
-            PhotonNetwork.LocalPlayer.NickName = playerName;
+        if (controller.IsMine)
+        {
+            controller.Owner.NickName = playerName;
         }
         UpdateUI();
     }

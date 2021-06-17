@@ -67,7 +67,7 @@ public class UI_RemainingPlayerDisplay : MonoBehaviour
             bool homeMajor = point > 0;
             if (point < 0) point *= -1;
             scoreText.text = "점수 : " + point.ToString("0");
-            scoreText.color = GetColorByHex(homeMajor ? team_color[0] : team_color[1]);
+            scoreText.color = GetColorByHex(homeMajor ? team_color[1] : team_color[2]);
             fillImage.color = scoreText.color;
             fillImage.fillAmount = ((float)point / cpManager.endThreshold);            
            yield return new WaitForSeconds(1f);

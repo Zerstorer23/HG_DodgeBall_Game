@@ -10,7 +10,6 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     Projectile projectile;
     Projectile_Movement movement;
    internal HealthPoint myHealth;
-    [SerializeField] string exclusionPlayerID;
     [SerializeField] bool canKillBullet = false;
     public bool isMapObject = false;
     public bool givesDamage = true;
@@ -64,15 +63,11 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         if (pv.IsMine && !isMapObject && hitCount <=0) {
             EventManager.TriggerEvent(MyEvents.EVENT_MY_PROJECTILE_MISS, new EventObject() { stringObj = myHealth.controller.uid });
         }
-        exclusionPlayerID = "";
         myCollider.enabled = false;
         hitCount = 0;
     }
     private void OnEnable()
     {
-        if (!isMapObject) {
-            exclusionPlayerID = myHealth.controller.uid;
-        }
         myCollider.enabled = true;
         duplicateDamageChecker.Reset();
     }
@@ -162,13 +157,13 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     bool CheckValidDamageEvaluation(HealthPoint otherHP) {
         if (isMapObject)
         {
-            if (!otherHP.pv.IsMine) return false; // 맵오브젝트는 각자 알아서
+            return otherHP.controller.IsMine; // 맵오브젝트는 각자 알아서
         }
         else
         {
-            if (!pv.IsMine) return false; // 개인투사체는 주인이처리
+            return myHealth.controller.IsMine;
+            //if (!pv.IsMine) return false; // 개인투사체는 주인이처리
         }
-        return true;
     }
     int hitCount = 0;
     public bool DoProjectileCollision(GameObject targetObj)
@@ -183,7 +178,7 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     public void DoPlayerCollision(GameObject targetObj)
     {
         HealthPoint otherHP = targetObj.GetComponent<HealthPoint>();
-        if(!CheckValidDamageEvaluation(otherHP)) return ;
+        if (!CheckValidDamageEvaluation(otherHP)) return ;
         if (!CheckManifoldDamage(otherHP)) return;
         TriggerHit(otherHP);
         if (!CheckValidTeam(otherHP)) return;
@@ -194,13 +189,9 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     bool CheckValidTeam(HealthPoint otherHP) {
         if (GameSession.gameModeInfo.isTeamGame)
         {
-            if (isMapObject)
+            if (isMapObject || otherHP.IsMapProjectile())
             {
                 return true;//맵 ->아무거나 무조건 딜
-            }
-            if (otherHP.IsMapProjectile())
-            {
-                return true; //아무거나 -> 맵 무조건 딜
             }
             return (otherHP.myTeam != myHealth.myTeam); //그외 팀구분
 
@@ -245,7 +236,6 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         if (customBuffs.Count <= 0) return;
         BuffManager targetManager = otherHP.buffManager;
         if (targetManager == null || !targetManager.gameObject.activeInHierarchy) return;
-        if (targetManager.healthPoint.controller.uid == exclusionPlayerID) return;
         foreach (BuffData buff in customBuffs)
         {
             targetManager.pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)buff.buffType, buff.modifier, buff.duration);
@@ -263,8 +253,6 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     {
         if (otherHP.unitType == UnitType.Player)
         {
-
-            if (otherHP.controller.uid == exclusionPlayerID) return;
             string sourceID = (isMapObject) ? null : myHealth.controller.uid;
       //      Debug.Log("Damage player");
             otherHP.pv.RPC("DoDamage", RpcTarget.AllBuffered, sourceID, false);

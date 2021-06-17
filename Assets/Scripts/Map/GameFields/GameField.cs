@@ -183,7 +183,7 @@ public class GameField : MonoBehaviour
             originalMapSize = transform.localScale;
         }
 
-        int numPlayer = PhotonNetwork.CurrentRoom.PlayerCount;
+        int numPlayer = PlayerManager.GetPlayers().Length;
         float modifiedLength;
         if (!GameSession.gameModeInfo.scaleMapByPlayerNum)
         {
@@ -226,9 +226,10 @@ public class GameField : MonoBehaviour
     }
 
 
-    public virtual Vector3 GetPlayerSpawnPosition()
+    public virtual Vector3 GetPlayerSpawnPosition(UniversalPlayer myPlayer)
     {
-        int myIndex = PlayerManager.GetMyIndex(GameFieldManager.GetPlayersInField(fieldNo));
+        int myIndex = PlayerManager.GetMyIndex(myPlayer, GameFieldManager.GetPlayersInField(fieldNo));
+        Debug.LogWarning(myPlayer+" My Index " + myIndex);
         int x = myIndex % w;
         int y = myIndex / w;
         return GetPoissonPositionNear(x, y);

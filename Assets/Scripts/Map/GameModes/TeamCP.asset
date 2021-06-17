@@ -18,3 +18,4 @@ MonoBehaviour:
   scaleMapByPlayerNum: 0
   isTeamGame: 1
   isCoop: 0
+  allowBots: 1

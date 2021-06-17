@@ -28,7 +28,7 @@ public class Skill_Kyouko : ISkill
 
     public override void LoadInformation(SkillManager skm)
     {   
-        skm.cooltime = 3.6f;
+        skm.cooltime = 3.5f;
         skm.maxStack = 1;
     }
     /*
