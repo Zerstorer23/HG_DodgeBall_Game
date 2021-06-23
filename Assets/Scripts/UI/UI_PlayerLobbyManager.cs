@@ -52,7 +52,6 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         else
         {
             //난입유저 바로시작
-            PlayerManager.CountPlayersInTeam();
             GameFieldManager.SetGameMap(GameSession.gameModeInfo.gameMode);
             GameFieldManager.ChangeToSpectator();
             Debug.Log("난입세팅끝");
@@ -68,7 +67,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         Debug.Log("Instantiate after regame");
         if (PhotonNetwork.IsMasterClient)
         {
-            Player randomPlayer = PlayerManager.GetRandomPlayerExceptMe();
+            Player randomPlayer = PhotonNetwork.LocalPlayer.GetNext();// PlayerManager.GetRandomPlayerExceptMe();
             if (randomPlayer != null)
                 PhotonNetwork.SetMasterClient(randomPlayer);
         }
@@ -119,9 +118,21 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
             playerDictionary.Add(id, info);
         }
         eo.goData.GetComponent<Transform>().SetParent(playerListTransform, false);
+        RebalanceTeam();
         UpdateReadyStatus();
         debugUI();
     }
+
+    public void RebalanceTeam() {
+        if (!GameSession.gameModeInfo.isTeamGame) return;
+        foreach (var hud in playerDictionary.Values) {
+            if (hud == null || !hud.gameObject.activeInHierarchy) continue;
+            if (hud.controller.IsMine) {
+                hud.ResetTeam();
+            }
+        }
+    }
+
     void debugUI()
     {
         foundPlayers.Clear();
@@ -202,7 +213,6 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         //  Debug.Log("Start requested "+ gameStarted);
         if (gameStarted)
         {
-            PlayerManager.CountPlayersInTeam();
             GameFieldManager.SetGameMap(GameSession.gameModeInfo.gameMode);
             Debug.Log("RPC Start game");
             StartGame();
@@ -219,6 +229,8 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
             PhotonNetwork.Destroy(localPlayerObject);
             localPlayerObject = null;
         }
+        GetComponent<UI_BotLobby>().DestoryBotsPanel();
+        
         EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.InGame });
         EventManager.TriggerEvent(MyEvents.EVENT_GAME_STARTED, null);
     }

@@ -3,26 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UI_TouchPanel : MonoBehaviour
+public class UI_TouchPanel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+/*, IPointerClickHandler,
+IPointerUpHandler, IPointerExitHandler, IPointerEnterHandler,
+*/
 {
     // Start is called before the first frame update
     public static bool isTouching = false;
     public static Vector2 touchVector;
-/*   private void OnMouseDown()
-    {
-        // var touches = Input.touches;
-        Debug.Log("touch count " + Input.touchCount);
-        for (int i = 0; i < Input.touchCount; ++i) {
-            var touch = Input.GetTouch(i);
-            //if (touch.phase != TouchPhase.Began) continue;
-            Debug.Log(i+": Mousedown " + touch.position+" touch "+ EventSystem.current.IsPointerOverGameObject(touch.fingerId));
-            if (!EventSystem.current.IsPointerOverGameObject(touch.fingerId))
-            {
-                isTouching = true;
-              //  return;
-            }
-        }
-    }*/
+
     public void HandleTouch() {
         if (Input.touchCount <= 0) return;
 
@@ -59,38 +48,58 @@ public class UI_TouchPanel : MonoBehaviour
         }
 
     }
-    private void Update()
-    {
-        HandleTouch();
-    }
-
-    /*    private void OnMouseUp()
-        {
-            isTouching = false;
-            Debug.Log("Mousedown "+isTouching);
-
-        }*/
 /*    private void Update()
     {
-        if (Input.touchCount > 0)
-        {
-            var touches = Input.touches;
-            for (int i = 0; i < touches.Length; i++)
-            {
+        HandleTouch();
+    }*/
+ public void OnBeginDrag(PointerEventData eventData)
+    {
+        StartTouch(eventData);
+    }
 
-                if (!EventSystem.current.IsPointerOverGameObject(i))
-                {
-                    isTouching = true;
-                    EventManager.TriggerEvent(MyEvents.EVENT_SCREEN_TOUCH, new EventObject() { objData = touches[i].position });
-                    Debug.Log("Mousedown " + isTouching);
-                }
-            }
+    public void OnDrag(PointerEventData eventData)
+    {
+        StartTouch(eventData);
+    }
 
-        }
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        EndTouch(eventData);
+    }
+    
+    /*
+    public void OnPointerClick(PointerEventData eventData)
+    {
+     //   Debug.Log("Clicked: " + eventData.pointerCurrentRaycast.gameObject.name);
     }*/
 
-    private void OnEnable()
+    public void OnPointerDown(PointerEventData eventData)
     {
-        gameObject.SetActive(Application.platform == RuntimePlatform.Android);
+        StartTouch(eventData);
+    }
+
+/*    public void OnPointerEnter(PointerEventData eventData)
+    {
+     //   Debug.Log("Mouse Enter");
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+       // Debug.Log("Mouse Exit");
+    }*/
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        EndTouch(eventData);
+    }
+    public void StartTouch(PointerEventData eventData) {
+
+        isTouching = true;
+        touchVector = eventData.position;
+       // Debug.Log("Mouse Down: " + touchVector);
+    }
+    public void EndTouch(PointerEventData eventData) {
+        isTouching = false;
+        touchVector = eventData.position;
     }
 }

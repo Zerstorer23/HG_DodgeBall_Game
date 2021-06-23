@@ -57,7 +57,7 @@ public class Unit_Player : MonoBehaviourPun
     private void OnEnable()
     {
         myPortrait.color = new Color(1, 1, 1);
-        myUnderlings = new List<GameObject>();
+        myUnderlings.Clear();
         ParseInstantiationData();
         if (controller.IsLocal)
         {

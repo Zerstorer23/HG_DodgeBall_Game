@@ -7,6 +7,7 @@ using static ConstantStrings;
 public class Projectile_Explosion : MonoBehaviourPun
 {
     Projectile_DamageDealer damageDealer;
+    public bool attackMyTeam = false;
     private void Awake()
     {
         damageDealer = GetComponent<Projectile_DamageDealer>();
@@ -23,19 +24,12 @@ public class Projectile_Explosion : MonoBehaviourPun
     void HandleCollision(GameObject go)
     {
         string tag = go.tag;
-        HealthPoint otherHP;
         switch (tag)
         {
             case TAG_PLAYER:
-                otherHP = go.GetComponent<HealthPoint>();
-                if (!otherHP.pv.IsMine)
-                {
-                    DoExplosion();
-                }
-                break;
             case TAG_PROJECTILE:
-                otherHP = go.GetComponent<HealthPoint>();
-                if (!otherHP.IsMapProjectile() && !otherHP.pv.IsMine)
+                HealthPoint otherHP = go.GetComponent<HealthPoint>();
+                if (otherHP.IsMapProjectile() || !otherHP.controller.IsLocal)
                 {
                     DoExplosion();
                 }
@@ -46,7 +40,7 @@ public class Projectile_Explosion : MonoBehaviourPun
                 break;
         }
     }
-    public float radius = 2f;
+    float radius = 2.25f;
     void DoExplosion() {
         Collider2D[] collisions = Physics2D.OverlapCircleAll(transform.position,radius, LayerMask.GetMask("Player", "Projectile"));
         for (int i = 0; i < collisions.Length; i++)
@@ -57,25 +51,26 @@ public class Projectile_Explosion : MonoBehaviourPun
             switch (c.gameObject.tag)
             {
                 case TAG_PLAYER:
+                case TAG_PROJECTILE:
+                    if (!attackMyTeam) {
+                        if (GameSession.gameModeInfo.isTeamGame &&
+                            healthPoint.myTeam == damageDealer.myHealth.myTeam &&
+                            healthPoint.controller.uid != damageDealer.myHealth.controller.uid) {
+                            continue;
+                        }
+                    }
                     damageDealer.GiveDamage(healthPoint);
                     if (photonView.IsMine) {
                         PhotonNetwork.Instantiate(PREFAB_EXPLOSION_1, transform.position, Quaternion.identity, 0);
                     }
-                    //  damageDealer.DoPlayerCollision(c.gameObject);
-                    break;
-                case TAG_PROJECTILE:
-                    damageDealer.GiveDamage(healthPoint);
-                    PhotonNetwork.Instantiate(PREFAB_EXPLOSION_1, transform.position, Quaternion.identity, 0);
-                    //   damageDealer.DoProjectileCollision(c.gameObject);
-                    //healthPoint.KillImmm...
                     break;
             }
 
         }
     }
-    private void OnDrawGizmos()
+/*    private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, radius);
-    }
+    }*/
 }

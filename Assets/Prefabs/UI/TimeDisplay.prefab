@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1804502850263833440}
   - component: {fileID: 1804502850263833441}
   - component: {fileID: 2935539191079336394}
+  - component: {fileID: 8459141822802712654}
   m_Layer: 5
   m_Name: TimeDisplay
   m_TagString: Untagged
@@ -91,3 +92,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35dd2a23a13e8c43bf60ad14984180e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8459141822802712654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804502850263833455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1

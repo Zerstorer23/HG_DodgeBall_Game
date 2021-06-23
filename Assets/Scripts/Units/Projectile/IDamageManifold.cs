@@ -10,6 +10,33 @@ public interface IDamageManifold
     bool RemoveAttackHistory(int tid);
     void Reset();
 }
+public class DamageManifold {
+    public static IDamageManifold SetDamageManifold(DamageManifoldType damageManifold)
+    {
+        switch (damageManifold)
+        {
+            case DamageManifoldType.Once:
+                return new DamageOnce();
+            case DamageManifoldType.Queue:
+                return new DamageQueue();
+
+            case DamageManifoldType.Timed:
+                return new DamageTimed();
+
+            case DamageManifoldType.InAndOout:
+                return new DamageInAndOut();
+
+            case DamageManifoldType.None:
+                return new DamageNone();
+
+            default:
+                return new DamageOnce();
+
+        }
+    }
+
+}
+
 public class DamageQueue : IDamageManifold
 {
     Queue<int> damageRecords = new Queue<int>();
@@ -157,7 +184,42 @@ public class DamageInAndOut: IDamageManifold
         return false;
     }
 }
+
+public class DamageNone : IDamageManifold
+{
+    List<int> damageRecords = new List<int>();
+    public bool CheckDuplicateDamage(int tid)
+    {
+        if (!damageRecords.Contains(tid))
+        {
+            damageRecords.Add(tid);
+        }
+        return true;
+    }
+
+    public bool FindAttackHistory(int tid)
+    {
+        return damageRecords.Contains(tid);
+    }
+
+    public bool RemoveAttackHistory(int tid)
+    {
+        if (damageRecords.Contains(tid))
+        {
+            damageRecords.Remove(tid);
+            return true;
+        }
+        return false;
+    }
+
+    public void Reset()
+    {
+        damageRecords.Clear();
+    }
+
+}
+
 public enum DamageManifoldType
 {
-    Once, Queue, Timed,InAndOout
+    Once, Queue, Timed,InAndOout,None
 }

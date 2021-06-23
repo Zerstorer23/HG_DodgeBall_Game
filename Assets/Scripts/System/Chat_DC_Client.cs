@@ -98,7 +98,14 @@ public class Chat_DC_Client : MonoBehaviour
                 }
             }
             mutex.ReleaseMutex();
-            connectionStatus = !(mySocket.Poll(1, SelectMode.SelectRead) && mySocket.Available == 0);
+            try
+            {
+                connectionStatus = !(mySocket.Poll(1, SelectMode.SelectRead) && mySocket.Available == 0);
+
+            }
+            catch {
+                connectionStatus = false;
+            }
             if (!connectionStatus)
             {
                 Disconnect();
@@ -128,6 +135,10 @@ public class Chat_DC_Client : MonoBehaviour
         return message;
     }
     private void OnApplicationQuit()
+    {
+        Disconnect();
+    }
+    private void OnDisable()
     {
         Disconnect();
     }

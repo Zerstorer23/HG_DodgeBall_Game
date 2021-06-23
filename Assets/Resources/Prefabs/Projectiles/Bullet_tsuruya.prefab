@@ -132,7 +132,7 @@ CapsuleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11acf07a26e990b4e8a7a203824e0132, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeout: 0.48
+  timeout: 0.35
 --- !u!114 &6212558457632629342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,10 +207,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 673b0276b7be51347bda3aaf0850345e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  exclusionPlayerID: 
   canKillBullet: 1
   isMapObject: 0
-  givesDamage: 1
+  givesDamage: 0
   customBuffs: []
   myCollider: {fileID: 4545853780612740703}
   damageManifold: 0

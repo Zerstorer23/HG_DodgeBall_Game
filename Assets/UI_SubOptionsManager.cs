@@ -6,30 +6,29 @@ using UnityEngine;
 public class UI_SubOptionsManager : MonoBehaviour
 {
     [SerializeField] GameObject anonGame, changeTeam, addBot, removeBot;
-    private void Awake()
+    private void OnEnable()
     {
-
         EventManager.StartListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
+        EventManager.StartListening(MyEvents.EVENT_PLAYER_JOINED, OnGamemodeChanged);
     }
-    private void OnDestroy()
+    private void OnDisable()
     {
         EventManager.StopListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
+        EventManager.StopListening(MyEvents.EVENT_PLAYER_JOINED, OnGamemodeChanged);
 
     }
-/*    private void OnEnable()
-    {
-        OnGamemodeChanged(null);
-    }*/
+
     private void OnGamemodeChanged(EventObject arg0)
     {
-        GameModeConfig mode = arg0.Get<GameModeConfig>();
-       StartCoroutine(WaitAndActive(mode));
+        GameModeConfig mode = GameSession.gameModeInfo;
+        StartCoroutine(WaitAndActive(mode));
 
     }
     IEnumerator WaitAndActive(GameModeConfig mode) {
         yield return new WaitForFixedUpdate();
         changeTeam.SetActive(mode.isTeamGame);
-        addBot.SetActive(mode.allowBots);
-        removeBot.SetActive(mode.allowBots);
+        bool allowBots = mode.CheckBotGame();
+        addBot.SetActive(allowBots);
+        removeBot.SetActive(allowBots);
     }
 }

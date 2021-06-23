@@ -33,7 +33,7 @@ public class Projectile : MonoBehaviourPun
         if (player != null)
         {
             controller.SetControllerInfo(player.controller.IsBot, playerID);
-            Debug.LogWarning("ctrl info set " + playerID);
+
             if (followPlayer)
             {
                 player.SetMyProjectile(gameObject);

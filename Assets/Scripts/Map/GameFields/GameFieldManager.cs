@@ -134,7 +134,6 @@ public partial class GameFieldManager : MonoBehaviourPun
     {
         gameFields.Add(field);
         gameFields[0].InitialiseMap(0);
-        Debug.LogWarning("Add gamefield 0");
     }
     private void OnGameStartRequested(EventObject arg0)
     {

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +12,6 @@ public class GameModeConfig : ScriptableObject
     public bool scaleMapByPlayerNum = true;
     public bool isTeamGame = false;
     public bool isCoop = false;
-    public bool allowBots = false;
 
     public bool IsFieldFinished(GameStatus stat)
     {
@@ -37,5 +37,24 @@ public class GameModeConfig : ScriptableObject
                 break;
         }
         return fieldFinished;
+    }
+    public bool CheckBotGame()
+    {
+        if (!PhotonNetwork.IsMasterClient) return false;
+        switch (GameSession.gameModeInfo.gameMode)
+        {
+            case GameMode.PVP:
+                return (PhotonNetwork.CurrentRoom.PlayerCount <= 1);
+            case GameMode.TEAM:
+                return (PhotonNetwork.CurrentRoom.PlayerCount <= 2);
+            case GameMode.Tournament:
+                return false;
+            case GameMode.PVE:
+                return false;
+            case GameMode.TeamCP:
+                return true;
+        }
+        return false;
+
     }
 }

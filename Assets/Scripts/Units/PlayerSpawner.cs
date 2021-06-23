@@ -14,11 +14,8 @@ public class PlayerSpawner : MonoBehaviour
     public PlayerSpawnerType spawnerType = PlayerSpawnerType.Once;
     public Unit_SharedMovement desolator;
     [SerializeField] GameField gameField;
-    private void Awake()
-    {
-        gameField = GetComponentInParent<GameField>();
-    }
 
+    int numHome, numAway;
     private void OnEnable()
     {
         lastDiedPlayer = null;
@@ -85,7 +82,7 @@ public class PlayerSpawner : MonoBehaviour
 
     public void SpawnPlayer(UniversalPlayer player)
     {
-        Debug.Log("Spawn player");
+        Debug.Assert(player != null, " null player !!");
         CharacterType character = player.GetProperty("CHARACTER", CharacterType.NONE);
         Vector3 spawnPos;
         if (character == CharacterType.NONE)
@@ -95,29 +92,48 @@ public class PlayerSpawner : MonoBehaviour
         }
 
         spawnPos = gameField.GetPlayerSpawnPosition(player);
+        GameObject unit;
         if (player.IsBot)
         {
 
-            PhotonNetwork.InstantiateRoomObject(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0,
+           unit = PhotonNetwork.InstantiateRoomObject(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0,
                 new object[] { character, maxLives, gameField.fieldNo, true, player.uid });
         }
         else {
 
-            PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0,
+            unit = PhotonNetwork.Instantiate(ConstantStrings.PREFAB_PLAYER, spawnPos, Quaternion.identity, 0,
                 new object[] { character, maxLives, gameField.fieldNo, false, player.uid });
+        }
+
+        if (spawnerType == PlayerSpawnerType.Respawn)
+        {
+            BuffManager bm = unit.GetComponent<BuffManager>();
+            bm.pv.RPC("AddBuff",RpcTarget.AllBuffered, (int)BuffType.InvincibleFromBullets, 1f, 3d);
         }
     }
     [SerializeField] float respawnTime = 5f;
     IEnumerator RespawnPlayer(UniversalPlayer player) {
-        for (int i = 0; i < respawnTime; i++)
+        Team team = player.GetProperty("TEAM", Team.NONE);
+        float modRespawnTime = ModifyRespawnTime(team);
+        for (int i = 0; i < modRespawnTime; i++)
         {
             if (player.IsLocal)
             {
-                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject((respawnTime - i).ToString("0") + " 초후 리스폰"));
+                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject((modRespawnTime - i).ToString("0") + " 초후 리스폰"));
             }
             yield return new WaitForSeconds(1f);
         }
         SpawnPlayer(player);    
+    }
+    float ModifyRespawnTime(Team team) {
+        if ((team == Team.HOME && numAway > numHome)) {
+            return respawnTime * (numHome / numAway);
+        
+        } else if (team == Team.AWAY && numHome > numAway)
+        {
+            return respawnTime * (numAway / numHome);
+        }
+        return respawnTime;
     }
 
     public void RegisterPlayer(string uid, Unit_Player unit)
@@ -127,6 +143,8 @@ public class PlayerSpawner : MonoBehaviour
         if (unitsOnMap.Count == gameField.expectedNumPlayer)
         {
             //Everyone is spawned
+            numHome = PlayerManager.GetNumberInTeam(Team.HOME);
+            numAway = PlayerManager.GetNumberInTeam(Team.AWAY);
             if (gameObject.activeInHierarchy)
                 StartCoroutine(WaitAndCheck());
         }

@@ -10,15 +10,30 @@ using UnityEngine.SceneManagement;
 public class PlayerManager : MonoBehaviourPunCallbacks
 {
     private static PlayerManager prConnMan;
+    
     public int myId = 0;
     public bool init = false;
     //***************//
+    private void Awake()
+    {
+        EventManager.StartListening(MyEvents.EVENT_GAME_CYCLE_RESTART, OnGameRestart);
+    }
+    private void OnDestroy()
+    {
 
-   public override void OnJoinedRoom()
+        EventManager.StopListening(MyEvents.EVENT_GAME_CYCLE_RESTART, OnGameRestart);
+    }
+
+    private void OnGameRestart(EventObject arg0)
+    {
+        RemoveAllBots();
+        botIDnumber = 0;
+    }
+
+    public override void OnJoinedRoom()
     {
         Init();
     }
-
     public static PlayerManager instance
     {
         get
@@ -29,9 +44,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks
                 if (!prConnMan)
                 {
                 }
-                else {
-                   // prConnMan.Init();
-                }
             }
 
             return prConnMan;
@@ -40,11 +52,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
     internal static void AddBotPlayer(UniversalPlayer botPlayer)
     {
+      //  Debug.LogWarning("Add bot " + botPlayer);
         instance.playerDict.Add(botPlayer.uid, botPlayer);
         instance.currentPlayerNum++;
     }
     public static void RemoveBotPlayer(string uid) {
-        if (instance.playerDict.ContainsKey(uid)) {
+        if (instance.playerDict.ContainsKey(uid))
+        {
+           // Debug.LogWarning("Remove bot " + uid);
             instance.playerDict.Remove(uid);
             instance.currentPlayerNum--;
         }
@@ -130,6 +145,12 @@ public class PlayerManager : MonoBehaviourPunCallbacks
                    select p;
         return list.ToArray();
     }
+    internal static int GetBotCount() {
+        return (
+            from UniversalPlayer p in instance.playerDict.Values
+            where p.IsBot
+            select p).Count();
+    }
     public static void RemoveAllBots()
     {
 
@@ -137,9 +158,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
                    where p.IsBot
                    select p.uid).ToArray();
         foreach (string s in list) {
+          //  Debug.LogWarning("Remove bot " + s);
             instance.playerDict.Remove(s);
         }
-        botIDnumber = 0;
     }
     internal static UniversalPlayer[] GetPlayers() {
         return instance.playerDict.Values.ToArray();
@@ -172,11 +193,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     {
         if (playerDict.ContainsKey(newPlayer.UserId))
         {
-
             playerDict.Remove(newPlayer.UserId);
             currentPlayerNum--;
             Debug.Log("<color=#00ff00> removePlayer </color> " + currentPlayerNum);
         }
+        EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_LEFT, new EventObject(newPlayer.UserId));
     }
     public static UniversalPlayer GetPlayerByID(string id) {
         instance.Init();
@@ -187,6 +208,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         }
         else
         {
+            Debug.LogWarning("Couldnt find " + id + " size "+instance.playerDict.Count);
             return null;
         }
     }
@@ -197,17 +219,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks
                    where p.GetProperty("TEAM", Team.NONE) == team
                    select p).First();
                    
-/*
-        foreach (var p in instance.playerDict.Values)
-        {
-            if (!p.HasProperty("TEAM")) continue;
-            Team pTeam = p.GetProperty<Team>("TEAM");
-            if (pTeam == team)
-            {
-                return p;
-            }
-        }
-        return null;*/
     }
 
     internal static int GetNumberInTeam(Team myTeam)
@@ -215,32 +226,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         return (from UniversalPlayer p in instance.playerDict.Values
                 where p.GetProperty("TEAM", Team.NONE) == myTeam
                 select p).Count();
-/*
-        if (instance.teamCount == null) return 0;
-        if (!instance.teamCount.ContainsKey(myTeam)) return 0;
-        return instance.teamCount[myTeam];*/
+
     }
 
-    readonly Dictionary<Team, int> teamCount = new Dictionary<Team, int>();
-    public static void CountPlayersInTeam() {
-        instance.teamCount.Clear();
-        foreach (var p in instance.playerDict.Values)
-        {
-            if (!p.HasProperty("TEAM")) {
-                Debug.LogWarning("No team"+p);
-                continue;
-            }
-            Team pTeam = p.GetProperty<Team>("TEAM");
-            Debug.LogWarning(p +"+ team" + pTeam);
-            if (instance.teamCount.ContainsKey(pTeam))
-            {
-                instance.teamCount[pTeam]++;
-            }
-            else {
-                instance.teamCount.Add(pTeam, 1);
-            }
-        }
-    }
     public static UniversalPlayer LocalPlayer { 
         get => instance.playerDict [PhotonNetwork.LocalPlayer.UserId];
     }
@@ -299,4 +287,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
                PhotonNetwork.ConnectUsingSettings();
            }
        }*/
+
+
+
 }

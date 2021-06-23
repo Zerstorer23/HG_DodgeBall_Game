@@ -14,8 +14,8 @@ public class Map_CapturePoint : MonoBehaviourPun
     public Team owner = Team.NONE;
     public float captureProgress;
     float captureSpeed = 10f; //10
-    float captureThreshold = 100f;
-    float radius = 7.25f;
+    float captureThreshold = 150f;
+    float radius; 
     GameField gameField;
     SortedDictionary<string, Unit_Player> players;
 
@@ -39,7 +39,10 @@ public class Map_CapturePoint : MonoBehaviourPun
     {
         owner = Team.NONE;
         captureProgress = 0;
+        radius = transform.lossyScale.x * 0.15f;
         UpdateBanner();
+        StartCoroutine(TimedCheckDominance());
+        UI_RemainingPlayerDisplay.GetIcon(this);
         EventManager.StartListening(MyEvents.EVENT_CP_CAPTURED, OnPointCaptured);
     }
     private void OnDisable()
@@ -78,18 +81,7 @@ public class Map_CapturePoint : MonoBehaviourPun
        // UpdateBanner();
     }
 
-    private bool IsBypassing(int captured)
-    {
-        if (owner == Team.HOME)
-        {
-            return (captured < captureIndex);
-        }
-        else if (owner == Team.AWAY)
-        {
-            return (captured > captureIndex);
-        }
-        return false;
-    }
+
 
    public Team dominantTeam = Team.NONE;
    public int dominantPoint = 0;
@@ -97,10 +89,6 @@ public class Map_CapturePoint : MonoBehaviourPun
     {
         if (IsOpen())
         {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                CheckDominance();
-            }
             UpdateProgress();
             CheckCapture();
             UpdateFill();
@@ -124,12 +112,23 @@ public class Map_CapturePoint : MonoBehaviourPun
         UpdateFill();
     }
 
+    IEnumerator TimedCheckDominance() {
+        while (gameObject.activeInHierarchy) {
+            if (IsOpen()) {
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    CheckDominance();
+                }
+                yield return new WaitForSeconds(0.2f);
+            }
+        }
+    }
+
     void CheckDominance() {
-        players = gameField.playerSpawner.unitsOnMap;
         Team dominance = Team.NONE;
         int homeHP = 0;
         int awayHP = 0;
-
+        players = gameField.playerSpawner.unitsOnMap;
         foreach (var player in players)
         {
             if (player.Value == null || !player.Value.gameObject.activeInHierarchy) continue;
@@ -156,7 +155,6 @@ public class Map_CapturePoint : MonoBehaviourPun
                 }
             }
         }
-       
         if (captureByHP) {
             if (homeHP == awayHP)
             {
@@ -201,7 +199,7 @@ public class Map_CapturePoint : MonoBehaviourPun
         UpdateBanner();
     }
 
-    [SerializeField] Image ownerFlag, fillSprite, lockImage, boundary;
+    [SerializeField] public Image ownerFlag, fillSprite, lockImage, boundary;
     [SerializeField] Text capturingText;
 
    
@@ -223,7 +221,7 @@ public class Map_CapturePoint : MonoBehaviourPun
         fillSprite.fillAmount = (Mathf.Abs(captureProgress )/ captureThreshold);
     }
     void UpdateProgress() {
-
+        
         if (dominantTeam == Team.NONE)
         {
             capturingText.enabled = false;
@@ -259,11 +257,11 @@ public class Map_CapturePoint : MonoBehaviourPun
         {
             capturingText.enabled = true;
             float amount = captureSpeed * Time.fixedDeltaTime * dominantPoint;
-            if (dominantTeam == Team.HOME && cpManager.IsValidCapturePoint(Team.HOME,captureIndex))
+            if (dominantTeam == Team.HOME && cpManager.IsValidCapturePoint(Team.HOME,captureIndex) && captureProgress < captureThreshold)
             {
                 captureProgress += amount;
             }
-            else if (dominantTeam == Team.AWAY && cpManager.IsValidCapturePoint(Team.AWAY, captureIndex))
+            else if (dominantTeam == Team.AWAY && cpManager.IsValidCapturePoint(Team.AWAY, captureIndex) && captureProgress > -captureThreshold)
             {
                 captureProgress -= amount;
             }
@@ -284,10 +282,10 @@ public class Map_CapturePoint : MonoBehaviourPun
     void CheckCapture()
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        if (captureProgress > captureThreshold && owner != Team.HOME) {
+        if (captureProgress >= captureThreshold && owner != Team.HOME) {
             owner = Team.HOME;
             photonView.RPC("NotifyCapture", RpcTarget.AllBuffered, (int)owner);
-        }else if(captureProgress < -captureThreshold && owner != Team.AWAY)
+        }else if(captureProgress <= -captureThreshold && owner != Team.AWAY)
         {
             owner = Team.AWAY;
             photonView.RPC("NotifyCapture", RpcTarget.AllBuffered, (int)owner);

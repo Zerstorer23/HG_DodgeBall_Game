@@ -3896,6 +3896,7 @@ GameObject:
   - component: {fileID: 1327729937330670377}
   - component: {fileID: 7435282203246503500}
   - component: {fileID: 3471888096930760732}
+  - component: {fileID: 7134322073229637354}
   m_Layer: 0
   m_Name: GameField-cp
   m_TagString: Untagged
@@ -3996,12 +3997,36 @@ MonoBehaviour:
   suddenDeathCalled: 0
   gameFieldFinished: 0
   expectedNumPlayer: 0
+  fieldWinner:
+    uid: 
   winnerName: 
   startTime: 0
   fieldType: 0
   spawnPositions:
   - {fileID: 59189630823646733}
   - {fileID: 8427734698829780775}
+--- !u!114 &7134322073229637354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3471888096930760735}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4221982869398543782
 GameObject:
   m_ObjectHideFlags: 0
@@ -7886,6 +7911,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbbc20ee2d5bde14da20afd4f95fa34a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameField: {fileID: 3471888096930760732}
 --- !u!1 &7726483774403104212
 GameObject:
   m_ObjectHideFlags: 0
@@ -7974,6 +8000,7 @@ MonoBehaviour:
   spawnDelay: 1.75
   modPerPerson: 5
   modPerStep: 0.75
+  gameField: {fileID: 3471888096930760732}
   boxProbability: 0.25
 --- !u!1 &7726483774799909735
 GameObject:
@@ -8354,7 +8381,10 @@ MonoBehaviour:
   debugUnitList: []
   spawnerType: 1
   desolator: {fileID: 0}
+  gameField: {fileID: 3471888096930760732}
   respawnTime: 5
+  lastDiedPlayer:
+    uid: 
 --- !u!1 &8456285468369343838
 GameObject:
   m_ObjectHideFlags: 0
@@ -8949,7 +8979,6 @@ MonoBehaviour:
   serialCaptureRequired: 1
   endThreshold: 100
   currentPoint: 0
-  finishOnAllCapture: 0
 --- !u!114 &7029297106958611366
 MonoBehaviour:
   m_ObjectHideFlags: 0

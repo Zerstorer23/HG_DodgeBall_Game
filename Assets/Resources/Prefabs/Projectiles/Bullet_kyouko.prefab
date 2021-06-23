@@ -95,7 +95,7 @@ MonoBehaviour:
   controller: {fileID: 0}
   currentLife: 0
   invincibleFromBullets: 1
-  invincibleFromMapBullets: 0
+  invincibleFromMapBullets: 1
   dontKillByException: 1
   associatedField: 0
   killerUID: 
@@ -106,7 +106,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8629071319047820310}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 673b0276b7be51347bda3aaf0850345e, type: 3}
   m_Name: 
@@ -114,10 +114,7 @@ MonoBehaviour:
   canKillBullet: 1
   isMapObject: 0
   givesDamage: 0
-  customBuffs:
-  - buffType: 1
-    modifier: -0.1
-    duration: 0.1
+  customBuffs: []
   myCollider: {fileID: 0}
   damageManifold: 0
 --- !u!114 &1619734601232522482
@@ -132,7 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 943687bd53f71ec4aab29eaf6df0353d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 2
+  attackMyTeam: 0
 --- !u!114 &4556413170392631494
 MonoBehaviour:
   m_ObjectHideFlags: 0

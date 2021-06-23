@@ -12,7 +12,7 @@ public class SkillManager : MonoBehaviourPun
     internal BuffManager buffManager;
     //Data
     public CharacterType myCharacter;
-    Controller controller;
+    public Controller controller;
 
     public ISkill mySkill;
     public int maxStack = 1;
@@ -30,14 +30,13 @@ public class SkillManager : MonoBehaviourPun
         player = GetComponent<Unit_Player>();
         buffManager = GetComponent<BuffManager>();
         controller = GetComponent<Controller>();
-
     }
     private void OnEnable()
     {
         myCharacter = (CharacterType)pv.InstantiationData[0];
         ParseSkill(myCharacter);
         InitSkill();
-        if (pv.IsMine)
+        if (controller.IsMine)
         {
             if(!controller.IsBot)UI_SkillBox.SetSkillInfo(this);
             EventManager.StartListening(MyEvents.EVENT_MY_PROJECTILE_HIT, OnProjectileHit);
@@ -63,6 +62,7 @@ public class SkillManager : MonoBehaviourPun
     {
         skillInUse = false;
         remainingStackTime = cooltime; // a;
+        currStack = 1;
     }
     private void OnProjectileMiss(EventObject eo)
     {

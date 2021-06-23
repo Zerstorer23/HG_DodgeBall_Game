@@ -33,8 +33,8 @@ public class Skill_Kyonmouto : ISkill
 
     public override void LoadInformation(SkillManager skm)
     {
-        skm.cooltime = 3.5f;
-        skm.maxStack = 3;
+        skm.cooltime = 3.25f;
+        skm.maxStack = 2;
     }
 
 }

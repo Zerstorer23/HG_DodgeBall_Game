@@ -28,16 +28,14 @@ public partial class IEvaluationMachine
     Vector3[] walls = new Vector3[2];//x,y
     public int myInstanceID;
 
-    public void SetInformation(Unit_AutoDrive autoDriver, float range) {
+    public IEvaluationMachine(Unit_AutoDrive autoDriver) {
         this.autoDriver = autoDriver;
         this.player = autoDriver.player;
         myInstanceID = player.gameObject.GetInstanceID();
         movement = player.movement;
         skillManager = player.skillManager;
-        SetRange(range);
+        SetRange(20f);
     }
-
-
 
     public void AddFoundObject(int tid, GameObject go) {
         foundObjects.Add(tid, go);

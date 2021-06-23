@@ -8,20 +8,27 @@ public class Skill_Kyouko : ISkill
     public override ActionSet GetSkillActionSet(SkillManager skm)
     {
         ActionSet mySkill = new ActionSet(skm);
-        mySkill.SetParam(SkillParams.MoveSpeed, 30f);
+        mySkill.SetParam(SkillParams.MoveSpeed, 25f);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KYOUKO);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.Die);
-        float angleSize = 15f;
-        float angleOffset = skm.unitMovement.GetAim() - angleSize;
-        for (int i = 0; i < 3; i++)
-        {
-            float angle = angleOffset +angleSize * i;
-            mySkill.Enqueue(new Action_SetAngle() { paramValue = angle });
-            mySkill.Enqueue(new Action_GetCurrentPlayerVector3_AngledOffset());
-            mySkill.Enqueue(new Action_InstantiateBulletAt());
-            mySkill.Enqueue(new Action_SetProjectileStraight());
-        }
 
+        mySkill.Enqueue(new Action_Player_GetAim());
+        mySkill.Enqueue(new Action_GetCurrentPlayerVector3_AngledOffset());
+        mySkill.Enqueue(new Action_InstantiateBulletAt());
+        mySkill.Enqueue(new Action_SetProjectileStraight());
+        
+
+        /*        float angleSize = 15f;
+                float angleOffset = skm.unitMovement.GetAim() - angleSize;
+                for (int i = 0; i < 3; i++)
+                {
+                    float angle = angleOffset +angleSize * i;
+                    mySkill.Enqueue(new Action_SetAngle() { paramValue = angle });
+                    mySkill.Enqueue(new Action_GetCurrentPlayerVector3_AngledOffset());
+                    mySkill.Enqueue(new Action_InstantiateBulletAt());
+                    mySkill.Enqueue(new Action_SetProjectileStraight());
+                }
+        */
         return mySkill;
     }
 

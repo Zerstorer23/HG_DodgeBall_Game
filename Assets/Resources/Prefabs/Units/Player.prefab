@@ -1970,6 +1970,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pv: {fileID: 0}
   myCharacter: 0
+  controller: {fileID: 0}
   maxStack: 1
   cooltime: 0
   skillInUse: 0
@@ -2760,6 +2761,11 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 8822352236447964824}
+    - target: {fileID: 1603591511212159369, guid: b0a76a304affe2b4e82a82308289b4ac,
+        type: 3}
+      propertyPath: threshold
+      value: 0.08
+      objectReference: {fileID: 0}
     - target: {fileID: 1603591511212159375, guid: b0a76a304affe2b4e82a82308289b4ac,
         type: 3}
       propertyPath: m_Name

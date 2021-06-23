@@ -25,12 +25,7 @@ public class BuffManager : MonoBehaviourPun
         unitPlayer = GetComponent<Unit_Player>();
         controller = GetComponent<Controller>();
     }
-    private void Start()
-    {
-        if (unitPlayer.myCharacter == CharacterType.YASUMI) {
-            pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.HideBuffs, 1f, -1d);
-        }
-    }
+
     private void Update()
     {
         CheckBuffDeactivations();
@@ -38,7 +33,11 @@ public class BuffManager : MonoBehaviourPun
     private void OnEnable()
     {
         RemoveAllBuff();
-        buffDictionary = new Dictionary<BuffType, float>();
+        buffDictionary.Clear();
+        if (unitPlayer.myCharacter == CharacterType.YASUMI)
+        {
+            pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.HideBuffs, 1f, -1d);
+        }
     }
 
 
@@ -149,7 +148,7 @@ public class BuffManager : MonoBehaviourPun
     }
     [PunRPC]
     public void HandleCameraShake(string activatorID) {
-        if (controller.Equals(activatorID)) return;
+        if (PlayerManager.LocalPlayer.uid == (activatorID) || controller.IsBot) return;
         float duration = 1.5f;
         MainCamera.instance.DoShake(time: duration);
         MainCamera.instance.DoRotation(time: duration);

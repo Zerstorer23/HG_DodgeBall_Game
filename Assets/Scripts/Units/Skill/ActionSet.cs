@@ -7,15 +7,16 @@ using UnityEngine;
 public class ActionSet
 {
     //Caster Object
-    internal UnityEngine.GameObject caster;
+    internal GameObject caster;
     internal SkillManager skillManager;
     internal Unit_Player castingPlayer;
+    internal Unit_Movement castingPlayerMovement;
 
     //Cache
     internal PhotonView projectilePV,casterPV; 
 
     //GameObject
-    internal UnityEngine.GameObject spawnedObject;
+    internal GameObject spawnedObject;
 
     private Dictionary<SkillParams, object> parameters = new Dictionary<SkillParams, object>();
     public bool isMutualExclusive = false;
@@ -37,6 +38,7 @@ public class ActionSet
         caster = skm.gameObject;
         castingPlayer = skm.gameObject.GetComponent<Unit_Player>();
         casterPV = caster.GetComponent<PhotonView>();
+        castingPlayerMovement = caster.GetComponent<Unit_Movement>();
         skillManager = skm;
     }
     public void Init() {

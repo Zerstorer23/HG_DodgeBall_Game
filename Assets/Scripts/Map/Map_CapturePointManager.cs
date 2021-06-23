@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class Map_CapturePointManager : MonoBehaviourPun
 {
-    [SerializeField] Map_CapturePoint[] capturePoints;
+    [SerializeField] public Map_CapturePoint[] capturePoints;
     Dictionary<int, Map_CapturePoint> mapDictionary = new Dictionary<int, Map_CapturePoint>();
     GameField_CP gameFieldCP;
     public int maxIndex, homeNext, awayNext = 0;
@@ -15,7 +15,6 @@ public class Map_CapturePointManager : MonoBehaviourPun
     float pointPerSec = 0.5f;
     public float endThreshold = 100f;
     public float currentPoint = 0;
-    public bool finishOnAllCapture = false;
     private void Awake()
     {
         capturePoints = GetComponentsInChildren<Map_CapturePoint>();
@@ -83,22 +82,33 @@ public class Map_CapturePointManager : MonoBehaviourPun
     [PunRPC]
     void SetPoint(float point) {
         currentPoint = point;
-        if (!finishOnAllCapture)
+    }
+    public Team GetTeamWithMaxPoint() {
+        if (currentPoint > endThreshold)
         {
-            if (currentPoint > endThreshold)
-            {
-                gameFieldCP.FinishGame(Team.HOME);
-            }
-            else if (currentPoint < -endThreshold)
-            {
-                gameFieldCP.FinishGame(Team.AWAY);
-            }
+            return (Team.HOME);
+        }
+        else if (currentPoint < -endThreshold)
+        {
+            return (Team.AWAY);
+        }
+        else {
+            return Team.NONE;
+        }
+    }
+    public Team GetHighestTeam() {
+        if (currentPoint < 0)
+        {
+            return (Team.AWAY);
+        }
+        else
+        {
+            return (Team.HOME);
         }
     }
 
     private void OnPointCaptured(EventObject arg0)
     {
-        Debug.Log("Capture received");
         DefineOpenPoints();
         foreach (var cp in capturePoints) {
             cp.UpdateBanner();
@@ -138,12 +148,10 @@ public class Map_CapturePointManager : MonoBehaviourPun
         if (homeNext > maxIndex)
         {
             homeNext = maxIndex;
-            if (finishOnAllCapture) gameFieldCP.FinishGame(Team.HOME);
         }
         if (awayNext < 0)
         {
             awayNext = 0;
-           if(finishOnAllCapture) gameFieldCP.FinishGame(Team.AWAY);
         }
     }
 

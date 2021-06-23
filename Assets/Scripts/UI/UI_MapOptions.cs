@@ -141,7 +141,6 @@ public class UI_MapOptions : MonoBehaviourPun
     [PunRPC]
     public void SetGameMode(int index)
     {
-        Debug.LogWarning("GameModeSet");
         GameSession.gameModeInfo = ConfigsManager.gameModeDictionary[(GameMode)index];
         EventManager.TriggerEvent(MyEvents.EVENT_GAMEMODE_CHANGED, new EventObject() { objData = GameSession.gameModeInfo });
         UpdateSettingsUI();

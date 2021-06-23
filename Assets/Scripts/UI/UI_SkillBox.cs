@@ -24,7 +24,8 @@ public class UI_SkillBox : MonoBehaviour
     }
     public static void SetSkillInfo(SkillManager skm, CharacterType character)
     {
-        instance.skill = skm;
+        if (!skm.controller.IsLocal) return;
+            instance.skill = skm;
         instance.portrait.sprite = ConfigsManager.unitDictionary[character].portraitImage;
         instance.desc.text = ConfigsManager.unitDictionary[character].txt_skill_desc;
     }

@@ -9,7 +9,8 @@ public class Skill_Koihime : ISkill
     {
         ActionSet mySkill = new ActionSet( skm);
         mySkill.isMutualExclusive = true;
-        float duration = 0.33f;
+        float duration = 0.22f;
+        //6.6거리 0.33초간 -> 
         mySkill.SetParam(SkillParams.Duration, duration); //1.5
                                                       // mySkill.SetParam(SkillParams.Modifier, 0.75f);
         mySkill.SetParam(SkillParams.Color, "#c80000");
@@ -20,7 +21,7 @@ public class Skill_Koihime : ISkill
         mySkill.Enqueue(new Action_SetParameter() { paramType = SkillParams.BuffData, paramValue = blockSkill});//
         mySkill.Enqueue(new Action_Player_AddBuff());//
                                                             // mySkill.SetParam(SkillParams.Modifier, 0.5f);
-        float dashSpeed = 20f;
+        float dashSpeed = 30f;
         mySkill.Enqueue(new Action_InstantiateBullet_FollowPlayer());
         mySkill.Enqueue(new Action_SetProjectileStatic());
         mySkill.Enqueue(new Action_DoDeathAfter());//
@@ -38,7 +39,7 @@ public class Skill_Koihime : ISkill
 
     public override void LoadInformation(SkillManager skm)
     {
-        skm.cooltime = 2.5f;
+        skm.cooltime = 3.5f;
         skm.maxStack = 3;
     }
 

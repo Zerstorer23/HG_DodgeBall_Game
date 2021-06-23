@@ -29,7 +29,6 @@ public class GameSession : MonoBehaviourPun
 
     public float gameSpeed = 1f;
     public bool devMode = false;
-    public bool useHardBot = false;
     public CharacterType debugChara = CharacterType.NONE;
 
     public static bool auto_drive_enabled = false;
@@ -117,13 +116,13 @@ public class GameSession : MonoBehaviourPun
     }
 
     public static void ShowMainMenu() {
-
         instance.pv.RPC("ShowPanel", RpcTarget.AllBuffered);
     }
     [PunRPC]
     void ShowPanel()
     {
         EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.PreGame });
+        EventManager.TriggerEvent(MyEvents.EVENT_GAME_CYCLE_RESTART, null);
     }
     [PunRPC]
     public void ResignMaster(Player newMaster) {
@@ -149,9 +148,9 @@ public class GameSession : MonoBehaviourPun
         if (routine != null) {
             instance.StopCoroutine(routine);
         }
-
         return newRoutine;
     }
+
     public static CharacterType GetPlayerCharacter(UniversalPlayer player)
     {
         if (!player.HasProperty("CHARACTER")) return CharacterType.NONE;

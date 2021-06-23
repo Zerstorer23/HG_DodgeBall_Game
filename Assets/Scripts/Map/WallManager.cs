@@ -18,7 +18,7 @@ public class WallManager : MonoBehaviour
     public void SetWalls()
     {
         DisableWalls();
-        bool enableWalls = GameSession.gameModeInfo.gameMode == GameMode.PVP;
+        bool enableWalls = (GameSession.gameModeInfo.gameMode == GameMode.PVP || GameSession.gameModeInfo.gameMode == GameMode.TeamCP );
         if (GameSession.instance != null && GameSession.instance.devMode) enableWalls = false;
         if (enableWalls) {
             int seed = (int)PhotonNetwork.CurrentRoom.CustomProperties[ConstantStrings.HASH_ROOM_RANDOM_SEED];

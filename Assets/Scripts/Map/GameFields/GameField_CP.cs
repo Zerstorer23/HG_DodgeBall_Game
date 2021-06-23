@@ -31,38 +31,59 @@ public class GameField_CP : GameField
     {
         base.OnEnable();
         timeoutRoutine = GameSession.CheckCoroutine(timeoutRoutine, WaitAndFinishGame());
-       if(!GameSession.instance.devMode) StartCoroutine(timeoutRoutine);
+        StartCoroutine(timeoutRoutine);
     }
-    public static float timeout = 300f;
+    public static float timeout = 180f;
     IEnumerator WaitAndFinishGame() {
-        yield return new WaitForSeconds(timeout);
-        float point = cpManager.currentPoint;
-        if (point < 0)
-        {
-            FinishGame(Team.AWAY);
+        float elapsedTime = 0f;
+        Team winner;
+        while (elapsedTime < timeout) {
+            winner = cpManager.GetTeamWithMaxPoint();
+            if (winner != Team.NONE)
+            {
+                if (PhotonNetwork.IsMasterClient) {
+                    photonView.RPC("FinishGame", RpcTarget.AllBuffered, (int)winner);
+                }
+                yield break;
+            }
+            else {
+                elapsedTime++;
+                yield return new WaitForSeconds(1f);
+            }
         }
-        else 
+        if (PhotonNetwork.IsMasterClient)
         {
-            FinishGame(Team.HOME);
+            winner = cpManager.GetHighestTeam();
+            photonView.RPC("FinishGame", RpcTarget.AllBuffered, (int)winner);
         }
+
     }
     public override void OnDisable()
     {
         base.OnDisable();
-        StopCoroutine(timeoutRoutine);
+        if (timeoutRoutine != null) {
+
+            StopCoroutine(timeoutRoutine);
+        }
     }
-    internal void FinishGame(Team winTeam)
+    [PunRPC]
+    public void FinishGame(Team winTeam)
     {
         UniversalPlayer winner = PlayerManager.GetPlayerOfTeam(winTeam);
-        Debug.Log("GAME FISNISHED /  winner " + winner);
         if (gameFieldFinished) return;
+        if (timeoutRoutine != null)
+        {
+            StopCoroutine(timeoutRoutine);
+        }
+
+        Debug.LogWarning("GAME FISNISHED /  winner " + winner);
         gameFieldFinished = true;
         fieldWinner = winner;
         winnerName = winner.NickName;
         //  Debug.Log("FIeld " + fieldNo + " finished with winner " + fieldWinner);
         EventManager.TriggerEvent(MyEvents.EVENT_FIELD_FINISHED, new EventObject() { intObj = fieldNo });
         gameObject.SetActive(false);
-        GameFieldManager.pv.RPC("FinishTheGame", RpcTarget.AllBufferedViaServer, winner.uid);
+        GameFieldManager.instance.FinishTheGame(winner.uid);
     }
     public override void CheckFieldConditions(GameStatus stat)
     {

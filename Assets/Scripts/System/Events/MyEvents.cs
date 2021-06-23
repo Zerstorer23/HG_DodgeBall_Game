@@ -27,10 +27,12 @@ public enum MyEvents {
     ,EVENT_SEND_MESSAGE
     ,EVENT_SHOW_PANEL
     ,EVENT_POP_UP_PANEL 
+    ,EVENT_GAME_CYCLE_RESTART
 
 
     ,EVENT_SCREEN_TOUCH
     ,EVENT_CP_CAPTURED
+    ,EVENT_PLAYER_LEFT
 }
 
 public class EventOneArg: UnityEvent<EventObject>

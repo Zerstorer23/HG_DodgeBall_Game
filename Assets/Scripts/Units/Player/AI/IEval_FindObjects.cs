@@ -55,7 +55,7 @@ public partial class IEvaluationMachine
                 case TAG_PROJECTILE:
                     if (IsProjectileDangerous(tid, c.gameObject))
                     {
-                     //   Debug.LogWarning("Add " + c.gameObject.name);
+                        //   Debug.LogWarning("Add " + c.gameObject.name);
                         AddFoundObject(tid, c.gameObject);
                     }
                     break;

@@ -95,6 +95,7 @@ public class StatisticsManager : MonoBehaviourPun
     public void SetBotProperty(string uid, string key, object value)
     {
         var player = PlayerManager.GetPlayerByID(uid);
+        if (player == null) return;
         player.SetCustomProperties(key, value, false);
     }
 

@@ -120,7 +120,10 @@ MonoBehaviour:
   debugUnitList: []
   spawnerType: 1
   desolator: {fileID: 0}
+  gameField: {fileID: 5004894902945371930}
   respawnTime: 5
+  lastDiedPlayer:
+    uid: 
 --- !u!1 &63242645374699851
 GameObject:
   m_ObjectHideFlags: 0
@@ -1393,7 +1396,6 @@ MonoBehaviour:
   serialCaptureRequired: 0
   endThreshold: 100
   currentPoint: 0
-  finishOnAllCapture: 0
 --- !u!114 &1501808399178607776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3342,6 +3344,7 @@ MonoBehaviour:
   spawnDelay: 1.75
   modPerPerson: 5
   modPerStep: 0.75
+  gameField: {fileID: 5004894902945371930}
   boxProbability: 0.25
 --- !u!1 &2189759593440824417
 GameObject:
@@ -3448,6 +3451,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbbc20ee2d5bde14da20afd4f95fa34a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameField: {fileID: 5004894902945371930}
 --- !u!1 &2189759594831191836
 GameObject:
   m_ObjectHideFlags: 0
@@ -6427,6 +6431,7 @@ GameObject:
   - component: {fileID: 7437520950254425135}
   - component: {fileID: 1329977462977034570}
   - component: {fileID: 5004894902945371930}
+  - component: {fileID: 691714948523240240}
   m_Layer: 0
   m_Name: GameField-cp FFA
   m_TagString: Untagged
@@ -6443,7 +6448,7 @@ Transform:
   m_GameObject: {fileID: 5004894902945371929}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 60, y: 60, z: 1}
+  m_LocalScale: {x: 80, y: 80, z: 1}
   m_Children:
   - {fileID: 2189759594425215299}
   - {fileID: 1535793421774782381}
@@ -6527,12 +6532,36 @@ MonoBehaviour:
   suddenDeathCalled: 0
   gameFieldFinished: 0
   expectedNumPlayer: 0
+  fieldWinner:
+    uid: 
   winnerName: 
   startTime: 0
   fieldType: 0
   spawnPositions:
   - {fileID: 3808814791953558879}
   - {fileID: 3808814792229773011}
+--- !u!114 &691714948523240240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5004894902945371929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &5116924919751685425
 GameObject:
   m_ObjectHideFlags: 0
@@ -12574,12 +12603,12 @@ PrefabInstance:
     - target: {fileID: 8369689948012077555, guid: 9b5e87f4767f05340b2632380e95fc9c,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.383
+      value: -0.4315
       objectReference: {fileID: 0}
     - target: {fileID: 8369689948012077555, guid: 9b5e87f4767f05340b2632380e95fc9c,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.395
+      value: -0.435
       objectReference: {fileID: 0}
     - target: {fileID: 8369689948012077555, guid: 9b5e87f4767f05340b2632380e95fc9c,
         type: 3}
@@ -12659,12 +12688,12 @@ PrefabInstance:
     - target: {fileID: 8369689948012077555, guid: 9b5e87f4767f05340b2632380e95fc9c,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.367
+      value: 0.4434
       objectReference: {fileID: 0}
     - target: {fileID: 8369689948012077555, guid: 9b5e87f4767f05340b2632380e95fc9c,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.353
+      value: 0.4242
       objectReference: {fileID: 0}
     - target: {fileID: 8369689948012077555, guid: 9b5e87f4767f05340b2632380e95fc9c,
         type: 3}

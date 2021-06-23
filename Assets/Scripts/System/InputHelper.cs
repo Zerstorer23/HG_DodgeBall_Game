@@ -50,7 +50,7 @@ public class InputHelper : MonoBehaviour
         {
             GetInputHorizontal = GetKeyInputHorizontal;
             GetInputVertical = GetKeyInputVertical;
-            GetTargetVector = GetMousePosition;
+            GetTargetVector = GetMousePosition;// GetMousePosition;
             skillKeyFired = FireButtonDown_PC;
         }
     }

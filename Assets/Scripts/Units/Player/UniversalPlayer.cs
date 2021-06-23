@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class UniversalPlayer
 {
     ControllerType controllerType = ControllerType.Human;
@@ -46,7 +47,6 @@ public class UniversalPlayer
             player.NickName = value;
         }
         else {
-            //TODO use ConnectedPlayerManager
             SetBotProperty("NICKNAME", value);
         }
     }
@@ -142,7 +142,7 @@ public class UniversalPlayer
         else {
             customProperties.Add(tag, value);
         }
-        if (broadcast) {
+        if (broadcast && PhotonNetwork.IsMasterClient) {
             StatisticsManager.SetBotProperty_Broadcast(uid, tag, value);
         }
     }

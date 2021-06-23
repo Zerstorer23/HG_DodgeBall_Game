@@ -19,7 +19,9 @@ public class EventObject
     public EventObject(object obj) {
         this.objData = obj;
     }
-    public EventObject(string str) {
+    public EventObject(string str)
+    {
+        this.objData = str;
         this.stringObj = str;
     }
     public T Get<T>() {

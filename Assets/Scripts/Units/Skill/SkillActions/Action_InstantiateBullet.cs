@@ -28,7 +28,7 @@ public class Action_InstantiateBullet_FollowPlayer : SkillAction
     public override float Activate()
     {
         int fieldNumber = parent.castingPlayer.fieldNo;
-        float angle = parent.caster.GetComponent<Unit_Movement>().GetAim();
+        float angle = parent.castingPlayerMovement.GetAim();
         Quaternion rotation = Quaternion.Euler(0, 0, angle);
         GameObject obj = PhotonNetwork.Instantiate(
             GetParam<string>(SkillParams.PrefabName),
@@ -79,7 +79,7 @@ public class Action_GetCurrentPlayerPosition : SkillAction
 
     public override float Activate()
     {
-        float angle = parent.caster.GetComponent<Unit_Movement>().GetAim();
+        float angle = parent.castingPlayerMovement.GetAim();
         parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, angle));
         parent.SetParam(SkillParams.EulerAngle, angle);
         parent.SetParam(SkillParams.Vector3, parent.caster.transform.position);
@@ -91,7 +91,7 @@ public class Action_Player_GetAim : SkillAction
 
     public override float Activate()
     {
-        float angle = parent.caster.GetComponent<Unit_Movement>().GetAim();
+        float angle = parent.castingPlayerMovement.GetAim();
         parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, angle));
         parent.SetParam(SkillParams.EulerAngle, angle);
         parent.SetParam(SkillParams.Vector3, ConstantStrings.GetAngledVector(angle,1f));
@@ -103,7 +103,7 @@ public class Action_GetCurrentPlayerPosition_AngledOffset : SkillAction
 
     public override float Activate()
     {
-        float angle = parent.caster.GetComponent<Unit_Movement>().GetAim();
+        float angle = parent.castingPlayerMovement.GetAim();
         float distance = GetParam<float>(SkillParams.Distance, 1.4f);
         Vector3 angledVector = ConstantStrings.GetAngledVector(angle, distance);
         parent.SetParam(SkillParams.Quarternion, Quaternion.Euler(0, 0, angle));

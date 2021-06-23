@@ -20,13 +20,12 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     public Collider2D myCollider;
     bool hasCustomCollider = false;
 
-
     public DamageManifoldType damageManifold = DamageManifoldType.Once;
     public IDamageManifold duplicateDamageChecker = null;
 
     private void Awake()
     {
-        SetDamageManifold();
+        duplicateDamageChecker = DamageManifold.SetDamageManifold(damageManifold);
         FindCollider();
         projectile = GetComponent<Projectile>();
         movement = GetComponent<Projectile_Movement>();
@@ -34,28 +33,6 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         pv = GetComponent<PhotonView>();
         Debug.Assert(projectile != null, "Where is projectile");
         hasCustomCollider = GetComponent<Projectile_CustomDamageDealer>() != null;
-    }
-
-    private void SetDamageManifold()
-    {
-        switch (damageManifold)
-        {
-            case DamageManifoldType.Once:
-                duplicateDamageChecker = new DamageOnce();
-                break;
-            case DamageManifoldType.Queue:
-                duplicateDamageChecker = new DamageQueue();
-                break;
-            case DamageManifoldType.Timed:
-                duplicateDamageChecker = new DamageTimed();
-                break;
-            case DamageManifoldType.InAndOout:
-                duplicateDamageChecker = new DamageInAndOut();
-                break;
-            default:
-                duplicateDamageChecker = new DamageOnce();
-                break;
-        }
     }
 
     private void OnDisable()
@@ -97,7 +74,6 @@ public class Projectile_DamageDealer : MonoBehaviourPun
     // Start is called before the first frame update
     private void OnTriggerEnter2D(Collider2D collision)
     {
-
         string tag = collision.gameObject.tag;
        // Debug.Log(gameObject.name + "Trigger with " + collision.gameObject.name+" / tag "+tag);
         switch (tag)

@@ -11,20 +11,24 @@ public class UI_BotLobby : MonoBehaviourPunCallbacks
     private void Awake()
     {
         lobbyManager = GetComponent<UI_PlayerLobbyManager>();
-        EventManager.StartListening(MyEvents.EVENT_GAME_STARTED, OnGameStarted);
-        EventManager.StartListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
     }
 
 
 
-    private void OnDestroy()
+    private new void OnDisable()
     {
         EventManager.StopListening(MyEvents.EVENT_GAME_STARTED, OnGameStarted);
         EventManager.StopListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
+        EventManager.StopListening(MyEvents.EVENT_PLAYER_JOINED, OnGamemodeChanged);
+        EventManager.StopListening(MyEvents.EVENT_PLAYER_LEFT, OnGamemodeChanged);
     }
     private new void OnEnable()
     {
         botPanels.Clear();
+        EventManager.StartListening(MyEvents.EVENT_GAME_STARTED, OnGameStarted);
+        EventManager.StartListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
+        EventManager.StartListening(MyEvents.EVENT_PLAYER_JOINED, OnGamemodeChanged);
+        EventManager.StartListening(MyEvents.EVENT_PLAYER_LEFT, OnGamemodeChanged);
     }
     private void OnGameStarted(EventObject arg0)
     {
@@ -38,8 +42,8 @@ public class UI_BotLobby : MonoBehaviourPunCallbacks
     }
     private void OnGamemodeChanged(EventObject arg0)
     {
-        GameModeConfig info = arg0.Get<GameModeConfig>();
-        if (!info.allowBots)
+        GameModeConfig info = GameSession.gameModeInfo;
+        if (!info.CheckBotGame())
         {
             foreach (var panel in botPanels)
             {
@@ -50,23 +54,44 @@ public class UI_BotLobby : MonoBehaviourPunCallbacks
                 }
             }
             botPanels.Clear();
-            PlayerManager.RemoveAllBots();
+            if (PhotonNetwork.IsMasterClient) {
+                photonView.RPC("RemoveAllBots", RpcTarget.AllBuffered);
+            }
         }
     }
+    public void DestoryBotsPanel() {
+        if (PhotonNetwork.IsMasterClient) {
 
+            foreach (var entry in botPanels)
+            {
+                PhotonNetwork.Destroy(entry.gameObject);
+            }
+        }
+        botPanels.Clear();
+    }
+
+    [PunRPC]
+    public void RemoveAllBots()
+    {
+        PlayerManager.RemoveAllBots();
+
+    }
+
+
+    int maxBots = 4;
     public void OnAddBot()
     {
-        if (!PhotonNetwork.IsMasterClient)
+        if (!PhotonNetwork.IsMasterClient || !GameSession.gameModeInfo.CheckBotGame())
         {
             return;
         }
+        if (PlayerManager.GetBotCount()+1 > maxBots) return;
         string newID = PlayerManager.PollBotID();
         photonView.RPC("AddBotPlayer", RpcTarget.AllBuffered, newID);
-        Debug.LogWarning("RPC add bot");
     }
     public void OnRemoveBot()
     {
-        if (!PhotonNetwork.IsMasterClient)
+        if (!PhotonNetwork.IsMasterClient )
         {
             return;
         }
@@ -76,6 +101,7 @@ public class UI_BotLobby : MonoBehaviourPunCallbacks
             photonView.RPC("RemoveBotPlayer", RpcTarget.AllBuffered, bots[0].uid);
         }
     }
+
 
     [PunRPC]
     public void AddBotPlayer(string uid)
@@ -90,10 +116,12 @@ public class UI_BotLobby : MonoBehaviourPunCallbacks
         PlayerManager.AddBotPlayer(botPlayer);
         InstantiateBotPanel(botPlayer);
     }
+    
 
     [PunRPC]
     public void RemoveBotPlayer(string uid)
     {
+        Debug.LogWarning("Remove bot " + uid);
         PlayerManager.RemoveBotPlayer(uid);
         for (int i = 0; i < botPanels.Count; i++)
         {
@@ -106,6 +134,7 @@ public class UI_BotLobby : MonoBehaviourPunCallbacks
                 }
                 lobbyManager.RemovePlayer(uid);
                 botPanels.RemoveAt(i);
+                lobbyManager.RebalanceTeam();
                 return;
             }
         }

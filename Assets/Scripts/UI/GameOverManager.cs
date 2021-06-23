@@ -69,7 +69,6 @@ public class GameOverManager : MonoBehaviour
     IEnumerator WaitAndOut()
     {
         PhotonNetwork.RemoveRPCs(PhotonNetwork.LocalPlayer);
-        PlayerManager.RemoveAllBots();
         yield return new WaitForFixedUpdate();
         if (PhotonNetwork.IsMasterClient)
         {
@@ -85,7 +84,7 @@ public class GameOverManager : MonoBehaviour
         miniWinnerName.text = string.Format("{0}초", gameTime.ToString("0.0"));
         if (GameSession.gameModeInfo.gameMode == GameMode.PVE)
         {
-            float prevScore = PlayerPrefs.GetFloat(ConstantStrings.PREFS_TIME_RECORD, 0f);
+            float prevScore = PlayerPrefs.GetFloat(PREFS_TIME_RECORD, 0f);
             GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_pve_time, (int)gameTime);
             if (gameTime > prevScore)
             {

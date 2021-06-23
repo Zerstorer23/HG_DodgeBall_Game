@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,13 +10,14 @@ public partial class IEvaluationMachine
 {
     RandomDirectionMaker rdm = new RandomDirectionMaker();
 
-
+    public int collideCount = 0;
     public virtual Vector3 EvaluateMoves()
     {
-
         //1. Heuristic
         Vector3 move = Vector3.zero;
         dangerList.Clear();
+        collideCount = 0;
+
         foreach (GameObject go in foundObjects.Values)
         {
             if (go == null || !go.activeInHierarchy)
@@ -38,6 +40,10 @@ public partial class IEvaluationMachine
                     {
                         dangerList.Add(go);
                     }
+                    if (distance <= 2.5f)
+                    {
+                        collideCount++;
+                    }
                     move += EvaluateProjectile(tid, go, distance, directionToTarget);
 
                     break;
@@ -46,6 +52,7 @@ public partial class IEvaluationMachine
                     break;
                 case TAG_BOX_OBSTACLE:
                     multiplier = GetMultiplier(distance);
+                    collideCount++;
                     move -= directionToTarget * multiplier;
                     break;
             }
@@ -55,10 +62,8 @@ public partial class IEvaluationMachine
         move += GetToCapturePoint();
 
         //2. KNNs
-        if (dangerList.Count > 0)
-        {
-            move += Drive_KNN();
-        }
+
+        move += Drive_KNN();
         // Debug.Log("Wall move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
         if (move.magnitude > 1f)
         {
@@ -70,9 +75,37 @@ public partial class IEvaluationMachine
         }
 
         move = AbsoluteEvasion(move);
-
-        //  Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
+        move = PreventExtremeMove(move);
+        //Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
         return move;
+    }
+    protected Vector3 lastRecPos;
+    protected double lastRecTime;
+    protected float threshold = 0.05f;
+    public virtual Vector3 PreventExtremeMove(Vector3 v)
+    {
+
+        if (PhotonNetwork.Time > lastRecTime + 0.5)
+        {
+            lastRecPos = player.movement.networkPos;
+            lastRecTime = PhotonNetwork.Time;
+        }
+        Vector3 newPos = player.movement.networkPos + player.movement.GetMovementSpeed() * Time.deltaTime * v;
+        float dist = Vector2.Distance(lastRecPos, newPos);
+        if (dist <= threshold
+           && collideCount < 2
+           && dangerList.Count < 2
+            )
+        {
+            return Vector3.zero;
+        }
+        else
+        {
+            return v;
+        }
+    }
+    public virtual float DiffuseAim(float angle) {
+        return angle;
     }
 
     protected Vector3 EvaluateBuff(GameObject go, int tid, Vector3 directionToTarget, float distance)
@@ -139,7 +172,7 @@ public partial class IEvaluationMachine
                 break;
             case CharacterType.ASAKURA:
             case CharacterType.KYOUKO:
-                attackRange = 8f;
+                attackRange = 6f;
                 break;
             case CharacterType.KYONMOUTO:
                 attackRange = 5.5f;
@@ -285,7 +318,7 @@ public partial class IEvaluationMachine
             return dir;
         }
 
-        if (pMove.moveSpeed > player.movement.GetMovementSpeed())
+        if (pMove.moveSpeed > 15f)//player.movement.GetMovementSpeed())
         {
             if (!IsApproaching(pMove, distance)) return Vector3.zero;
             /*   

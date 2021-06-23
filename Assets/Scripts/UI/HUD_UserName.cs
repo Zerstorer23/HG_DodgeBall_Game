@@ -47,16 +47,21 @@ public class HUD_UserName : MonoBehaviourPun
 
     private void OnGamemodeChanged(EventObject arg0)
     {
-        if (controller.IsMine) {
-            GameModeConfig currMode = (GameModeConfig)arg0.objData;
-            if (currMode.isTeamGame) {
-             //   var indexMap = PlayerManager.GetIndexMap(PlayerManager.GetPlayers());
+        ResetTeam();
+    }
+    public void ResetTeam() {
+        if (!gameObject.activeInHierarchy) return;
+        if (controller.IsMine)
+        {
+            if (GameSession.gameModeInfo.isTeamGame)
+            {
                 int index = PlayerManager.GetMyIndex(controller.Owner, PlayerManager.GetPlayers());
                 myTeam = (Team)(index % 2 + 1);
             }
             pv.RPC("SetTeam", RpcTarget.AllBuffered, (int)myTeam);
         }
     }
+
     [PunRPC]
     public void SetTeam(int teamNumber)
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Unit_Movement : 
+public class Unit_Movement :
     MonoBehaviourPunCallbacks
     , IPunObservable
 {
@@ -45,11 +45,23 @@ public class Unit_Movement :
     }
     public override void OnEnable()
     {
-
         InputHelper.SetAxisNames();
-        autoDriver.StartBot(
-            (GameSession.auto_drive_enabled || controller.IsBot),
-            controller.IsBot);
+        autoDriver.StartBot(DetermineBotType());
+    }
+    BotType DetermineBotType() {
+        if (GameSession.auto_drive_enabled && !controller.IsBot) return BotType.Hard;
+        if (controller.IsBot)
+        {
+            if (GameSession.gameModeInfo.gameMode == GameMode.TeamCP)
+            {
+                return BotType.Easy;
+            }
+            else
+            {
+                return BotType.Normal;
+            }
+        }
+        return BotType.None;
     }
 
 

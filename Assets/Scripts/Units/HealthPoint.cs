@@ -48,10 +48,8 @@ public class HealthPoint : MonoBehaviourPun
 
     private void OnFieldFinish(EventObject obj)
     {
-        Debug.Log("receive field finish");
         if (!isDead && obj.intObj == associatedField)
         {
-            Debug.Log("Die");
             Kill_Immediate();
         }
     }
@@ -214,7 +212,6 @@ public class HealthPoint : MonoBehaviourPun
                 if (killerUID == null)
                 {
                     killerUID = attackerUserID;
-                    Debug.Log("send id " + attackerUserID);
                     EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID, hitHealthPoint = this });
                     ChatManager.SendNotificationMessage(attackerNickname + " 님이 " + controller.Owner.NickName + "님을 살해했습니다.", "#FF0000");
                 }

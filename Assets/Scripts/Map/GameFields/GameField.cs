@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameField : MonoBehaviour
+public class GameField : MonoBehaviourPun
 {
     public int fieldNo = 0;
     public MapSpec mapSpec = new MapSpec();
@@ -229,7 +229,7 @@ public class GameField : MonoBehaviour
     public virtual Vector3 GetPlayerSpawnPosition(UniversalPlayer myPlayer)
     {
         int myIndex = PlayerManager.GetMyIndex(myPlayer, GameFieldManager.GetPlayersInField(fieldNo));
-        Debug.LogWarning(myPlayer+" My Index " + myIndex);
+//        Debug.LogWarning(myPlayer+" My Index " + myIndex);
         int x = myIndex % w;
         int y = myIndex / w;
         return GetPoissonPositionNear(x, y);
