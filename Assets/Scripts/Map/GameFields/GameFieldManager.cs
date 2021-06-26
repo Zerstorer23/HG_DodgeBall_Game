@@ -295,6 +295,10 @@ public partial class GameFieldManager : MonoBehaviourPun
     public IEnumerator WaitAndSpectate()
     {
         yield return new WaitForSeconds(1f);
+        if (totalUnitsDictionary.ContainsKey(PhotonNetwork.LocalPlayer.UserId)) {
+            var unit = totalUnitsDictionary[PhotonNetwork.LocalPlayer.UserId];
+            if (unit != null && unit.gameObject.activeInHierarchy) yield break;
+        }
         ChatManager.SetInputFieldVisibility(true);
         MainCamera.FocusOnField(true);
        // MainCamera.instance.FocusOnAlivePlayer();
