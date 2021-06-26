@@ -67,7 +67,8 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         Debug.Log("Instantiate after regame");
         if (PhotonNetwork.IsMasterClient)
         {
-            Player randomPlayer = PhotonNetwork.LocalPlayer.GetNext();// PlayerManager.GetRandomPlayerExceptMe();
+         //  Player randomPlayer = PhotonNetwork.LocalPlayer.GetNext();// PlayerManager.GetRandomPlayerExceptMe();
+            Player randomPlayer = PlayerManager.GetRandomPlayerExceptMe();
             if (randomPlayer != null)
                 PhotonNetwork.SetMasterClient(randomPlayer);
         }

@@ -65,7 +65,14 @@ public class Unit_Player : MonoBehaviourPun
             EventManager.StartListening(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, IncrementKill);
             MainCamera.SetFollow(GameSession.GetInst().networkPos);
             MainCamera.FocusOnField(false);
-            ChatManager.SetInputFieldVisibility(false);
+            if (GameSession.gameModeInfo.gameMode != GameMode.TeamCP)
+            {
+                ChatManager.SetInputFieldVisibility(false);
+            }
+            else {
+
+                ChatManager.SetInputFieldVisibility(true);
+            }
             UI_StatDisplay.SetPlayer(this);
         }
         GameFieldManager.gameFields[fieldNo].playerSpawner.RegisterPlayer(controller.uid, this);

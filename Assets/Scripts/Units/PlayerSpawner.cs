@@ -127,11 +127,11 @@ public class PlayerSpawner : MonoBehaviour
     }
     float ModifyRespawnTime(Team team) {
         if ((team == Team.HOME && numAway > numHome)) {
-            return respawnTime * (numHome / numAway);
+            return respawnTime * ((float)numHome / numAway);
         
         } else if (team == Team.AWAY && numHome > numAway)
         {
-            return respawnTime * (numAway / numHome);
+            return respawnTime * ((float)numAway / numHome);
         }
         return respawnTime;
     }

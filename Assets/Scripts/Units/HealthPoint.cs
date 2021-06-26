@@ -129,11 +129,14 @@ public class HealthPoint : MonoBehaviourPun
             if (pv.IsMine)
             {
                 PhotonNetwork.Instantiate(ConstantStrings.PREFAB_HEAL_1, transform.position, Quaternion.identity, 0);
-                MainCamera.instance.DoShake();
-                #if UNITY_ANDROID && !UNITY_EDITOR
-                Handheld.Vibrate();
-                #endif
-                unitPlayer.PlayHitAudio();
+                if (controller.IsLocal) {
+
+                    MainCamera.instance.DoShake();
+                    #if UNITY_ANDROID && !UNITY_EDITOR
+                                    Handheld.Vibrate();
+                    #endif
+                    unitPlayer.PlayHitAudio();
+                }
             }
             NotifySourceOfDamage(attackerUserID, instaDeath);
         }
