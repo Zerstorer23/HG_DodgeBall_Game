@@ -105,6 +105,18 @@ MonoBehaviourPun
                 break;
         }
     }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        string tag = collision.gameObject.tag;
+        Debug.Log(gameObject.name + "Collision with " + collision.gameObject.name + " / tag " + tag);
+        switch (tag)
+        {
+            case TAG_PLAYER:
+            case TAG_PROJECTILE:
+                myCollider.isTrigger = false;
+                break;
+        }
+    }
     IEnumerator TurnOffTrigger()
     {
         yield return new WaitForSeconds(0.5f);

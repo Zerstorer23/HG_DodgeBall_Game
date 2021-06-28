@@ -132,8 +132,8 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
 
 	}
-	public static void FocusField() {
-		instance.mainChatBox.FocusOnField(true);
+	public static void FocusField(bool doFocus) {
+		instance.mainChatBox.FocusOnField(doFocus);
 	}
 	public static void SetInputFieldVisibility(bool enable)
 	{
