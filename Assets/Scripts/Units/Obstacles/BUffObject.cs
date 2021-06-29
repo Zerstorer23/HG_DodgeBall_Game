@@ -66,7 +66,7 @@ public class BuffObject : MonoBehaviourPun
     private void OnDisable()
     {
         status = BuffObjectStatus.Starting;
-        EventManager.StopListening(MyEvents.EVENT_GAME_FINISHED, OnFieldFinished);
+        EventManager.StopListening(MyEvents.EVENT_FIELD_FINISHED, OnFieldFinished);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
