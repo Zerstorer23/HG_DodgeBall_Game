@@ -10,13 +10,15 @@ public class UI_ChatBox : MonoBehaviour
 {
 	public InputField inputField;
 	public Text outputText;
+	public Text placeholderText;
 	public ScrollRect scrollRect;
 	public UnityEngine.GameObject inputBox;
 	[SerializeField] RectTransform contentTrans;
 
 	List<string> chatQueue = new List<string>();
     private void Awake()
-    {
+	{
+		placeholderText = inputField.placeholder.GetComponent<Text>();
 		EventManager.StartListening(MyEvents.EVENT_SHOW_PANEL, ScrollToBottom);
     }
     private void OnDestroy()
@@ -37,8 +39,8 @@ public class UI_ChatBox : MonoBehaviour
 		if (Input.GetKeyUp(KeyCode.Return))
 		{
 			emptyEnter++;
-			if (emptyEnter >= 2 && !isSelected)
-			{
+			Debug.Log(emptyEnter + " . " + isSelected);
+			if (emptyEnter >= 2 && !isSelected){
 				FocusOnField(true);
 			}
 		}
@@ -51,7 +53,7 @@ public class UI_ChatBox : MonoBehaviour
 	}
 	public void Input_OnValueChange()
 	{
-		isSelected = true;
+	//	isSelected = true;
 	}
 	public void Input_OnEndEdit()
 	{
@@ -72,9 +74,10 @@ public class UI_ChatBox : MonoBehaviour
 			else {
 				ChatManager.SendChatMessage(inputField.text);
 			}
-			if (Application.platform != RuntimePlatform.Android) {
+			FocusOnField(false);
+			/*if (Application.platform != RuntimePlatform.Android) {
 				FocusOnField(true);
-			}
+			}*/
 		}
 		inputField.text = "";
 
@@ -144,17 +147,17 @@ public class UI_ChatBox : MonoBehaviour
 		{
 			inputField.ActivateInputField();
 			inputField.Select();
-			inputField.placeholder.GetComponent<Text>().text = "채팅을 입력";
+			placeholderText.text = "<color=#5675FF>채팅을 입력</color>";
 		}
 		else
 		{
 			inputField.DeactivateInputField();
 			if (!EventSystem.current.alreadySelecting) EventSystem.current.SetSelectedGameObject(null);
-			inputField.placeholder.GetComponent<Text>().text = "Enter로 채팅시작";
-			//EventSystem.current.SetSelectedGameObject(null);
+			placeholderText.text = "Enter로 채팅시작";
 		}
 		isSelected = enable;
 		emptyEnter = 0;
+		Debug.LogWarning(isSelected + " / " + emptyEnter);
 	}
 
 	IEnumerator scrollRoutine;
