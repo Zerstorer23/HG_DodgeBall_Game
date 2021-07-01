@@ -45,7 +45,9 @@ public class Skill_Kyon : ISkill
     {
         HealthPoint targetHP = eo.hitHealthPoint;
 
-        if (eo.sourceDamageDealer.myHealth.controller.uid != original.controller.uid) return;
+        UniversalPlayer attacker = PlayerManager.GetPlayerByID(eo.stringObj);
+        if (attacker == null) return;
+        if (attacker.uid != original.controller.uid) return;
         if (targetHP.unitType != UnitType.Player) return;
        // CheckYasumi(targetHP);
         

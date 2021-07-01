@@ -43,6 +43,7 @@ public class BoxObstacle : MonoBehaviourPun
 
         isDead = false;
         boundarySprite.enabled = true;
+        myCollider.enabled = false;
         EventManager.TriggerEvent(MyEvents.EVENT_BOX_SPAWNED, new EventObject() { goData = gameObject });
 
     }
