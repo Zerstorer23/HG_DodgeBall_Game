@@ -44,10 +44,12 @@ public class Unit_AutoDrive : MonoBehaviour
 
 
     SortedDictionary<string, Unit_Player> playersOnMap;
+    double spawnTime;
     private void OnEnable()
     {
         EventManager.StartListening(MyEvents.EVENT_BOX_SPAWNED, OnBoxSpawned);
         EventManager.StartListening(MyEvents.EVENT_BOX_ENABLED, OnBoxEnabled);
+        spawnTime = PhotonNetwork.Time;
     }
 
     public bool CanAttackTarget()
@@ -57,6 +59,7 @@ public class Unit_AutoDrive : MonoBehaviour
             if (PhotonNetwork.Time < player.skillManager.lastActivated + 1) return false;
         }
         if (GameSession.gameModeInfo.isCoop) return true;
+        if (PhotonNetwork.Time < (spawnTime + 1d)) return false;
         if (player.myCharacter == CharacterType.Taniguchi) return false;
         FindNearestPlayer();
         if (targetEnemy == null)

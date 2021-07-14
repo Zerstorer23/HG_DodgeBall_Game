@@ -23,11 +23,16 @@ public class UI_MapOptions : MonoBehaviourPun
     [SerializeField] Dropdown mapDiffDropdown;
     [SerializeField] Dropdown livesDropdown;
     [SerializeField] Dropdown gamemodeDropdown;
+    [SerializeField] Dropdown mapOptionsDropdown;
+    [SerializeField] GameObject subOptionsObject;
     [SerializeField] GameObject[] masterOnlyObjects;
    public MapDifficulty mapDiff;
    public int livesIndex =0;
+    public int mapSubOptionChoice = 0;
 
     public static int[] lives = new int[] { 1, 3, 5 };
+
+
 
     public void SetGameStarted(bool enable) {
         gameStarted = enable;
@@ -44,8 +49,41 @@ public class UI_MapOptions : MonoBehaviourPun
     }
     private void OnEnable()
     {
+        ShowSubMapOptions();
         UpdateSettingsUI();
     }
+
+    public void ShowSubMapOptions() {
+        mapOptionsDropdown.ClearOptions();
+        switch (GameSession.gameModeInfo.gameMode)
+        {
+            case GameMode.PVP:
+            case GameMode.TEAM:
+            case GameMode.Tournament:
+            case GameMode.PVE:
+                subOptionsObject.SetActive(false);
+                break;
+            case GameMode.TeamCP:
+                subOptionsObject.SetActive(true);
+                for (int i = 0; i < 2; i++) {
+                    mapOptionsDropdown.options.Add(new Dropdown.OptionData());
+                }
+                mapOptionsDropdown.options[0].text = "점령지 1개";
+                mapOptionsDropdown.options[1].text = "점령지 5개";
+                mapOptionsDropdown.SetValueWithoutNotify(0);
+                mapSubOptionChoice = 0;
+                break;
+        }
+    }
+    public void OnDropdown_MapSubOptions()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            int index = mapOptionsDropdown.value;
+            pv.RPC("SetMapSubOptions", RpcTarget.AllBuffered, index);
+        }
+    }
+
     public void OnDropdown_MapDifficulty()
     {
         if (PhotonNetwork.IsMasterClient)
@@ -84,6 +122,7 @@ public class UI_MapOptions : MonoBehaviourPun
         mapDiffDropdown.interactable = isMaster;
         livesDropdown.interactable = isMaster;
         gamemodeDropdown.interactable = isMaster;
+        mapOptionsDropdown.interactable = isMaster;
         mapDiffDropdown.SetValueWithoutNotify((int)mapDiff);
         livesDropdown.SetValueWithoutNotify((int)livesIndex);
         int gmode = 0;
@@ -91,6 +130,7 @@ public class UI_MapOptions : MonoBehaviourPun
             gmode = (int)GameSession.gameModeInfo.gameMode;
         }
         gamemodeDropdown.SetValueWithoutNotify(gmode);
+        mapOptionsDropdown.SetValueWithoutNotify(mapSubOptionChoice);
     }
 
     internal void LoadRoomSettings()
@@ -131,7 +171,12 @@ public class UI_MapOptions : MonoBehaviourPun
         mapDiff = (MapDifficulty)diff;
         UpdateSettingsUI();
     }
-
+    [PunRPC]
+    public void SetMapSubOptions(int diff)
+    {
+        mapSubOptionChoice = diff;
+        UpdateSettingsUI();
+    }
     [PunRPC]
     public void SetPlayerLives(int index)
     {
@@ -142,6 +187,7 @@ public class UI_MapOptions : MonoBehaviourPun
     public void SetGameMode(int index)
     {
         GameSession.gameModeInfo = ConfigsManager.gameModeDictionary[(GameMode)index];
+        ShowSubMapOptions();
         EventManager.TriggerEvent(MyEvents.EVENT_GAMEMODE_CHANGED, new EventObject() { objData = GameSession.gameModeInfo });
         UpdateSettingsUI();
     }
@@ -151,6 +197,7 @@ public class UI_MapOptions : MonoBehaviourPun
         hash.Add(HASH_MAP_DIFF, default_difficult);
         hash.Add(HASH_PLAYER_LIVES, default_lives_index);
         hash.Add(HASH_VERSION_CODE, GameSession.GetVersionCode());
+        hash.Add(HASH_SUB_MAP_OPTIONS, 0);
         hash.Add(HASH_GAME_MODE, GameMode.PVP);
         hash.Add(HASH_GAME_STARTED, false);
         hash.Add(HASH_GAME_AUTO, false);
@@ -163,6 +210,7 @@ public class UI_MapOptions : MonoBehaviourPun
         hash.Add(HASH_MAP_DIFF, mapDiff);
         hash.Add(HASH_PLAYER_LIVES, livesIndex);
         hash.Add(HASH_VERSION_CODE, GameSession.GetVersionCode());
+        hash.Add(HASH_SUB_MAP_OPTIONS, mapSubOptionChoice);
         hash.Add(HASH_GAME_STARTED, gameStarted);
         hash.Add(HASH_GAME_MODE, GameSession.gameModeInfo.gameMode);
         PhotonNetwork.CurrentRoom.SetCustomProperties(hash);

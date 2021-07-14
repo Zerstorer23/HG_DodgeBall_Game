@@ -117,16 +117,14 @@ public partial class GameFieldManager : MonoBehaviourPun
 
     private static void SetUp_CP()
     {
-        int homeNum = PlayerManager.GetNumberInTeam(Team.HOME);
-        int awayNum = PlayerManager.GetNumberInTeam(Team.AWAY);
-        if (homeNum == awayNum)
+        int mapNum = (int)PhotonNetwork.CurrentRoom.CustomProperties[ConstantStrings.HASH_SUB_MAP_OPTIONS];
+        if (mapNum == 0)
         {
-            SetUpSingleField(instance.field_CP_FFA);
+            SetUpSingleField(instance.field_CP);
         }
         else
         {
-           // SetUpSingleField(instance.field_CP_FFA);
-            SetUpSingleField(instance.field_CP);
+            SetUpSingleField(instance.field_CP_FFA);
         }
     }
 

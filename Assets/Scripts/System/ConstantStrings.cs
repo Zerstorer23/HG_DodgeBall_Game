@@ -46,6 +46,7 @@ public class ConstantStrings : MonoBehaviour
     public const string HASH_MAP_DIFF = "MapDifficulty";
     public const string HASH_PLAYER_LIVES = "PlayerLives";
     public const string HASH_VERSION_CODE = "VersionCode";
+    public const string HASH_SUB_MAP_OPTIONS = "SubMapOption";
     public const string HASH_GAME_STARTED = "GameStarted";
     public const string HASH_GAME_MODE = "GameMode";
     public const string HASH_GAME_AUTO = "GameAuto";

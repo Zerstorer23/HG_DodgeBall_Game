@@ -136,6 +136,7 @@ public partial class IEvaluationMachine
         {
             case CharacterType.KIMIDORI:
             case CharacterType.MIKURU:
+            case CharacterType.T:
                 attackRange = 999f;
                 break;
             case CharacterType.TSURUYA:
@@ -172,7 +173,7 @@ public partial class IEvaluationMachine
                 break;
             case CharacterType.ASAKURA:
             case CharacterType.KYOUKO:
-                attackRange = 6f;
+                attackRange = 8f;
                 break;
             case CharacterType.KYONMOUTO:
                 attackRange = 5.5f;
@@ -207,11 +208,6 @@ public partial class IEvaluationMachine
         {
             doApproach = skillAvailable;
         }
-        if (player.myCharacter == CharacterType.KIMIDORI)
-        {
-            return KeepConstantDistance(directionToTarget, distance, 3.5f, false);
-        }
-
         if (doApproach)
         {
             return ApproachPlayer(directionToTarget, distance);
@@ -284,6 +280,7 @@ public partial class IEvaluationMachine
             case CharacterType.T:
             case CharacterType.SASAKI:
             case CharacterType.KOIHIME:
+            case CharacterType.TSURUYA:
                 if (isKamikazeSkill)
                 {
                     multiplier = GetMultiplier(distance / 2f);

@@ -27,7 +27,7 @@ public class Projectile_Explosion : MonoBehaviourPun
     }
     void HandleCollision(GameObject go)
     {
-
+        if (!damageDealer.myHealth.controller.IsMine) return;
         string tag = go.tag;
         switch (tag)
         {

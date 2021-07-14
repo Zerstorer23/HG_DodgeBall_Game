@@ -157,7 +157,6 @@ public class UI_ChatBox : MonoBehaviour
 		}
 		isSelected = enable;
 		emptyEnter = 0;
-		Debug.LogWarning(isSelected + " / " + emptyEnter);
 	}
 
 	IEnumerator scrollRoutine;
