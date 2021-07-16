@@ -3055,7 +3055,7 @@ MonoBehaviour:
   skillPanelUI: {fileID: 1564884124}
   leaderboardUI: {fileID: 0}
   gameOverManager: {fileID: 165690841}
-  versionCode: 0714
+  versionCode: 0716
   requireHalfAgreement: 1
   gameSpeed: 1
   devMode: 0
@@ -3132,6 +3132,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 938fb2cbe3a9c7a4f8650c63d9ef612a, type: 2}
   - {fileID: 11400000, guid: 96131eec98ad92d4cb0c8f8536d97401, type: 2}
   - {fileID: 11400000, guid: fe32b3e4dcf1a934182ce340740ce883, type: 2}
+  - {fileID: 11400000, guid: f7c9d04d21aeec54ab5f478ad5164c2f, type: 2}
+  - {fileID: 11400000, guid: 64915ba4f706d374b902d8873ac870da, type: 2}
   buffConfigs:
   - {fileID: 11400000, guid: 8a3d9885cacb20c47bd7f8d170b502f4, type: 2}
   - {fileID: 11400000, guid: f0443da244408cd458234c96d3131e1f, type: 2}

@@ -98,7 +98,7 @@ public class Skill_Asakura : ISkill
                 stepAngle *= -1f;
             }
             mySkill.Enqueue(new Action_Player_GetAim());
-            mySkill.Enqueue(new Action_ModifyAngle() { paramValue = angleOffset });
+            mySkill.Enqueue(new Action_ModifyAngle(angleOffset));
             mySkill.Enqueue(new Action_GetCurrentPlayerVector3_AngledOffset());
             mySkill.Enqueue(new Action_InstantiateBulletAt());
             mySkill.Enqueue(new Action_SetProjectileStraight());
@@ -118,7 +118,7 @@ public class Skill_Asakura : ISkill
             for (int j = 0; j < 3; j++) {
                 float modAngle = startAngle + (30f * j);
                 mySkill.Enqueue(new Action_Player_GetAim());
-                mySkill.Enqueue(new Action_ModifyAngle() { paramValue = modAngle });
+                mySkill.Enqueue(new Action_ModifyAngle(modAngle) );
                 mySkill.Enqueue(new Action_GetCurrentPlayerVector3_AngledOffset());
                 mySkill.Enqueue(new Action_InstantiateBulletAt());
                 mySkill.Enqueue(new Action_SetProjectileStraight());
@@ -141,7 +141,7 @@ public class Skill_Asakura : ISkill
             {
                 float modAngle = startAngle + (30f * j);
                 mySkill.Enqueue(new Action_Player_GetAim());
-                mySkill.Enqueue(new Action_ModifyAngle() { paramValue = modAngle });
+                mySkill.Enqueue(new Action_ModifyAngle(modAngle));
                 mySkill.Enqueue(new Action_GetCurrentPlayerVector3_AngledOffset());
                 mySkill.Enqueue(new Action_InstantiateBulletAt());
                 mySkill.Enqueue(new Action_SetProjectileCurves());

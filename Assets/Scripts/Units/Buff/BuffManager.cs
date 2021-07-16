@@ -55,7 +55,18 @@ public class BuffManager : MonoBehaviourPun
                 Buffs_active.RemoveAt(i);
                 i--;
             }
-
+        }
+    }
+    private void DeactivateAllBuffOfKind(BuffType type) {
+        for (int i = 0; i < Buffs_active.Count; i++)
+        {
+            if ((Buffs_active[i]).buffType == type)
+            {
+                RemoveBuff(Buffs_active[i]);
+                UpdateBuffIndicator(Buffs_active[i].buffType, false);
+                Buffs_active.RemoveAt(i);
+                i--;
+            }
         }
     }
 
@@ -88,6 +99,9 @@ public class BuffManager : MonoBehaviourPun
                 SetTrigger(buff.buffType, true);
                 ToggleStat(BuffType.NumDamageReceivedWhileBuff, true);
                 break;
+            case BuffType.OnFire:
+                HandleFire(buff);
+                break;
             default:
                 SetBuff(buff.buffType, buff.modifier, true);
                 break;
@@ -100,17 +114,25 @@ public class BuffManager : MonoBehaviourPun
         }
     }
 
+    private void HandleFire(BuffData buff)
+    {
+        if (GetTrigger(BuffType.InvincibleFromBullets)) return;
+        SetTrigger(buff.buffType, true);
+        int numFire = CountTrigger(BuffType.OnFire);
+        if (numFire >= 10)
+        {
+            LoseHealthByBuff("!!체력손실!!"); 
+            DeactivateAllBuffOfKind(BuffType.OnFire);
+        }
+    }
+
     private void HandleBoom()
     {
         if (controller.IsMine)
         {
             if (GetTrigger(BuffType.InvincibleFromBullets)) return;
-            healthPoint.HealHP(-1);
-
-            if (controller.IsLocal) {
-                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject("!!체력손실!!"));
-            }
         }
+        LoseHealthByBuff("!!체력손실!!");
     }
 
     public void RemoveBuff(BuffData buff)
@@ -122,6 +144,7 @@ public class BuffManager : MonoBehaviourPun
             case BuffType.InvincibleFromBullets:
             case BuffType.HideBuffs:
             case BuffType.BlockSkill:
+            case BuffType.OnFire:
                 SetTrigger(buff.buffType, false);
                 break;
             case BuffType.MirrorDamage:
@@ -140,14 +163,22 @@ public class BuffManager : MonoBehaviourPun
             int numDamage = GetStat(BuffType.NumDamageReceivedWhileBuff);
             if (numDamage <= 0)
             {
-                if (controller.IsLocal) {
-                    EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = " 반사 실패 패널티 -1" });
-                }
-                healthPoint.pv.RPC("ChangeHP", RpcTarget.AllBuffered, -1);
+                LoseHealthByBuff(" 반사 실패 패널티 -1");
             }
         }
         ToggleStat(BuffType.NumDamageReceivedWhileBuff, false);
     }
+    public void LoseHealthByBuff(string message) {
+        if (controller.IsMine)
+        {
+            healthPoint.HealHP(-1);
+            if (controller.IsLocal)
+            {
+                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(message));
+            }
+        }
+    }
+
     [PunRPC]
     public void HandleCameraShake(string activatorID) {
         if (PlayerManager.LocalPlayer.uid == (activatorID) || controller.IsBot) return;
@@ -247,7 +278,15 @@ public class BuffManager : MonoBehaviourPun
         //Debug.Log("Num trigger " + buffTriggers[type] + " tpye " + type);
         return buffTriggers[type] > 0;
     }
-
+    public int CountTrigger(BuffType type)
+    {
+        if (!buffTriggers.ContainsKey(type))
+        {
+            return 0;
+        }
+        //Debug.Log("Num trigger " + buffTriggers[type] + " tpye " + type);
+        return buffTriggers[type];
+    }
     void UpdateBuffIndicator(BuffType changedBuff, bool enable) {
         if (!controller.IsLocal && unitPlayer!= null && unitPlayer.buffManager.GetTrigger(BuffType.HideBuffs))
         {

@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90c68fbdaad312e49bb2b023b12463e2, type: 3}
   m_Name: Taniguchi
   m_EditorClassIdentifier: 
-  characterID: 17
-  txt_name: "\uAD00\uC804"
+  characterID: 19
+  txt_name: "\uB2E4\uB2C8\uAD6C\uCE58"
   noRandom: 1
-  txt_skill_desc: "\uC2A4\uD0AC\uC2DC\uC804 \uC989\uC2DC \uC0AC\uB9DD\uD569\uB2C8\uB2E4.
-    \uBB34\uC791\uC704\uD53D\uC73C\uB85C \uC120\uD0DD\uB418\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
+  txt_skill_desc: "\uC9C1\uC120\uBC29\uD5A5\uC73C\uB85C \uC5F0\uC18D\uACF5\uACA9"
   portraitImage: {fileID: 21300000, guid: 63bfc9678546b024cafe76c7ee63f34a, type: 3}

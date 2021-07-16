@@ -60,7 +60,7 @@ public class Unit_AutoDrive : MonoBehaviour
         }
         if (GameSession.gameModeInfo.isCoop) return true;
         if (PhotonNetwork.Time < (spawnTime + 1d)) return false;
-        if (player.myCharacter == CharacterType.Taniguchi) return false;
+        if (player.myCharacter == CharacterType.SPECTATOR) return false;
         FindNearestPlayer();
         if (targetEnemy == null)
         {

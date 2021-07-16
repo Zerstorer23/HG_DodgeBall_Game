@@ -6,7 +6,7 @@ using UnityEngine;
 public class BuffIndicator : MonoBehaviour
 {
 
-    [SerializeField] GameObject slow, fast, invincible, cooltime, skilldefault;
+    [SerializeField] GameObject slow, fast, invincible, cooltime, skilldefault,fire;
 
     [SerializeField] BuffManager buffManager;
     [SerializeField] Unit_Player unit;
@@ -24,6 +24,9 @@ public class BuffIndicator : MonoBehaviour
                 break;
             case BuffType.Cooltime:
                 cooltime.SetActive(buffManager.HasBuff(BuffType.Cooltime) != 0f);
+                break;
+            case BuffType.OnFire:
+                fire.SetActive(buffManager.GetTrigger(BuffType.OnFire));
                 break;
             case BuffType.InvincibleFromBullets:
                 bool isInvincible = buffManager.GetTrigger(BuffType.InvincibleFromBullets);

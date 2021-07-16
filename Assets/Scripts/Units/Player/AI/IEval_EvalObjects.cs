@@ -140,6 +140,8 @@ public partial class IEvaluationMachine
                 attackRange = 999f;
                 break;
             case CharacterType.TSURUYA:
+            case CharacterType.TANIGUCHI:
+            case CharacterType.FUJIWARA:
                 attackRange = 12;
                 break;
             case CharacterType.HARUHI:

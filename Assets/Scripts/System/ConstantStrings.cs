@@ -7,6 +7,7 @@ public class ConstantStrings : MonoBehaviour
 {
 
     public const string PREFAB_BULLET_1 = "Prefabs/Projectiles/Bullet1";
+    public const string PREFAB_BULLET_Body = "Prefabs/Projectiles/Bullet_Body";
     public const string PREFAB_BULLET_DESOLATION = "Prefabs/Projectiles/Bullet_desolation";
     public const string PREFAB_BULLET_ASAKURA = "Prefabs/Projectiles/Bullet_asakura";
     public const string PREFAB_BULLET_T = "Prefabs/Projectiles/Bullet_T";
@@ -22,7 +23,8 @@ public class ConstantStrings : MonoBehaviour
     public const string PREFAB_BULLET_KUYOU = "Prefabs/Projectiles/Bullet_kuyou";
     public const string PREFAB_BULLET_KYONMOUTO = "Prefabs/Projectiles/Bullet_kyonmouto";
     public const string PREFAB_BULLET_KYONKO = "Prefabs/Projectiles/Bullet_kyonko";
-    public const string PREFAB_BULLET_Body = "Prefabs/Projectiles/Bullet_Body";
+    public const string PREFAB_BULLET_TANIGUCHI = "Prefabs/Projectiles/Bullet_taniguchi";
+    public const string PREFAB_BULLET_FUJIWARA = "Prefabs/Projectiles/Bullet_fujiwara";
 
 
 

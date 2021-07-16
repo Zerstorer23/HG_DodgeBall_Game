@@ -92,6 +92,30 @@ public class ActionSet
             parameters.Add(key, v);
         }
     }
+    internal void ModifyParam(SkillParams key, float v)
+    {
+        // Debug.Log("Set param " + key + " : " + v);
+        if (parameters.ContainsKey(key))
+        {
+            parameters[key] = (float)parameters[key] +v;
+        }
+        else
+        {
+            parameters.Add(key, v);
+        }
+    }
+    internal void ModifyParam(SkillParams key, Vector3 v)
+    {
+        // Debug.Log("Set param " + key + " : " + v);
+        if (parameters.ContainsKey(key))
+        {
+            parameters[key] = (Vector3)parameters[key] + v;
+        }
+        else
+        {
+            parameters.Add(key, v);
+        }
+    }
 }
 public enum SkillParams { 
     Width,Height,PrefabName,Transform,Duration,GameObject,Quarternion,Vector3

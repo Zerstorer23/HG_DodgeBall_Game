@@ -53,7 +53,6 @@ public class Action_InstantiateBulletAt : SkillAction
         int fieldNumber = parent.castingPlayer.fieldNo;
         Vector3 pos = GetParam<Vector3>(SkillParams.Vector3);
         Quaternion angle = GetParam<Quaternion>(SkillParams.Quarternion);
-    
         GameObject obj = PhotonNetwork.Instantiate(
           GetParam<string>(SkillParams.PrefabName), pos, angle, 0
             , new object[] { fieldNumber, parent.castingPlayer.controller.uid, false });

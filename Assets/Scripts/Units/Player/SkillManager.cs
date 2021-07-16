@@ -222,8 +222,14 @@ public class SkillManager : MonoBehaviourPun
             case CharacterType.MORI:
                 mySkill = new Skill_Mori();
                 break;
-            case CharacterType.Taniguchi:
+            case CharacterType.SPECTATOR:
+                mySkill = new Skill_Spectator();
+                break;
+            case CharacterType.TANIGUCHI:
                 mySkill = new Skill_Taniguchi();
+                break;
+            case CharacterType.FUJIWARA:
+                mySkill = new Skill_Fujiwara();
                 break;
         }
         mySkill.LoadInformation(this);
@@ -232,5 +238,5 @@ public class SkillManager : MonoBehaviourPun
 public enum CharacterType
 {
     NONE, NAGATO, HARUHI, MIKURU, KOIZUMI, KUYOU, ASAKURA, KYOUKO, KIMIDORI, KYONMOUTO, SASAKI, TSURUYA, KOIHIME, YASUMI
-        , KYONKO, KYON, T, Taniguchi, MORI
+        , KYONKO, KYON, T, SPECTATOR, MORI,TANIGUCHI,FUJIWARA
 }
