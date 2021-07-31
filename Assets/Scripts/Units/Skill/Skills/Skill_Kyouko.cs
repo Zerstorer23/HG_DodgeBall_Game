@@ -21,17 +21,6 @@ public class Skill_Kyouko : ISkill
             mySkill.Enqueue(new Action_WaitForSeconds());
 
         }
-        /*        float angleSize = 15f;
-                float angleOffset = skm.unitMovement.GetAim() - angleSize;
-                for (int i = 0; i < 3; i++)
-                {
-                    float angle = angleOffset +angleSize * i;
-                    mySkill.Enqueue(new Action_SetAngle() { paramValue = angle });
-                    mySkill.Enqueue(new Action_GetCurrentPlayerVector3_AngledOffset());
-                    mySkill.Enqueue(new Action_InstantiateBulletAt());
-                    mySkill.Enqueue(new Action_SetProjectileStraight());
-                }
-        */
         return mySkill;
     }
 
@@ -40,6 +29,7 @@ public class Skill_Kyouko : ISkill
     {   
         skm.cooltime = 3f;
         skm.maxStack = 1;
+        skm.ai_projectileSpeed = 25f;
     }
     /*
      

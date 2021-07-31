@@ -12,7 +12,7 @@ public class Bot_Easy : IEvaluationMachine {
         SetRange(15f);
     }
 
-    public override void DetermineAttackType()
+    public override void DetermineAttackType(CharacterType myCharacter)
     {
         attackRange = Random.Range(3f,8f);
     }
@@ -22,7 +22,7 @@ public class Bot_Easy : IEvaluationMachine {
         dangerList.Clear();
         foreach (GameObject go in foundObjects.Values)
         {
-            if (go == null || !go.activeInHierarchy)
+            if (IsInactive(go))
             {
                 continue;
             }

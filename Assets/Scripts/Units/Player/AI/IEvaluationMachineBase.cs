@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,6 +22,7 @@ public partial class IEvaluationMachine
     //-----ATTACK PLAYERS-----//
     public float attackRange = 10f;
     public bool isKamikazeSkill = false;
+    protected bool doPredictedAim = false;
 
     public List<GameObject> dangerList = new List<GameObject>();
     public Dictionary<int, GameObject> foundObjects = new Dictionary<int, GameObject>();
@@ -53,7 +55,8 @@ public partial class IEvaluationMachine
         // Collider2D[] collisions = Physics2D.OverlapCircleAll(transform.position, collideRadius, LayerMask.GetMask(TAG_PROJECTILE));
         foreach (GameObject go in foundObjects.Values)
         {
-            if (go == null || !go.activeInHierarchy) continue;
+            if (IsInactive(go)) continue;
+            
             if (go.tag != TAG_PROJECTILE) continue;
             if (Vector2.Distance(go.transform.position, player.transform.position) > range_Collision) continue;
             if (!IsProjectileDangerous(go.GetInstanceID(), go)) continue;
@@ -162,6 +165,23 @@ public partial class IEvaluationMachine
     public bool IsInAttackRange(GameObject target) {
         return Vector2.Distance(target.transform.position, player.transform.position) <= attackRange;
     }
+
+    public bool isRecharging = true;
+    protected double skillInterval = 0.5d;
+    public bool IsFireSkillDecision(SkillManager skm)
+    {
+        if (PhotonNetwork.Time < skm.lastActivated + skillInterval) return false;
+        if (GameSession.gameModeInfo.isCoop) return true;
+
+        if (skm.currStack >= skm.maxStack) {
+            isRecharging = false;
+        }
+        if (skm.currStack <= 0) {
+            isRecharging = true;
+        }
+        return !isRecharging;
+    }
+
     public void Reset()
     {
         isKamikazeSkill = false;

@@ -13,7 +13,7 @@ public class Map_CapturePoint : MonoBehaviourPun
     public int captureIndex;
     public Team owner = Team.NONE;
     public float captureProgress;
-    float captureSpeed = 10f; //10
+    float captureSpeed = 25f; //10
     float captureThreshold = 150f;
     float radius; 
     GameField gameField;
@@ -84,7 +84,7 @@ public class Map_CapturePoint : MonoBehaviourPun
 
 
    public Team dominantTeam = Team.NONE;
-   public int dominantPoint = 0;
+   public float dominantRatio = 0;
     private void FixedUpdate()
     {
         if (IsOpen())
@@ -131,7 +131,7 @@ public class Map_CapturePoint : MonoBehaviourPun
         players = gameField.playerSpawner.unitsOnMap;
         foreach (var player in players)
         {
-            if (player.Value == null || !player.Value.gameObject.activeInHierarchy) continue;
+            if (IsInactive(player.Value)) continue;
             float dist = Vector2.Distance(transform.position, player.Value.transform.position);
             if (dist < radius)
             {
@@ -175,27 +175,27 @@ public class Map_CapturePoint : MonoBehaviourPun
             if (dominance != dominantTeam)
             {
                 dominantTeam = dominance;
-                dominantPoint = 0;
+                dominantRatio = 0;
                 //Send RPC.. set neutral
-                photonView.RPC("ChangeCapturingStatus", RpcTarget.AllBuffered, (int)dominantTeam, dominantPoint);
+                photonView.RPC("ChangeCapturingStatus", RpcTarget.AllBuffered, (int)dominantTeam, dominantRatio);
             }
         } else
         {
-            int diff =Math.Abs(homeHP - awayHP);
-            if (dominance != dominantTeam || dominantPoint != diff)
+            float diff =(float)Math.Abs(homeHP - awayHP) / (homeHP + awayHP);
+            if (dominance != dominantTeam || dominantRatio != diff)
             {
                 dominantTeam = dominance;
-                dominantPoint = diff;
-                photonView.RPC("ChangeCapturingStatus", RpcTarget.AllBuffered, (int)dominantTeam, dominantPoint);
+                dominantRatio = diff;
+                photonView.RPC("ChangeCapturingStatus", RpcTarget.AllBuffered, (int)dominantTeam, dominantRatio);
             }
         }
 
 
     }
     [PunRPC]
-    void ChangeCapturingStatus(int majorTeam, int numCapturing) {
+    void ChangeCapturingStatus(int majorTeam, float newRatio) {
         dominantTeam = (Team)majorTeam;
-        dominantPoint = numCapturing;
+        dominantRatio = newRatio;
         UpdateBanner();
     }
 
@@ -225,7 +225,7 @@ public class Map_CapturePoint : MonoBehaviourPun
         if (dominantTeam == Team.NONE)
         {
             capturingText.enabled = false;
-            float amount = 2f* captureSpeed * Time.fixedDeltaTime;
+            float amount = captureSpeed * Time.fixedDeltaTime;
             float max = 0;
             if (owner == Team.AWAY)
             {
@@ -256,7 +256,7 @@ public class Map_CapturePoint : MonoBehaviourPun
         else
         {
             capturingText.enabled = true;
-            float amount = captureSpeed * Time.fixedDeltaTime * dominantPoint;
+            float amount = captureSpeed * Time.fixedDeltaTime * dominantRatio;
             if (dominantTeam == Team.HOME && cpManager.IsValidCapturePoint(Team.HOME,captureIndex) && captureProgress < captureThreshold)
             {
                 captureProgress += amount;

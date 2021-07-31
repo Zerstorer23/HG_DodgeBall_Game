@@ -15,34 +15,68 @@ public class UI_ChatBox : MonoBehaviour
 	public UnityEngine.GameObject inputBox;
 	[SerializeField] RectTransform contentTrans;
 
+	[Header("ChatModeHandler")]
+	[SerializeField] GameObject CenterPanel;
+
 	List<string> chatQueue = new List<string>();
     private void Awake()
 	{
 		placeholderText = inputField.placeholder.GetComponent<Text>();
 		EventManager.StartListening(MyEvents.EVENT_SHOW_PANEL, ScrollToBottom);
+		EventManager.StartListening(MyEvents.EVENT_CHAT_BAN, OnChatBanCatch);
+		EventManager.StartListening(MyEvents.EVENT_CHAT_MODE, OnChatMode);
     }
+
+  
     private void OnDestroy()
 	{
 		EventManager.StopListening(MyEvents.EVENT_SHOW_PANEL, ScrollToBottom);
+		EventManager.StopListening(MyEvents.EVENT_CHAT_BAN, OnChatBanCatch);
+		EventManager.StopListening(MyEvents.EVENT_CHAT_MODE, OnChatMode);
 
 	}
-    public void SetInputFieldVisibility(bool enable)
+
+	public bool isChatMode = false;
+    private void OnChatMode(EventObject arg0)
+    {
+		isChatMode = !isChatMode;
+		CenterPanel.SetActive(!isChatMode);
+		if (isChatMode) {
+//			inputField.gameObject.GetComponent<RectTransform>(). = new Rect(0, 0, 900, 0);
+
+		}
+    }
+
+    public static bool isChatBan = false;
+	private void OnChatBanCatch(EventObject arg0)
+	{
+		isChatBan = !isChatBan;
+		if (!PhotonNetwork.IsMasterClient)
+		{
+			SetInputFieldVisibility(!isChatBan);
+		}
+		if (isChatBan)
+		{
+			ChatManager.SendLocalMessage("채팅이 비활성화되었습니다.");
+		}
+		else
+		{
+			ChatManager.SendLocalMessage("채팅이 활성화되었습니다.");
+
+		}
+	}
+
+	public void SetInputFieldVisibility(bool enable)
 	{
 		inputBox.SetActive(enable);
 	}
 
 	public static bool isSelected = false;
-	int emptyEnter = 1;
 	void Update()
 	{
-
 		if (Input.GetKeyUp(KeyCode.Return))
 		{
-			emptyEnter++;
-			Debug.Log(emptyEnter + " . " + isSelected);
-			if (emptyEnter >= 2 && !isSelected){
-				FocusOnField(true);
-			}
+			FocusOnField(!isSelected);
 		}
 		else
 		if (Input.GetKeyUp(KeyCode.Escape))
@@ -51,6 +85,7 @@ public class UI_ChatBox : MonoBehaviour
 		}
 
 	}
+
 	public void Input_OnValueChange()
 	{
 	//	isSelected = true;
@@ -60,25 +95,19 @@ public class UI_ChatBox : MonoBehaviour
 
 		if (string.IsNullOrEmpty(inputField.text))
 		{
-			FocusOnField(false);
+			return;
 		}
-		else
+		string text = inputField.text;
+		if (text[0] == '/')
 		{
-			string text = inputField.text;
-			if (text[0] == '/')
-			{
-				ParseUserCommand(text);
-			}else if (text[0] == '!') {
-				ParseCommand(text);
-			}
-			else {
-				ChatManager.SendChatMessage(inputField.text);
-			}
-			FocusOnField(false);
-			/*if (Application.platform != RuntimePlatform.Android) {
-				FocusOnField(true);
-			}*/
+			ParseUserCommand(text);
+		}else if (text[0] == '!') {
+			ParseCommand(text);
 		}
+		else {
+			ChatManager.SendChatMessage(inputField.text);
+		}
+		
 		inputField.text = "";
 
 	}
@@ -105,6 +134,11 @@ public class UI_ChatBox : MonoBehaviour
 		else if (text.Contains("점검"))
 		{
 			PlayerManager.KickEveryoneElse();
+		}
+		else if (text.Contains("채팅밴"))
+		{
+			if(PhotonNetwork.IsMasterClient)
+			GameSession.instance.photonView.RPC("TriggerEvent", RpcTarget.AllBuffered, (int)MyEvents.EVENT_CHAT_BAN);
 		}
 	}
 	public void AddLine(string lineString)
@@ -156,7 +190,6 @@ public class UI_ChatBox : MonoBehaviour
 			placeholderText.text = "Enter로 채팅시작";
 		}
 		isSelected = enable;
-		emptyEnter = 0;
 	}
 
 	IEnumerator scrollRoutine;

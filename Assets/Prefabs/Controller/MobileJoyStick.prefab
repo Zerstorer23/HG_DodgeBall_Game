@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 123823498329847939}
   - component: {fileID: 3227851782147073499}
+  - component: {fileID: 4071751960052385162}
   m_Layer: 0
   m_Name: MobileJoyStick
   m_TagString: Untagged
@@ -53,7 +54,24 @@ MonoBehaviour:
   stick: {fileID: 2534883199140919307}
   stickBackground: {fileID: 123823498329847939}
   radius: 0
-  delta: {x: 0, y: 0, z: 0}
+  mobileAuto: {fileID: 0}
+  delta: {x: 0, y: 0}
+--- !u!58 &4071751960052385162
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4200196401597538405}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 200, y: 200}
+  serializedVersion: 2
+  m_Radius: 205
 --- !u!1 &5734210371080995038
 GameObject:
   m_ObjectHideFlags: 0

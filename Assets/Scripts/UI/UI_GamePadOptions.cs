@@ -49,7 +49,11 @@ public class UI_GamePadOptions : MonoBehaviour
         }
     }
     public void UpdateUI() {
-        if (useGamepad)
+        if (Application.platform == RuntimePlatform.Android) {
+
+            nowUsingText.text = "사용중:모바일";
+        }
+        else if (useGamepad)
         {
             nowUsingText.text = "사용중:게임패드";
         }

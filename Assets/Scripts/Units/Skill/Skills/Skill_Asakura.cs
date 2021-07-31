@@ -153,6 +153,7 @@ public class Skill_Asakura : ISkill
     {
         skm.cooltime = 3.5f;
         skm.maxStack = 1;
+
     }
 
 

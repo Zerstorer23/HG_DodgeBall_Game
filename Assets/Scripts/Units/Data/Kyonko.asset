@@ -17,3 +17,6 @@ MonoBehaviour:
   noRandom: 0
   txt_skill_desc: "\uD0C0\uACA9\uC2DC \uC2A4\uD0AC\uC2B5\uB4DD"
   portraitImage: {fileID: 21300000, guid: 3554c7f15889e5b428d1222a5c53a83a, type: 3}
+  isKamikaze: 0
+  attackRange: 4
+  DoPredictionShot: 1

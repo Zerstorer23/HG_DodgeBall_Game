@@ -13,7 +13,7 @@ public class Skill_Fujiwara : ISkill
         mySkill.SetParam(SkillParams.Distance, 0.5f);
         int num = 50;
         float time = 2f;
-        float speed = 18f;
+        float speed = 15f;
         mySkill.SetParam(SkillParams.MoveSpeed, speed);
 
         for (int i = 0; i < num; i++) {
@@ -35,8 +35,9 @@ public class Skill_Fujiwara : ISkill
 
     public override void LoadInformation(SkillManager skm)
     {
-        skm.cooltime = 2f;
+        skm.cooltime = 3f;
         skm.maxStack = 3;
+        skm.ai_projectileSpeed = 15f;
     }
     /*
        public override ActionSet GetSkillActionSet(SkillManager skm)

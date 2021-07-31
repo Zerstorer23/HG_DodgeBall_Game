@@ -11,6 +11,10 @@ public partial class IEvaluationMachine
     RandomDirectionMaker rdm = new RandomDirectionMaker();
 
     public int collideCount = 0;
+
+    protected Vector3 lastMove;
+    protected double lastEvalTime;
+    protected double lazyEvalInterval = 0.7d;
     public virtual Vector3 EvaluateMoves()
     {
         //1. Heuristic
@@ -20,10 +24,7 @@ public partial class IEvaluationMachine
 
         foreach (GameObject go in foundObjects.Values)
         {
-            if (go == null || !go.activeInHierarchy)
-            {
-                continue;
-            }
+            if (IsInactive(go)) continue;
             int tid = go.GetInstanceID();
             Vector3 directionToTarget = go.transform.position - player.movement.networkPos;
             directionToTarget.Normalize();
@@ -57,9 +58,12 @@ public partial class IEvaluationMachine
                     break;
             }
         }
-
+        if (dangerList.Count == 0 &&
+            PhotonNetwork.Time <= (lastEvalTime + lazyEvalInterval)) {
+            return lastMove;
+        }
         move += GetAwayFromWalls();
-        move += GetToCapturePoint();
+        //move += GetToCapturePoint();
 
         //2. KNNs
 
@@ -75,7 +79,8 @@ public partial class IEvaluationMachine
         }
 
         move = AbsoluteEvasion(move);
-        move = PreventExtremeMove(move);
+    //    move = PreventExtremeMove(move);
+        lastMove = move;
         //Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
         return move;
     }
@@ -104,6 +109,23 @@ public partial class IEvaluationMachine
             return v;
         }
     }
+    public Vector3 predictedPosition;
+    public virtual float PredictAim(Unit_Player source, Unit_Player target)
+    {
+        Vector3 targetPosition = target.transform.position;
+        Vector3 sourcePosition = source.transform.position;
+        if (doPredictedAim)
+        {
+            float distance = Vector2.Distance(source.transform.position, target.transform.position);
+            float predictionTime = distance / source.skillManager.ai_projectileSpeed;
+             predictedPosition =target.movement.GetPredictedPositionAfter(predictionTime);
+           // Debug.Log("Predict " + (predictedPosition-target.transform.position) + " after " + predictionTime);
+            return GameSession.GetAngle(sourcePosition, predictedPosition);
+        }
+        else {
+            return GameSession.GetAngle(sourcePosition, targetPosition); 
+        }
+    }
     public virtual float DiffuseAim(float angle) {
         return angle;
     }
@@ -130,70 +152,22 @@ public partial class IEvaluationMachine
        
     }
 
-    public virtual void DetermineAttackType()
+    public virtual void DetermineAttackType(CharacterType thisCharacter = CharacterType.NONE)
     {
-        switch (player.myCharacter)
-        {
-            case CharacterType.KIMIDORI:
-            case CharacterType.MIKURU:
-            case CharacterType.T:
-                attackRange = 999f;
-                break;
-            case CharacterType.TSURUYA:
-            case CharacterType.TANIGUCHI:
-            case CharacterType.FUJIWARA:
-                attackRange = 12;
-                break;
-            case CharacterType.HARUHI:
-                attackRange = 5.5f;
-                isKamikazeSkill = true;
-                break;
-            case CharacterType.KUYOU:
-                attackRange = 5.5f;
-                break;
-            case CharacterType.KYONKO:
-            case CharacterType.KYON:
-                attackRange = 4f;
-                break;
-            case CharacterType.KOIZUMI:
-                attackRange = 10f;
-                isKamikazeSkill = true;
-                break;
-            case CharacterType.KOIHIME:
-                attackRange = 4f;
-                isKamikazeSkill = true;
-                break;
-            case CharacterType.SASAKI:
-                attackRange = 8f;
-                isKamikazeSkill = true;
-                break;
-            case CharacterType.YASUMI:
-                attackRange = 4f;
-                break;
-            case CharacterType.NAGATO:
-                attackRange = 10f;
-                break;
-            case CharacterType.ASAKURA:
-            case CharacterType.KYOUKO:
-                attackRange = 8f;
-                break;
-            case CharacterType.KYONMOUTO:
-                attackRange = 5.5f;
-                break;
-            case CharacterType.MORI:
-                attackRange = 9f;
-                break;
-            default:
-                attackRange = 10f;
-                break;
+        if (thisCharacter == CharacterType.NONE) {
+            thisCharacter = player.myCharacter;
         }
-
+        var config = ConfigsManager.unitDictionary[thisCharacter];
+        attackRange = config.attackRange;
+        isKamikazeSkill = config.isKamikaze;
+        doPredictedAim = config.DoPredictionShot;
+        skillInterval = (doPredictedAim) ? 0.2d : 0.5d;
     }
     public virtual Vector3 EvaluatePlayer(GameObject go, int tid, Vector3 directionToTarget, float distance)
     {
         Unit_Player enemyPlayer = cachedComponent.Get<Unit_Player>(tid, go);
         if (!IsPlayerDangerous(enemyPlayer)) return Vector3.zero;
-        bool skillAvailable = skillManager.SkillIsReady();
+        bool skillAvailable = skillManager.SkillIsReady() && !isRecharging;
         bool skillInUse = skillManager.SkillInUse();
         if (isKamikazeSkill && skillInUse)
         {
@@ -209,6 +183,10 @@ public partial class IEvaluationMachine
         else
         {
             doApproach = skillAvailable;
+        }
+        if (player.myCharacter == CharacterType.KIMIDORI)
+        {
+            doApproach = true;
         }
         if (doApproach)
         {
@@ -285,12 +263,15 @@ public partial class IEvaluationMachine
             case CharacterType.TSURUYA:
                 if (isKamikazeSkill)
                 {
-                    multiplier = GetMultiplier(distance / 2f);
+                    multiplier = GetMultiplier(distance / 2.5f);
                 }
                 else
                 {
                     multiplier = GetMultiplier(distance / 1.5f);
                 }
+                break;
+            case CharacterType.KIMIDORI:
+                multiplier = GetMultiplier(4f);
                 break;
             default:
                 multiplier = GetMultiplier(distance);

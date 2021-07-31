@@ -141,8 +141,7 @@ public class HealthPoint : MonoBehaviourPun
             NotifySourceOfDamage(attackerUserID, instaDeath);
         }
     }
-
-    private void CheckMirrorDamage(string attackerUserID)
+    public void CheckMirrorDamage(string attackerUserID)
     {
         if (!controller.IsMine) return;
         if (IsMirrorDamage())
@@ -155,7 +154,15 @@ public class HealthPoint : MonoBehaviourPun
             }
             buffManager.AddStat(BuffType.NumDamageReceivedWhileBuff,1);
             unit.pv.RPC("ChangeHP", RpcTarget.AllBuffered, -1);
-//            damageDealer.DoPlayerCollision(unit.gameObject);
+        }
+    }
+    [PunRPC]
+    public void TriggerMirrorCount()
+    {
+        if (!controller.IsMine) return;
+        if (IsMirrorDamage())
+        {
+            buffManager.AddStat(BuffType.NumDamageReceivedWhileBuff, 1);
         }
     }
 

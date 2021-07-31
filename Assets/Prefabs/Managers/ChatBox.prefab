@@ -473,7 +473,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 524f3646003e51c40a848b4ce51f794e, type: 3}
-    m_FontSize: 24
+    m_FontSize: 18
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -712,9 +712,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputField: {fileID: 5799712075869342712}
   outputText: {fileID: 4018366476604516147}
+  placeholderText: {fileID: 0}
   scrollRect: {fileID: 4018366476546787362}
   inputBox: {fileID: 1313684183028669249}
   contentTrans: {fileID: 4018366476810983404}
+  CenterPanel: {fileID: 0}
+  isChatMode: 0
 --- !u!1 &4018366477706042487
 GameObject:
   m_ObjectHideFlags: 0
@@ -905,10 +908,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 524f3646003e51c40a848b4ce51f794e, type: 3}
-    m_FontSize: 14
+    m_FontSize: 10
     m_FontStyle: 2
     m_BestFit: 1
-    m_MinSize: 10
+    m_MinSize: 1
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -1160,10 +1163,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 524f3646003e51c40a848b4ce51f794e, type: 3}
-    m_FontSize: 14
+    m_FontSize: 10
     m_FontStyle: 0
     m_BestFit: 1
-    m_MinSize: 10
+    m_MinSize: 1
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0

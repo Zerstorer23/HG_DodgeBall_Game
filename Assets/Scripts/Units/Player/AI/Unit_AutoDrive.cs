@@ -13,13 +13,13 @@ public class Unit_AutoDrive : MonoBehaviour
 {
     internal GameObject directionIndicator;
 
-    public GameObject targetEnemy;
+    public Unit_Player targetEnemy;
     public Unit_Player player;
     internal float aimAngle;
     public BotType botType = BotType.Easy;
 
     public bool secondPrediction = true;
-    IEvaluationMachine machine;
+    public IEvaluationMachine machine;
     public void StartBot(BotType bType)//bool useBot, bool isNormalBot)
     {
 
@@ -54,19 +54,15 @@ public class Unit_AutoDrive : MonoBehaviour
 
     public bool CanAttackTarget()
     {
-        if (botType != BotType.Normal)
-        {
-            if (PhotonNetwork.Time < player.skillManager.lastActivated + 1) return false;
-        }
-        if (GameSession.gameModeInfo.isCoop) return true;
         if (PhotonNetwork.Time < (spawnTime + 1d)) return false;
-        if (player.myCharacter == CharacterType.SPECTATOR) return false;
+        if (!machine.IsFireSkillDecision(player.skillManager)) return false;
+    //    if (player.myCharacter == CharacterType.SPECTATOR) return false;
         FindNearestPlayer();
         if (targetEnemy == null)
         {
             return false;
         }
-        return machine.IsInAttackRange(targetEnemy);
+        return machine.IsInAttackRange(targetEnemy.gameObject);
     }
     private void OnDisable()
     {
@@ -95,6 +91,8 @@ public class Unit_AutoDrive : MonoBehaviour
             Gizmos.DrawWireSphere(transform.position, testrange);*/
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, machine.range_Search);
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(machine.predictedPosition,0.6f);
             DrawApproachStatus();
             DrawFoundObjects();
             DrawEnemy();
@@ -111,7 +109,7 @@ public class Unit_AutoDrive : MonoBehaviour
     void DrawFoundObjects() {
         foreach (GameObject go in machine.foundObjects.Values)
         {
-            if (go == null || !go.activeInHierarchy)
+            if (IsInactive(go))
             {
                 continue;
             }
@@ -125,6 +123,7 @@ public class Unit_AutoDrive : MonoBehaviour
 
     void FindNearestPlayer()
     {
+        targetEnemy = null;
         playersOnMap = gameFields[player.fieldNo].playerSpawner.unitsOnMap;
         float nearestEnemyDist = float.MaxValue;
         foreach (var p in playersOnMap.Values)
@@ -134,16 +133,16 @@ public class Unit_AutoDrive : MonoBehaviour
             if (dist < nearestEnemyDist)
             {
                 nearestEnemyDist = dist;
-                targetEnemy = p.gameObject;
+                targetEnemy = p;
             }
         }
         //  Debug.Log("Players " + playersOnMap.Count + " / " + targetEnemy);
     }
-    bool PlayerIsAttackable(Unit_Player p) {
-        if (p == null || !p.gameObject.activeInHierarchy) return false;
+   public bool PlayerIsAttackable(Unit_Player p) {
+        if (IsInactive(p)) return false;
         if (p.gameObject.GetInstanceID() == machine.myInstanceID) return false;
         if (GameSession.gameModeInfo.isTeamGame && p.myTeam == player.myTeam) return false;
-        if (p.buffManager.GetTrigger(BuffType.InvincibleFromBullets)) return false;
+        if (p.buffManager.GetTrigger(BuffType.InvincibleFromBullets)) return false; 
         if (p.buffManager.GetTrigger(BuffType.MirrorDamage)) return false;
         return true;
     }
@@ -153,6 +152,7 @@ public class Unit_AutoDrive : MonoBehaviour
     {
         machine.RemoveObjects();
         machine.FindNearByObjects();
+        machine.FindNearByPlayers();
     }
     private void Update()
     {
@@ -167,9 +167,8 @@ public class Unit_AutoDrive : MonoBehaviour
         {
             return player.movement.aimAngle;
         }
-        Vector3 targetPosition = targetEnemy.transform.position;
-        Vector3 sourcePosition = transform.position;
-        aimAngle = machine.DiffuseAim (GameSession.GetAngle(sourcePosition, targetPosition));
+        aimAngle = machine.PredictAim(player,targetEnemy); 
+        aimAngle = machine.DiffuseAim (aimAngle);
        // Debug.LogWarning("Aim " + aimAngle+" original "+GameSession.GetAngle(sourcePosition, targetPosition));
         directionIndicator.transform.localPosition = GetAngledVector(aimAngle, 1.4f); // new Vector3(dX, dY);
         directionIndicator.transform.localRotation = Quaternion.Euler(0, 0, aimAngle);

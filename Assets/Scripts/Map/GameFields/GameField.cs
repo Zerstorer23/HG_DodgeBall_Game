@@ -11,7 +11,7 @@ public class GameField : MonoBehaviourPun
     public PlayerSpawner playerSpawner;
     public BulletManager bulletSpawner;
     public BuffObjectSpawner buffSpawner;
-    public WallManager wallManager;
+    public WallSpawner wallSpawner;
     Transform mapTransform;
     public Transform[] map_transforms;
     public Vector3 originalMapSize;
@@ -23,7 +23,7 @@ public class GameField : MonoBehaviourPun
         playerSpawner = GetComponentInChildren<PlayerSpawner>();
         bulletSpawner = GetComponentInChildren<BulletManager>();
         buffSpawner = GetComponentInChildren<BuffObjectSpawner>();
-        wallManager = GetComponentInChildren<WallManager>();
+        wallSpawner = GetComponentInChildren<WallSpawner>();
     }
 
     public virtual void OnEnable()
@@ -153,6 +153,7 @@ public class GameField : MonoBehaviourPun
 
     public void InitialiseMap(int id = 0)
     {
+        Debug.Log("Initialised");
         fieldNo = id;
         InitialiseMapSize();
     }
@@ -165,7 +166,7 @@ public class GameField : MonoBehaviourPun
         playerSpawner.StartEngine();
         bulletSpawner.StartEngine(mapDIfficulty);
         buffSpawner.StartEngine();
-        wallManager.SetWalls();
+        wallSpawner.SetWalls();
         //EventManager.TriggerEvent(MyEvents.EVENT_FIELD_STARTED, new EventObject(){ });
     }
     void ResetFieldProperties() {

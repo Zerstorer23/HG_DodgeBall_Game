@@ -16,11 +16,15 @@ public class SkillManager : MonoBehaviourPun
 
     public ISkill mySkill;
     public int maxStack = 1;
+    public float ai_projectileSpeed = 10f;
     public float cooltime;
     public bool skillInUse = false;
 
     public float remainingStackTime;
     public int currStack;
+
+    delegate bool boolFunc();
+    boolFunc IsSkillRequested;
 
    internal double lastActivated = 0d;
     private void Awake()
@@ -36,6 +40,14 @@ public class SkillManager : MonoBehaviourPun
         myCharacter = (CharacterType)pv.InstantiationData[0];
         ParseSkill(myCharacter);
         InitSkill();
+        if (controller.IsBot) {
+            IsSkillRequested = unitMovement.autoDriver.CanAttackTarget;
+        }
+        else {
+            IsSkillRequested =()=> {
+                return InputHelper.skillKeyFired() || (GameSession.IsAutoDriving() && unitMovement.autoDriver.CanAttackTarget());
+            } ;
+        }
         if (controller.IsMine)
         {
             if(!controller.IsBot)UI_SkillBox.SetSkillInfo(this);
@@ -82,9 +94,7 @@ public class SkillManager : MonoBehaviourPun
 
     private void CheckSkillActivation()
     {
-        if (InputHelper.skillKeyFired() ||
-            ((GameSession.IsAutoDriving() || controller.IsBot) && unitMovement.autoDriver.CanAttackTarget())
-            )
+        if (IsSkillRequested())
         {
             if (buffManager.GetTrigger(BuffType.BlockSkill)) return;
             if (currStack > 0)

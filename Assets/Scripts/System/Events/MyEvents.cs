@@ -33,6 +33,9 @@ public enum MyEvents {
     ,EVENT_SCREEN_TOUCH
     ,EVENT_CP_CAPTURED
     ,EVENT_PLAYER_LEFT
+
+    ,EVENT_CHAT_BAN
+    ,EVENT_CHAT_MODE
 }
 
 public class EventOneArg: UnityEvent<EventObject>

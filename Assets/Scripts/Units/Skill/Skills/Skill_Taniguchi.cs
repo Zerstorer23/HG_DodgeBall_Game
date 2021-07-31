@@ -34,8 +34,9 @@ public class Skill_Taniguchi : ISkill
 
     public override void LoadInformation(SkillManager skm)
     {
-        skm.cooltime = 3.5f;
+        skm.cooltime = 3f;
         skm.maxStack = 3;
+        skm.ai_projectileSpeed = 25f;
     }
 
   

@@ -20,11 +20,13 @@ public partial class IEvaluationMachine
         foreach (var key in keys)
         {
             GameObject go = foundObjects[key];
-            if (go == null || !go.activeInHierarchy)
+            if (IsInactive(go))
             {
                 RemoveFoundObject(key);
             }
-            else if (go.tag != TAG_BOX_OBSTACLE)
+            else if (go.tag == TAG_BUFF_OBJECT 
+                || go.tag == TAG_PROJECTILE
+                )
             {
                 float dist = Vector2.Distance(player.movement.networkPos, go.transform.position);
                 if (dist > (range_Search + escapePadding))
@@ -34,9 +36,24 @@ public partial class IEvaluationMachine
             }
         }
     }
+    public void FindNearByPlayers()
+    {
+        var playersOnMap = gameFields[player.fieldNo].playerSpawner.unitsOnMap;
+        foreach (var player in playersOnMap.Values)
+        {
+            if (IsInactive(player)) continue;
+            var c = player.gameObject;
+            int tid = c.GetInstanceID();
+            if (foundObjects.ContainsKey(tid)) continue;
+            if (tid == myInstanceID) continue;
+            AddFoundObject(tid, c.gameObject);
+        }
+    }
     public void FindNearByObjects()
     {
-        Collider2D[] collisions = Physics2D.OverlapCircleAll(player.movement.networkPos, range_Search, LayerMask.GetMask(TAG_PLAYER, TAG_PROJECTILE, TAG_BUFF_OBJECT));
+        Collider2D[] collisions = Physics2D.OverlapCircleAll(player.movement.networkPos, range_Search, LayerMask.GetMask(
+            //TAG_PLAYER,
+            TAG_PROJECTILE, TAG_BUFF_OBJECT));
 
         for (int i = 0; i < collisions.Length; i++)
         {

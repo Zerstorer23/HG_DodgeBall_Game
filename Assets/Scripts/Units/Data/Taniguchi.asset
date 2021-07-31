@@ -15,5 +15,8 @@ MonoBehaviour:
   characterID: 19
   txt_name: "\uB2E4\uB2C8\uAD6C\uCE58"
   noRandom: 1
-  txt_skill_desc: "\uC9C1\uC120\uBC29\uD5A5\uC73C\uB85C \uC5F0\uC18D\uACF5\uACA9"
+  txt_skill_desc: "\uC870\uC900\uBC29\uD5A5\uC73C\uB85C \uC9C1\uC120 \uACF5\uACA9"
   portraitImage: {fileID: 21300000, guid: 63bfc9678546b024cafe76c7ee63f34a, type: 3}
+  isKamikaze: 0
+  attackRange: 12
+  evadeRange: 0

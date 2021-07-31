@@ -24,10 +24,11 @@ public class Skill_Kyon : ISkill
         }
     }
 
-    public override void LoadInformation(SkillManager skillManager)
+    public override void LoadInformation(SkillManager skm)
     {
-        skillManager.cooltime = 3.2f;
-        original = skillManager;
+        skm.cooltime = 3.2f;
+        skm.ai_projectileSpeed = 25f;
+        original = skm;
     }
     SkillManager original;
 
@@ -41,6 +42,12 @@ public class Skill_Kyon : ISkill
             original.maxStack = 1;
             obtainedSkill.LoadInformation(original);
         }*/
+    public bool IsNotForSteal(CharacterType targetChar) {
+        return (targetChar == CharacterType.KYONKO
+           || targetChar == CharacterType.KYON
+           || targetChar == CharacterType.YASUMI
+           );
+    }
     public override void OnPlayerKilledPlayer(EventObject eo)
     {
         HealthPoint targetHP = eo.hitHealthPoint;
@@ -49,34 +56,15 @@ public class Skill_Kyon : ISkill
         if (attacker == null) return;
         if (attacker.uid != original.controller.uid) return;
         if (targetHP.unitType != UnitType.Player) return;
-       // CheckYasumi(targetHP);
-        
-        CharacterType targetChar = targetHP.unitPlayer.myCharacter;
-        if (targetChar == CharacterType.KYONKO
-            || targetHP.unitPlayer.myCharacter == CharacterType.KYONKO
-            || targetHP.unitPlayer.myCharacter == CharacterType.YASUMI
-            ) return;
-        Debug.Log("Changed skill ");
+        if (IsNotForSteal(targetHP.unitPlayer.myCharacter)) return;
         obtainedSkill = targetHP.unitPlayer.skillManager.mySkill;
         original.maxStack = 1;
         obtainedSkill.LoadInformation(original);
         UI_SkillBox.SetSkillInfo(original, targetHP.unitPlayer.myCharacter);
+        var player = original.gameObject.GetComponent<Unit_Movement>();
+        if (player != null && player.autoDriver.machine != null) player.autoDriver.machine.DetermineAttackType(targetHP.unitPlayer.myCharacter);
     }
-    void CheckYasumi(HealthPoint targetHP)
-    {
-        if (targetHP.unitPlayer.myCharacter == CharacterType.YASUMI)
-        {
-            if (original.pv.IsMine)
-            {
-                original.pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)BuffType.HideBuffs, 1f, -1d);
-            }
-        }
-        else
-        {
-            BuffData buff = new BuffData(BuffType.HideBuffs, 1f, -1d);
-            original.buffManager.RemoveBuff(buff);
-        }
-    }
+
     public ActionSet GetKyonkoSet(SkillManager skm)
     {
         ActionSet mySkill = new ActionSet(skm);

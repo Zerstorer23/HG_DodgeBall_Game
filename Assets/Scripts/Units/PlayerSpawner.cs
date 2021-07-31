@@ -125,7 +125,9 @@ public class PlayerSpawner : MonoBehaviour
         }
         SpawnPlayer(player);    
     }
-    float ModifyRespawnTime(Team team) {
+    float ModifyRespawnTime(Team team)
+    {
+        return respawnTime;
         if ((team == Team.HOME && numAway > numHome)) {
             return respawnTime * ((float)numHome / numAway);
         

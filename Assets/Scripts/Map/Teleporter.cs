@@ -6,28 +6,29 @@ using UnityEngine;
 using UnityEngine.UI;
 using static ConstantStrings;
 
-public class Teleporter : MonoBehaviour
+public class Teleporter : MonoBehaviourPun
 {
     [SerializeField] Teleporter otherSide;
     [SerializeField] Text coolText;
     [SerializeField] Image directionIndicator;
     [SerializeField] SpriteRenderer hosSprite;
-    double teleportDelay = 3d;
+    double teleportDelay = 2.5d;
     public double nextTeleportTime = 0d;
     ICachedComponent cachedComponent = new ICachedComponent();
     float angleToOtherside;
-    
-    private void Start()
+    Dictionary<int,double> teleported = new Dictionary<int, double>();
+    private void OnEnable()
     {
-        if (otherSide != null)
-        {
-            angleToOtherside = GetAngleBetween(transform.position, otherSide.transform.position);
-            directionIndicator.transform.rotation = Quaternion.Euler(0, 0, angleToOtherside);
+        teleported.Clear();
+        UpdatePortalDirection();
+        if (photonView.InstantiationData != null) {
+            int fieldID = (int)photonView.InstantiationData[0];
+            transform.localScale = new Vector3(3, 3, 1);
+            transform.SetParent(GameFieldManager.gameFields[fieldID].gameObject.transform, true);
         }
-
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+/*    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (otherSide == null || PhotonNetwork.Time < (nextTeleportTime)) return;
         string tag = collision.gameObject.tag;
@@ -44,12 +45,12 @@ public class Teleporter : MonoBehaviour
         }
 
 
-    }
-    private void OnDrawGizmos()
+    }*/
+/*    private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, 1f);
-    }
+    }*/
     private void FixedUpdate()
     {
         UpdateCoolTime();
@@ -60,6 +61,8 @@ public class Teleporter : MonoBehaviour
         foreach (var c in collisions)
         {
             int tid = c.gameObject.GetInstanceID();
+            bool cool =  CheckTeleportRecord(tid);
+            if (!cool) continue;
             if (c.gameObject.CompareTag(TAG_PLAYER))
             {
                 Unit_Movement unit_Movement = cachedComponent.Get<Unit_Movement>(tid, c.gameObject);
@@ -68,7 +71,7 @@ public class Teleporter : MonoBehaviour
             } else if (c.gameObject.CompareTag(TAG_PROJECTILE)) {
 
                 HealthPoint health = cachedComponent.Get<HealthPoint>(tid, c.gameObject);
-                if (health.IsMapProjectile()) return;
+              //  if (health.IsMapProjectile()) return;
                 Projectile_Movement pMove = (Projectile_Movement)health.movement;
                 if (pMove.moveType == MoveType.Curves || pMove.moveType == MoveType.Straight) {
                     DoTeleport(pMove:pMove);
@@ -90,7 +93,23 @@ public class Teleporter : MonoBehaviour
         directionIndicator.enabled = true;
         
     }
+    [PunRPC]
+    public void LinkPortal(int viewID) {
+        PhotonView other = PhotonNetwork.GetPhotonView(viewID);
+        if (other != null) {
+            otherSide = other.gameObject.GetComponent<Teleporter>();
+            UpdatePortalDirection();
+        }
+    
+    }
+    public void UpdatePortalDirection() {
+        if (otherSide != null)
+        {
+            angleToOtherside = GetAngleBetween(transform.position, otherSide.transform.position);
+            directionIndicator.transform.rotation = Quaternion.Euler(0, 0, angleToOtherside);
+        }
 
+    }
     private void UpdateCoolTime()
     {
         double remain = (nextTeleportTime - PhotonNetwork.Time);
@@ -102,31 +121,59 @@ public class Teleporter : MonoBehaviour
         else {
             coolText.text = "";
             directionIndicator.enabled = true;
+            hosSprite.color = GetColorByHex("#23FF00");
         }
 
     }
 
     void DoTeleport(Unit_Movement unit = null, Projectile_Movement pMove = null)
     {
-
-        SetUsed(PhotonNetwork.Time + teleportDelay);
-        otherSide.SetUsed(nextTeleportTime);
-        otherSide.nextTeleportTime = nextTeleportTime;
+        GameObject go = null;
         if (unit != null)
         {
+            go = unit.gameObject;
+            SetUsed(PhotonNetwork.Time + teleportDelay);
+            otherSide.SetUsed(nextTeleportTime);
             unit.TeleportPosition(otherSide.transform.position);
         }
-        else if (pMove != null) { 
+        else if (pMove != null)
+        {
+            go = pMove.gameObject;
             pMove.TeleportPosition(otherSide.transform.position);
         }
+        if (go != null) {
+
+            AddTeleportRecord(go);
+            otherSide.AddTeleportRecord(go);
+        }
     }
-    public void SetUsed(double nextTime) {
+    public void SetUsed(double nextTime ) {
         nextTeleportTime = nextTime;
         hosSprite.color = Color.white; 
         directionIndicator.enabled = false;
         StartCoroutine(NumerateCooltime());
     }
 
+    public void AddTeleportRecord(GameObject go) {
+        int tid = go.GetInstanceID();
+        double time = PhotonNetwork.Time + teleportDelay;
+        if (teleported.ContainsKey(tid))
+        {
+            teleported[tid] = time;
+        }
+        else {
+            teleported.Add(tid,time );
+        }
+    }
+    public bool CheckTeleportRecord(int id) {
+        if (teleported.ContainsKey(id))
+        {
+            return (PhotonNetwork.Time > teleported[id]);
+        }
+        else {
+            return true;
+        }
+    }
     private void OnDisable()
     {
         cachedComponent.Clear();

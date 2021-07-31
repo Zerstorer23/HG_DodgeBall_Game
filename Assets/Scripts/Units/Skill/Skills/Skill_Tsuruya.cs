@@ -42,9 +42,8 @@ public class Skill_Tsuruya : ISkill
 
     public override void LoadInformation(SkillManager skm)
     {
-        skm.cooltime = 4f; skm.
-            maxStack = 3;
-
+        skm.cooltime = 4f; 
+        skm.maxStack = 3;
     }
 
 }

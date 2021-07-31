@@ -5,10 +5,12 @@ using static ConstantStrings;
 
 public class Skill_T : ISkill
 {
+    float moveSpeed = 13f;
     public override void LoadInformation(SkillManager skm)
     {
         skm.cooltime = 3.5f;
         skm.maxStack = 3;
+        skm.ai_projectileSpeed = moveSpeed;
     }
     public override ActionSet GetSkillActionSet(SkillManager skm)
     {
@@ -16,7 +18,7 @@ public class Skill_T : ISkill
         float searchRange = 8f;
         float rotateSpeed = 180f; // 180
 
-        mySkill.SetParam(SkillParams.MoveSpeed, 13f); //13
+        mySkill.SetParam(SkillParams.MoveSpeed, moveSpeed); //13
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_T);
         mySkill.SetParam(SkillParams.ReactionType, ReactionType.Bounce);
         mySkill.Enqueue(new Action_GetCurrentPlayerPosition_AngledOffset());

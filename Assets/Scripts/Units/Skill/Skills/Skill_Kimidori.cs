@@ -25,6 +25,7 @@ public class Skill_Kimidori : ISkill
     {
         skm.cooltime = 1.8f;
         skm.maxStack = 1;
+        skm.ai_projectileSpeed = 6f;
     }
 
 

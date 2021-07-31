@@ -9,13 +9,21 @@ public class Control_MobileStick : MonoBehaviour , IDragHandler,IPointerUpHandle
     [SerializeField] RectTransform stickBackground;
     public float radius;
 
-  private static  Control_MobileStick mobileStick;
+    private static  Control_MobileStick mobileStick;
+    public  UI_MobileAuto mobileAuto;
     Vector2 offset;
     private void Awake()
     {
         radius = stickBackground.rect.width * 0.5f;
         offset = new Vector2(radius, radius);
         mobileStick = this;
+    }
+    private void OnEnable()
+    {
+        mobileAuto.gameObject.SetActive(
+            GameSession.auto_drive_enabled
+            && ( Application.platform == RuntimePlatform.Android)
+            );
     }
 
     public void OnPointerDown(PointerEventData ped)

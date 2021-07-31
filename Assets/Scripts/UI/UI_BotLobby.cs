@@ -78,7 +78,7 @@ public class UI_BotLobby : MonoBehaviourPunCallbacks
     }
 
 
-    int maxBots = 4;
+    int maxBots = 6;
     public void OnAddBot()
     {
         if (!PhotonNetwork.IsMasterClient || !GameSession.gameModeInfo.CheckBotGame())

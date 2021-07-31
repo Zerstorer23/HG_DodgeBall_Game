@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using UnityEngine;
 using static ConstantStrings;
 
 public class Bot_Normal : IEvaluationMachine {
@@ -9,14 +10,24 @@ public class Bot_Normal : IEvaluationMachine {
         myInstanceID = player.gameObject.GetInstanceID();
         movement = player.movement;
         skillManager = player.skillManager;
-        SetRange(10f);
+        SetRange(8f);
     }
-
-
-
-    public override void DetermineAttackType()
+    public override void DetermineAttackType(CharacterType thisCharacter = CharacterType.NONE)
     {
-        attackRange = Random.Range(4f,12f);
+        if (thisCharacter == CharacterType.NONE)
+        {
+            thisCharacter = player.myCharacter;
+        }
+        var config = ConfigsManager.unitDictionary[thisCharacter];
+        attackRange = config.attackRange + Random.Range(-3f,3f);
+
+        /*
+         * 범위 무작위
+         */
+        isKamikazeSkill = config.isKamikaze;
+        doPredictedAim = false;
+        lazyEvalInterval = 1;
+        skillInterval = 1;
     }
     public override Vector3 EvaluateMoves()
     {
@@ -24,12 +35,20 @@ public class Bot_Normal : IEvaluationMachine {
         Vector3 move = Vector3.zero;
         dangerList.Clear();
         collideCount = 0;
+        if (PhotonNetwork.Time <= (lastEvalTime + lazyEvalInterval))
+        {
+            return lastMove;
+        }
         foreach (GameObject go in foundObjects.Values)
         {
-            if (go == null || !go.activeInHierarchy)
-            {
-                continue;
-            }
+            if (IsInactive(go)) continue;
+            float seed = Random.Range(0f, 1f);
+            if (seed < 0.4f) continue;
+
+            /*
+             * 40%는 무시
+             */
+
             int tid = go.GetInstanceID();
             Vector3 directionToTarget = go.transform.position - player.movement.networkPos;
             directionToTarget.Normalize();
@@ -42,16 +61,7 @@ public class Bot_Normal : IEvaluationMachine {
                     move += EvaluatePlayer(go, tid, directionToTarget, distance);
                     break;
                 case TAG_PROJECTILE:
-                    if (distance < range_Knn)
-                    {
-                        dangerList.Add(go);
-                    }
-                    if (distance <= 2.5f)
-                    {
-                        collideCount++;
-                    }
                     move += EvaluateProjectile(tid, go, distance, directionToTarget);
-
                     break;
                 case TAG_BUFF_OBJECT:
                     move += EvaluateBuff(go, tid, directionToTarget, distance);
@@ -63,10 +73,8 @@ public class Bot_Normal : IEvaluationMachine {
                     break;
             }
         }
-        move += GetToCapturePoint();
-
-        //2. KNNs
-        // Debug.Log("Wall move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
+       
+        move += GetAwayFromWalls();
         if (move.magnitude > 1f)
         {
             move.Normalize();
@@ -75,50 +83,48 @@ public class Bot_Normal : IEvaluationMachine {
         {
             move = Vector3.zero;
         }
-        //Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
+        lastMove = move;
         return move;
     }
     public override Vector3 EvaluatePlayer(GameObject go, int tid, Vector3 directionToTarget, float distance)
     {
         Unit_Player enemyPlayer = cachedComponent.Get<Unit_Player>(tid, go);
         if (!IsPlayerDangerous(enemyPlayer)) return Vector3.zero;
-        bool skillAvailable = skillManager.SkillIsReady();
+        bool skillAvailable = skillManager.SkillIsReady() && !isRecharging;
         bool skillInUse = skillManager.SkillInUse();
-        if ( skillInUse)
+        if (isKamikazeSkill && skillInUse)
         {
-            doApproach = true;
-           /* if (player.myCharacter == CharacterType.SASAKI)
+            if (player.myCharacter == CharacterType.SASAKI)
             {
                 doApproach = true;
             }
-            else
-            {
-                doApproach = !player.FindAttackHistory(tid);
-            }*/
+            /*
+             절대 한번에 두번공격 못하게 history코드 삭제
+             */
         }
         else
         {
             doApproach = skillAvailable;
         }
-
+        if (player.myCharacter == CharacterType.KIMIDORI)
+        {
+            doApproach = true;
+        }
         if (doApproach)
         {
-            return directionToTarget * GetMultiplier(distance);
+            return ApproachPlayer(directionToTarget, distance);
         }
         else
         {
-            return directionToTarget * -GetMultiplier(distance);
+            return EscapePlayer(directionToTarget, distance, enemyPlayer);
         }
 
 
     }
-    public override Vector3 PreventExtremeMove(Vector3 v)
-    {
-        return v;
-    }
+
     public override float DiffuseAim(float angle)
     {
-        return angle + Random.Range(-60f, 60f); 
+        return angle + Random.Range(-90f, 90f); 
     }
 
 }

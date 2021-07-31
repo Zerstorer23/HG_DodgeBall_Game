@@ -20,3 +20,6 @@ MonoBehaviour:
     \uAC00\uB2A5\uD558\uBA70 \uC911\uAC04\uC5D0 \uACF5\uACA9\uBC1B\uC73C\uBA74 \uC720\uB3C4
     \uD69F\uC218\uAC00 \uAC10\uC18C\uD569\uB2C8\uB2E4."
   portraitImage: {fileID: 21300000, guid: 07fe126ff12ea944c85b60363ff58089, type: 3}
+  isKamikaze: 0
+  attackRange: 999
+  DoPredictionShot: 1

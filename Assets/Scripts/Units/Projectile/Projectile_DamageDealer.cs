@@ -212,6 +212,10 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         if (customBuffs.Count <= 0) return;
         BuffManager targetManager = otherHP.buffManager;
         if (targetManager == null || !targetManager.gameObject.activeInHierarchy) return;
+        if (projectile.player != null && targetManager.GetTrigger(BuffType.MirrorDamage) ) {
+            targetManager = projectile.player.buffManager;
+            otherHP.pv.RPC("TriggerMirrorCount", RpcTarget.AllBuffered);
+        }
         foreach (BuffData buff in customBuffs)
         {
             targetManager.pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)buff.buffType, buff.modifier, buff.duration);

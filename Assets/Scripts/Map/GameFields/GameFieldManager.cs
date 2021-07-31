@@ -18,6 +18,7 @@ public partial class GameFieldManager : MonoBehaviourPun
     [SerializeField] GameField singleField;
     [SerializeField] GameField field_CP;
     [SerializeField] GameField field_CP_FFA;
+    [SerializeField] GameField field_CP_Serial;
 
     [Header("BuffSpawner")]
     public float spawnAfter = 6f;
@@ -122,9 +123,12 @@ public partial class GameFieldManager : MonoBehaviourPun
         {
             SetUpSingleField(instance.field_CP);
         }
-        else
+        else if(mapNum == 1)
         {
             SetUpSingleField(instance.field_CP_FFA);
+        }else if(mapNum == 2)
+        {
+            SetUpSingleField(instance.field_CP_Serial);
         }
     }
 

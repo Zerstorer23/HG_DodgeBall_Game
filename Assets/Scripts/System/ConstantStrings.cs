@@ -99,6 +99,11 @@ public class ConstantStrings : MonoBehaviour
     {
         return (Mathf.Max(localScale.x, localScale.y) * 0.5f);
     }
+    public static bool IsInactive(Component component) {
+        return (component == null || !component.gameObject.activeInHierarchy);
+    } public static bool IsInactive(GameObject go) {
+        return (go == null || !go.activeInHierarchy);
+    }
 }
 
 public enum GameMode { 

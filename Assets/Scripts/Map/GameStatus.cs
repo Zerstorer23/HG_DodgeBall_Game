@@ -21,7 +21,7 @@ public class GameStatus
         foreach (Unit_Player p in unitDict.Values)
         {
             total++;
-            if (p != null && p.gameObject.activeInHierarchy)
+            if (!ConstantStrings.IsInactive(p))
             {
                 lastSurvivor = p.controller.Owner;
                 alive++;

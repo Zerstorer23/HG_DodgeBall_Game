@@ -11,9 +11,12 @@ public class UnitConfig : ScriptableObject
     public string txt_name;
     public bool noRandom = false;
     [TextArea(15, 20)] public string txt_skill_desc;    
-    public Sprite portraitImage; 
+    public Sprite portraitImage;
 
-
+    [Header("AI Area")]
+    public bool isKamikaze = false;
+    public float attackRange;
+    public bool DoPredictionShot = false;
 
 
     

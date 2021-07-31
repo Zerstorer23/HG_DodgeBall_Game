@@ -10,10 +10,8 @@ public class AndroidOnly : MonoBehaviour
         if (enableOnAndroid)
         {
             gameObject.SetActive(Application.platform == RuntimePlatform.Android);
-
         }
         else {
-
             gameObject.SetActive(Application.platform != RuntimePlatform.Android);
         }
     }

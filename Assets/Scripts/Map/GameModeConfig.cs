@@ -44,9 +44,9 @@ public class GameModeConfig : ScriptableObject
         switch (GameSession.gameModeInfo.gameMode)
         {
             case GameMode.PVP:
-                return (PhotonNetwork.CurrentRoom.PlayerCount <= 1);
+                return true;
             case GameMode.TEAM:
-                return (PhotonNetwork.CurrentRoom.PlayerCount <= 2);
+                return true;
             case GameMode.Tournament:
                 return false;
             case GameMode.PVE:

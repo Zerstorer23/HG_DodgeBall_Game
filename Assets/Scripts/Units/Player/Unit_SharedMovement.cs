@@ -114,7 +114,6 @@ public class Unit_SharedMovement : MonoBehaviourPun
             Debug.LogWarning("Duplicated player in desolator " + userid + " / " + controllers.Count);
             return;
         }
-        Debug.Log("Controller size " + controllers.Count);
         controllers.Add(userid, 0);
     }
 

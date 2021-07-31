@@ -17,4 +17,7 @@ MonoBehaviour:
   noRandom: 1
   txt_skill_desc: "\uC2A4\uD0AC\uC2DC\uC804 \uC989\uC2DC \uC0AC\uB9DD\uD569\uB2C8\uB2E4.
     \uBB34\uC791\uC704\uD53D\uC73C\uB85C \uC120\uD0DD\uB418\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
-  portraitImage: {fileID: 21300000, guid: 00df36d4fdb3b3342978ad38663da55f, type: 3}
+  portraitImage: {fileID: 21300000, guid: 2de98e8738a21be4bb683e6180621034, type: 3}
+  isKamikaze: 0
+  attackRange: 0
+  DoPredictionShot: 0

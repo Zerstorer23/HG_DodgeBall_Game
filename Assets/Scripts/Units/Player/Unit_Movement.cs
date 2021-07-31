@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class Unit_Movement :
@@ -7,8 +8,7 @@ public class Unit_Movement :
     , IPunObservable
 {
     public float moveSpeed = 8f;
-    PhotonView pv;
-    Vector3 lastVector = Vector3.up;
+    Vector3 lastInputVector = Vector3.up;
     public float aimAngle = 0f;
     public Vector3 oldPosition;
 
@@ -34,20 +34,33 @@ public class Unit_Movement :
 
     private void Awake()
     {
-        pv = GetComponent<PhotonView>();
         buffManager = GetComponent<BuffManager>();
         unitPlayer = GetComponent<Unit_Player>();
         moveForce = GetComponent<Movement_Force>();
         myRigidBody = GetComponent<Rigidbody2D>();
         controller = GetComponent<Controller>();
-
         networkPosIndicator = GameSession.GetInst().networkPos;
     }
     public override void OnEnable()
     {
         InputHelper.SetAxisNames();
         autoDriver.StartBot(DetermineBotType());
+        records.Clear();
+        records.Enqueue(new TimeVector(PhotonNetwork.Time, transform.position));
     }
+    public float pastRecordTime = 0.2f;
+    Queue<TimeVector> records = new Queue<TimeVector>();
+
+    public Vector3 GetPredictedPositionAfter(float seconds) {
+        if (records.Count == 0) return transform.position;
+        var tv = records.Peek();
+        float deltaTime = (float)(PhotonNetwork.Time - tv.timestamp);
+        if (deltaTime <= 0) return transform.position;
+        Vector3 delta = (transform.position - tv.position) / deltaTime * seconds;
+        return transform.position  + delta;
+    }
+
+
     BotType DetermineBotType() {
         if (GameSession.auto_drive_enabled && !controller.IsBot) return BotType.Hard;
         if (controller.IsBot)
@@ -90,7 +103,19 @@ public class Unit_Movement :
         Move(Time.deltaTime);
         DequeuePositions();
         UpdateDirection();
+        RecordPositions();
     }
+
+    private void RecordPositions()
+    {
+        records.Enqueue(new TimeVector(PhotonNetwork.Time, transform.position));
+        while (records.Count > 0 &&
+            records.Peek().IsTooOld(pastRecordTime)
+            ) {
+            records.Dequeue();        
+        }
+    }
+
     public float GetMovementSpeed() => moveSpeed * buffManager.GetBuff(BuffType.MoveSpeed);
     void CheckAutoToggle() {
         if (controller.IsLocal)
@@ -152,7 +177,7 @@ public class Unit_Movement :
     {
         if (newPosition != oldPosition)
         {
-            lastVector = newPosition - oldPosition;
+            lastInputVector = newPosition - oldPosition;
             networkPos = newPosition;
             networkExpectedTime = PhotonNetwork.Time + GameSession.STANDARD_PING;
             oldPosition = newPosition;
@@ -209,7 +234,6 @@ public class Unit_Movement :
 
     void DequeuePositions()
     {
-
         TimeVector tv = null;
         int skip = 0;
         while (positionQueue.Count > 0 && positionQueue.Peek().IsExpired())
@@ -227,7 +251,6 @@ public class Unit_Movement :
         else {
             transform.position = ClampPosition(transform.position , Vector3.zero);
         }
-
     }
     void FlipBody(float xDelta) {
         Vector3 localScale = unitPlayer.charBody.transform.localScale;
@@ -260,7 +283,7 @@ public class Unit_Movement :
             }
         }
         else {
-            aimAngle = GameSession.GetAngle(Vector3.zero, lastVector); //벡터 곱 비교
+            aimAngle = GameSession.GetAngle(Vector3.zero, lastInputVector); //벡터 곱 비교
         }
         float rad = aimAngle / 180 * Mathf.PI;
         float dX = Mathf.Cos(rad) * indicatorLength;
@@ -338,6 +361,10 @@ public class TimeVector
     public bool IsExpired()
     {
         return (timestamp <= PhotonNetwork.Time);
+    }
+    public bool IsTooOld(double past)
+    {
+        return (timestamp <= (PhotonNetwork.Time - past));
     }
     public override string ToString() {
         return timestamp + " : " + position;

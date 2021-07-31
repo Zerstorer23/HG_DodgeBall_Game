@@ -144,6 +144,13 @@ public class GameSession : MonoBehaviourPun
         PhotonNetwork.LeaveRoom();
         Application.Quit();
     }
+    [PunRPC]
+    public void TriggerEvent(int eventCode)
+    {
+        MyEvents e = (MyEvents)   eventCode;
+        Debug.Log("Trigger event " + e);
+        EventManager.TriggerEvent(e, null);
+    }
     public static IEnumerator CheckCoroutine(IEnumerator routine, IEnumerator newRoutine) {
         if (routine != null) {
             instance.StopCoroutine(routine);

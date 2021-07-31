@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BuffIndicator : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class BuffIndicator : MonoBehaviour
 
     [SerializeField] BuffManager buffManager;
     [SerializeField] Unit_Player unit;
+    [SerializeField] Text fireText;
 
 
 
@@ -27,6 +29,7 @@ public class BuffIndicator : MonoBehaviour
                 break;
             case BuffType.OnFire:
                 fire.SetActive(buffManager.GetTrigger(BuffType.OnFire));
+                fireText.text = (buffManager.CountTrigger(BuffType.OnFire)).ToString();
                 break;
             case BuffType.InvincibleFromBullets:
                 bool isInvincible = buffManager.GetTrigger(BuffType.InvincibleFromBullets);

@@ -13,6 +13,7 @@ public class Skill_Nagato : ISkill
     {
         skm.cooltime = 3.3f;
         skm.maxStack = 5;
+        skm.ai_projectileSpeed = 20f;
     }
 
     public override ActionSet GetSkillActionSet(SkillManager skm)

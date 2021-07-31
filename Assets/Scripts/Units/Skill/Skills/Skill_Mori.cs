@@ -12,6 +12,7 @@ public class Skill_Mori : ISkill
     public override void LoadInformation(SkillManager skm)
     {
         skm.cooltime = 4f;
+        skm.ai_projectileSpeed = 40f;
     }
     public override ActionSet GetSkillActionSet(SkillManager skm)
     {

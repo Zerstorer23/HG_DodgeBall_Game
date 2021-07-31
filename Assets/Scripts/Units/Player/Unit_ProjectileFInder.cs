@@ -51,7 +51,7 @@ public class Unit_ProjectileFInder : MonoBehaviour
         foreach (var key in keys)
         {
             GameObject go = foundObjects[key];
-            if (go == null || !go.activeInHierarchy)
+            if (IsInactive(go))
             {
                 foundObjects.Remove(key);
             }

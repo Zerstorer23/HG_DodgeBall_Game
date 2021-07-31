@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class WallManager : MonoBehaviour
 {
-   public List<GameObject> sets = new List<GameObject>();
+    public List<GameObject> sets = new List<GameObject>();
     int selectedIndex = -1;
+
     private void Awake()
     {
          sets.Clear();
@@ -15,23 +16,19 @@ public class WallManager : MonoBehaviour
             sets.Add(i.gameObject);
         }
     }
-    public void SetWalls()
-    {
-        DisableWalls();
-        bool enableWalls = (GameSession.gameModeInfo.gameMode == GameMode.PVP || GameSession.gameModeInfo.gameMode == GameMode.TeamCP );
-        if (GameSession.instance != null && GameSession.instance.devMode) enableWalls = false;
-        if (enableWalls) {
-            int seed = (int)PhotonNetwork.CurrentRoom.CustomProperties[ConstantStrings.HASH_ROOM_RANDOM_SEED];
-            selectedIndex = seed % sets.Count;
-            sets[selectedIndex].SetActive(true);        
-        }
 
+    public void SelectRandomPreset() {
+        int seed = (int)PhotonNetwork.CurrentRoom.CustomProperties[ConstantStrings.HASH_ROOM_RANDOM_SEED];
+        selectedIndex = seed % sets.Count;
+        sets[selectedIndex].SetActive(true);
     }
+
+
     private void OnDisable()
     {
         DisableWalls();
     }
-    void DisableWalls() {
+    public void DisableWalls() {
         if (selectedIndex != -1)
         {
             sets[selectedIndex].SetActive(false);

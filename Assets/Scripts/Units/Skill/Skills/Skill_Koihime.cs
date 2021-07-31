@@ -41,6 +41,7 @@ public class Skill_Koihime : ISkill
     {
         skm.cooltime = 3.5f;
         skm.maxStack = 3;
+        skm.ai_projectileSpeed = 30f;
     }
 
 }

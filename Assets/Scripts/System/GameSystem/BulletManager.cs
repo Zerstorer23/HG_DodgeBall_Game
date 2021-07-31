@@ -39,7 +39,7 @@ public class BulletManager : MonoBehaviour
 
     private void OnSuddenDeath(EventObject obj)
     {
-       // activeMax += 4;
+        activeMax += 3;
     }
     private void OnEnable()
     {

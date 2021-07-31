@@ -22,10 +22,11 @@ public class Skill_Kyonko : ISkill
         }
     }
 
-    public override void LoadInformation(SkillManager skillManager)
+    public override void LoadInformation(SkillManager skm)
     {
-        skillManager.cooltime = 3.2f;
-        original = skillManager;
+        skm.cooltime = 3.2f;
+        skm.ai_projectileSpeed = 25f;
+        original = skm;
     }
     SkillManager original;
     void CheckYasumi(HealthPoint targetHP)
@@ -43,34 +44,28 @@ public class Skill_Kyonko : ISkill
             original.buffManager.RemoveBuff(buff);
         }
     }
+    public bool IsNotForSteal(CharacterType targetChar)
+    {
+        return (targetChar == CharacterType.KYONKO
+           || targetChar == CharacterType.KYON
+           || targetChar == CharacterType.YASUMI
+           );
+    }
     public override void OnMyProjectileHit(EventObject eo)
     {
         if (eo.sourceDamageDealer.myHealth.controller.uid != original.controller.uid) return;
         HealthPoint targetHP = eo.hitHealthPoint;
         if (targetHP.unitType != UnitType.Player) return;
-       // CheckYasumi(targetHP);
-        CharacterType targetChar = targetHP.unitPlayer.myCharacter;
-        if (targetChar == CharacterType.KYONKO
-            || targetHP.unitPlayer.myCharacter == CharacterType.KYONKO
-            || targetHP.unitPlayer.myCharacter == CharacterType.YASUMI
-            ) return;
-        Debug.Log("Changed skill ");
+        if (IsNotForSteal(targetHP.unitPlayer.myCharacter)) return;
+
         obtainedSkill = targetHP.unitPlayer.skillManager.mySkill;
         original.maxStack = 1;
         obtainedSkill.LoadInformation(original);
         UI_SkillBox.SetSkillInfo(original, targetHP.unitPlayer.myCharacter);
+        var player = original.gameObject.GetComponent<Unit_Movement>();
+        if (player != null && player.autoDriver.machine != null) player.autoDriver.machine.DetermineAttackType(targetHP.unitPlayer.myCharacter);
     }
-    /*
-    public override void OnPlayerKilledPlayer(EventObject eo)
-    {
-        HealthPoint targetHP = eo.hitHealthPoint;
-        if (targetHP.unitType != UnitType.Player) return;
-        if (targetHP.unitPlayer.myCharacter == CharacterType.KYONKO || targetHP.unitPlayer.myCharacter == CharacterType.KYONKO) return;
-        Debug.Log("Changed skill ");
-        obtainedSkill = targetHP.unitPlayer.skillManager.mySkill;
-        original.maxStack = 1;
-        obtainedSkill.LoadInformation(original);
-    }*/
+
     public ActionSet GetKyonkoSet(SkillManager skm) {
         ActionSet mySkill = new ActionSet(skm);
         mySkill.SetParam(SkillParams.PrefabName, PREFAB_BULLET_KYONKO);

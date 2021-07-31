@@ -49,7 +49,7 @@ public class Unit_HUD : MonoBehaviour
 
     private void SetHP()
     {
-        HP_fillSprite.fillAmount = (float)player.health.currentLife / maxLife;
+      //  HP_fillSprite.fillAmount = (float)player.health.currentLife / maxLife;
         hpText.text = player.health.currentLife.ToString("0");
     }
 

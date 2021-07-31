@@ -57,7 +57,8 @@ public class BuffManager : MonoBehaviourPun
             }
         }
     }
-    private void DeactivateAllBuffOfKind(BuffType type) {
+    private void DeactivateNbuffs(BuffType type, int count) {
+        int deactivated = 0;
         for (int i = 0; i < Buffs_active.Count; i++)
         {
             if ((Buffs_active[i]).buffType == type)
@@ -66,6 +67,10 @@ public class BuffManager : MonoBehaviourPun
                 UpdateBuffIndicator(Buffs_active[i].buffType, false);
                 Buffs_active.RemoveAt(i);
                 i--;
+            }
+            deactivated++;
+            if (deactivated >= count && count >= 0) {
+                return;
             }
         }
     }
@@ -119,10 +124,10 @@ public class BuffManager : MonoBehaviourPun
         if (GetTrigger(BuffType.InvincibleFromBullets)) return;
         SetTrigger(buff.buffType, true);
         int numFire = CountTrigger(BuffType.OnFire);
-        if (numFire >= 10)
+        if (numFire >= 12)
         {
             LoseHealthByBuff("!!체력손실!!"); 
-            DeactivateAllBuffOfKind(BuffType.OnFire);
+            DeactivateNbuffs(BuffType.OnFire, 6);
         }
     }
 
@@ -182,6 +187,8 @@ public class BuffManager : MonoBehaviourPun
     [PunRPC]
     public void HandleCameraShake(string activatorID) {
         if (PlayerManager.LocalPlayer.uid == (activatorID) || controller.IsBot) return;
+        UniversalPlayer caller = PlayerManager.GetPlayerByID(activatorID);
+        if (caller != null && caller.GetProperty("TEAM", Team.NONE) == PlayerManager.LocalPlayer.GetProperty("TEAM", Team.NONE)) return;
         float duration = 1.5f;
         MainCamera.instance.DoShake(time: duration);
         MainCamera.instance.DoRotation(time: duration);

@@ -58,28 +58,43 @@ public class UI_MapOptions : MonoBehaviourPun
         switch (GameSession.gameModeInfo.gameMode)
         {
             case GameMode.PVP:
+                OpenOptions("일반", "완전무작위");
+                break;
             case GameMode.TEAM:
             case GameMode.Tournament:
             case GameMode.PVE:
-                subOptionsObject.SetActive(false);
+                OpenOptions(null);
                 break;
             case GameMode.TeamCP:
-                subOptionsObject.SetActive(true);
-                for (int i = 0; i < 2; i++) {
-                    mapOptionsDropdown.options.Add(new Dropdown.OptionData());
-                }
-                mapOptionsDropdown.options[0].text = "점령지 1개";
-                mapOptionsDropdown.options[1].text = "점령지 5개";
-                mapOptionsDropdown.SetValueWithoutNotify(0);
-                mapSubOptionChoice = 0;
+                OpenOptions("점령지 1개", "점령지 5개"
+                    , "순차점령"
+                    );//, );
                 break;
         }
     }
+    public void OpenOptions(params string[] names) {
+        if (names == null || names.Length == 0) {
+            subOptionsObject.SetActive(false);
+            return;
+        }
+        int num = names.Length;
+        subOptionsObject.SetActive(num > 0);
+        for (int i = 0; i < num; i++)
+        {
+            var option = new Dropdown.OptionData();
+            option.text = names[i];
+            mapOptionsDropdown.options.Add(option);
+        }
+        mapSubOptionChoice = 0;
+        mapOptionsDropdown.captionText.text = mapOptionsDropdown.options[0].text;
+    }
+
     public void OnDropdown_MapSubOptions()
     {
         if (PhotonNetwork.IsMasterClient)
         {
             int index = mapOptionsDropdown.value;
+            Debug.Log("SubOption " + index);
             pv.RPC("SetMapSubOptions", RpcTarget.AllBuffered, index);
         }
     }
@@ -130,6 +145,10 @@ public class UI_MapOptions : MonoBehaviourPun
             gmode = (int)GameSession.gameModeInfo.gameMode;
         }
         gamemodeDropdown.SetValueWithoutNotify(gmode);
+        StartCoroutine(UpdateDropdown());
+    }
+    IEnumerator UpdateDropdown() {
+        yield return new WaitForFixedUpdate();
         mapOptionsDropdown.SetValueWithoutNotify(mapSubOptionChoice);
     }
 
@@ -194,8 +213,8 @@ public class UI_MapOptions : MonoBehaviourPun
     public static ExitGames.Client.Photon.Hashtable GetInitOptions()
     {
         var hash = new ExitGames.Client.Photon.Hashtable();
-        hash.Add(HASH_MAP_DIFF, default_difficult);
-        hash.Add(HASH_PLAYER_LIVES, default_lives_index);
+        hash.Add(HASH_MAP_DIFF, (GameSession.GetInst().devMode) ?MapDifficulty.None : default_difficult);
+        hash.Add(HASH_PLAYER_LIVES, (GameSession.GetInst().devMode)?2 : default_lives_index);
         hash.Add(HASH_VERSION_CODE, GameSession.GetVersionCode());
         hash.Add(HASH_SUB_MAP_OPTIONS, 0);
         hash.Add(HASH_GAME_MODE, GameMode.PVP);

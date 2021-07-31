@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4789825671286595527}
   - component: {fileID: 1776068842054292527}
   - component: {fileID: 6578238033747575218}
+  - component: {fileID: 1984709501164135657}
   m_Layer: 16
   m_Name: ConveryBelt
   m_TagString: ConveryerBelt
@@ -94,7 +95,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7149c1d70af4c8c4f8fbb410c95fde2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardinal: 1
+--- !u!114 &1984709501164135657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776068842054292526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1776068842405250668
 GameObject:
   m_ObjectHideFlags: 0
