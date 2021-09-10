@@ -76,7 +76,7 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    public static bool TriggerEvent(MyEvents eventName, EventObject variable)
+    public static bool TriggerEvent(MyEvents eventName, EventObject variable = null)
     {
         if (eventManager == null) {
             Debug.LogWarning("On Destroy no EventManager.");

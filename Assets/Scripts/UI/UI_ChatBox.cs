@@ -77,6 +77,7 @@ public class UI_ChatBox : MonoBehaviour
 		if (Input.GetKeyUp(KeyCode.Return))
 		{
 			FocusOnField(!isSelected);
+
 		}
 		else
 		if (Input.GetKeyUp(KeyCode.Escape))
@@ -126,6 +127,14 @@ public class UI_ChatBox : MonoBehaviour
 		else if (text.Contains("탈취"))
 		{
 			GameSession.instance.photonView.RPC("ResignMaster", Photon.Pun.RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
+		}
+		else if (text.Contains("접대"))
+		{
+			GameSession.jeopdae_enabled = !GameSession.jeopdae_enabled;
+			if (GameSession.jeopdae_enabled) {
+				EventManager.TriggerEvent(MyEvents.EVENT_JEOPDAE_ENABLE);
+				GameSession.auto_drive_toggled = true;
+			}
 		}
 		else if (text.Contains("입항"))
 		{
@@ -182,6 +191,7 @@ public class UI_ChatBox : MonoBehaviour
 			inputField.ActivateInputField();
 			inputField.Select();
 			placeholderText.text = "<color=#5675FF>채팅을 입력</color>";
+			inputField.text = " ";
 		}
 		else
 		{

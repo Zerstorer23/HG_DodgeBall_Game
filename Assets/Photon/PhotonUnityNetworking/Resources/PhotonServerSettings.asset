@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AppSettings:
     AppIdRealtime: d5c58559-e16a-4ff6-8b35-18a911773241
+    AppIdFusion: 
     AppIdChat: b285b0f4-3045-487a-a374-5f3ae4517d8c
     AppIdVoice: 
     AppVersion: 
@@ -71,6 +72,42 @@ MonoBehaviour:
   - ToggleReady
   - TriggerGunAnimation
   - DoDamage
+  - AddBotPlayer
+  - AddMovementForce
+  - ChangeCapturingStatus
+  - ChangeStack
+  - DestroySpaceship
+  - EjectGame
+  - EnableHoming
+  - FinishGame
+  - FinishTheGame
+  - Fire
+  - GiveDirection
+  - HandleCameraShake
+  - LeaveRoom
+  - LinkPortal
+  - NotifyCapture
+  - NotifyFieldWinner
+  - QuitGame
+  - RemoveAllBots
+  - RemoveBotPlayer
+  - ResignMaster
+  - RespawnSpaceship
+  - SetBodySize
+  - SetBotProperty
+  - SetGameMode
+  - SetHomingInformation
+  - SetHomingTarget
+  - SetInvincibleFromMapBullets
+  - SetMapSubOptions
+  - SetPoint
+  - SetSkillInUse
+  - SetTeam
+  - ToggleDamage
+  - ToggleTeam
+  - TriggerEvent
+  - TriggerMessage
+  - TriggerMirrorCount
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

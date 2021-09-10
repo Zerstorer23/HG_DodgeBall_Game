@@ -36,6 +36,7 @@ public enum MyEvents {
 
     ,EVENT_CHAT_BAN
     ,EVENT_CHAT_MODE
+    ,EVENT_JEOPDAE_ENABLE
 }
 
 public class EventOneArg: UnityEvent<EventObject>

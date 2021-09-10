@@ -82,6 +82,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         Debug.Assert(localPlayerObject == null, "PLayer obj not removed");
         localPlayerObject = PhotonNetwork.Instantiate(PREFAB_STARTSCENE_PLAYERNAME, Vector3.zero, Quaternion.identity, 0, new object[] { false, PhotonNetwork.LocalPlayer.UserId});
         localPlayerInfo = localPlayerObject.GetComponent<HUD_UserName>();
+        localPlayerInfo.lobbyManager = this;
         string name = PhotonNetwork.NickName;
         CharacterType character = PlayerManager.LocalPlayer.GetProperty("CHARACTER",(GameSession.instance.devMode)?GameSession.instance.debugChara : CharacterType.NONE);
         Team myTeam = PlayerManager.LocalPlayer.GetProperty("TEAM", Team.HOME);

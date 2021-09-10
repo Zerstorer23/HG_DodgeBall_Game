@@ -33,12 +33,13 @@ public class GameSession : MonoBehaviourPun
 
     public static bool auto_drive_enabled = false;
     public static bool auto_drive_toggled = false;
+    public static bool jeopdae_enabled= false;
     private void FixedUpdate()
     {
         Time.timeScale = gameSpeed;
     }
     public static bool IsAutoDriving() {
-        return auto_drive_toggled && auto_drive_enabled;
+        return (auto_drive_toggled ) &&(jeopdae_enabled|| auto_drive_enabled);
     }
     public static void toggleAutoDriveByKeyInput() {
         auto_drive_toggled = !auto_drive_toggled;

@@ -34,4 +34,13 @@ public class ConfigsManager : MonoBehaviour
         }
         return instance.unitConfigs[rand].characterID;
     }
+    public static CharacterType GetRandomCharacterExcept(CharacterType exception)
+    {
+        int rand = Random.Range(0, instance.unitConfigs.Length);
+        while (instance.unitConfigs[rand].characterID == exception)
+        {
+            rand = Random.Range(0, instance.unitConfigs.Length);
+        }
+        return instance.unitConfigs[rand].characterID;
+    }
 }

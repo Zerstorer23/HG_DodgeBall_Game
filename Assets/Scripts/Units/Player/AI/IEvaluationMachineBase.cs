@@ -168,7 +168,7 @@ public partial class IEvaluationMachine
 
     public bool isRecharging = true;
     protected double skillInterval = 0.5d;
-    public bool IsFireSkillDecision(SkillManager skm)
+    public  bool IsFireSkillDecision(SkillManager skm)
     {
         if (PhotonNetwork.Time < skm.lastActivated + skillInterval) return false;
         if (GameSession.gameModeInfo.isCoop) return true;

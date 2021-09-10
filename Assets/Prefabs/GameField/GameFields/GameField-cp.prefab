@@ -87,6 +87,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -222,6 +223,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -814,6 +816,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8184409962883160972}
     m_Modifications:
+    - target: {fileID: 4049531171754711134, guid: 2ef6b969f2b58f54cb6ff31b1fce5539,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4188301910708393665, guid: 2ef6b969f2b58f54cb6ff31b1fce5539,
         type: 3}
       propertyPath: captureIndex
@@ -899,6 +906,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8184409962883160972}
     m_Modifications:
+    - target: {fileID: 4049531171754711134, guid: 2ef6b969f2b58f54cb6ff31b1fce5539,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4188301910708393665, guid: 2ef6b969f2b58f54cb6ff31b1fce5539,
         type: 3}
       propertyPath: captureIndex
@@ -1180,6 +1192,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8184409962883160972}
     m_Modifications:
+    - target: {fileID: 4049531171754711134, guid: 2ef6b969f2b58f54cb6ff31b1fce5539,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6840589909282284809, guid: 2ef6b969f2b58f54cb6ff31b1fce5539,
         type: 3}
       propertyPath: m_RootOrder
@@ -1260,6 +1277,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8184409962883160972}
     m_Modifications:
+    - target: {fileID: 4049531171754711134, guid: 2ef6b969f2b58f54cb6ff31b1fce5539,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4188301910708393665, guid: 2ef6b969f2b58f54cb6ff31b1fce5539,
         type: 3}
       propertyPath: captureIndex
@@ -1426,6 +1448,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8184409962883160972}
     m_Modifications:
+    - target: {fileID: 4049531171754711134, guid: 2ef6b969f2b58f54cb6ff31b1fce5539,
+        type: 3}
+      propertyPath: sceneViewId
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4188301910708393665, guid: 2ef6b969f2b58f54cb6ff31b1fce5539,
         type: 3}
       propertyPath: captureIndex

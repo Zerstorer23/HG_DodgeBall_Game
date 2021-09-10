@@ -38,6 +38,9 @@ public class Unit_AutoDrive : MonoBehaviour
             case BotType.Hard:
                 machine = new IEvaluationMachine(this);
                 break;
+            case BotType.Jeopdae:
+                machine = new Bot_JeopDae(this);
+                break;
         }
         directionIndicator = player.driverIndicator;
     }
@@ -56,13 +59,21 @@ public class Unit_AutoDrive : MonoBehaviour
     {
         if (PhotonNetwork.Time < (spawnTime + 1d)) return false;
         if (!machine.IsFireSkillDecision(player.skillManager)) return false;
-    //    if (player.myCharacter == CharacterType.SPECTATOR) return false;
+        //    if (player.myCharacter == CharacterType.SPECTATOR) return false;
         FindNearestPlayer();
-        if (targetEnemy == null)
+        if (GameSession.jeopdae_enabled)
+        {
+            return true;
+        }
+        else if (targetEnemy == null)
         {
             return false;
         }
-        return machine.IsInAttackRange(targetEnemy.gameObject);
+        else {
+
+            return machine.IsInAttackRange(targetEnemy.gameObject);
+        }
+   
     }
     private void OnDisable()
     {
@@ -185,5 +196,5 @@ public class Unit_AutoDrive : MonoBehaviour
 }
 public enum BotType
 {
-    None, Easy,Normal, Hard
+    None, Easy,Normal, Hard , Jeopdae
 }

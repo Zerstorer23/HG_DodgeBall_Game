@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static ConstantStrings;
+using Random = UnityEngine.Random;
 
 public class HUD_UserName : MonoBehaviourPun
 {
     public PhotonView pv;
     public bool isReady = false;
-
+    public UI_PlayerLobbyManager lobbyManager;
     [SerializeField] Image readySprite;
     [SerializeField] Text nameText;
     [SerializeField] Image charPortrait;
@@ -30,18 +31,47 @@ public class HUD_UserName : MonoBehaviourPun
     private void OnEnable()
     {
         EventManager.StartListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
+        EventManager.StartListening(MyEvents.EVENT_JEOPDAE_ENABLE, CheckAutoReady);
         playerName = controller.Owner.NickName;
 
         bool isBot = (bool)pv.InstantiationData[0];
         string uid = (string)pv.InstantiationData[1];
         controller.SetControllerInfo(isBot, uid);
         isReady = controller.Owner.IsBot;
+        CheckAutoReady();
         UpdateUI();
         EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_JOINED, new EventObject() { stringObj = uid, goData = gameObject });
     }
+
+    private void CheckAutoReady(EventObject eo = null)
+    {
+        if (!GameSession.jeopdae_enabled) return;
+        StartCoroutine(ReadyCoroutine());
+        StartCoroutine(ChooseCharacter());
+
+    }
+    IEnumerator ReadyCoroutine() {
+        float randTime = Random.Range(2f, 4f);
+        yield return new WaitForSeconds(randTime);
+        lobbyManager.OnClick_Ready();
+    }
+    IEnumerator ChooseCharacter() {
+        float rand = Random.Range(0f, 1f);
+        CharacterType charSelection = ConfigsManager.GetRandomCharacterExcept(CharacterType.MIKURU);
+        if (rand <= 0.33)
+        {
+            float randTime = Random.Range(0.5f, 2f);
+            yield return new WaitForSeconds(randTime);
+            pv.RPC("ChangeCharacter", RpcTarget.AllBuffered, (int)charSelection);
+        }
+
+    }
+
+
     private void OnDisable()
     {
         EventManager.StopListening(MyEvents.EVENT_GAMEMODE_CHANGED, OnGamemodeChanged);
+        EventManager.StopListening(MyEvents.EVENT_JEOPDAE_ENABLE, CheckAutoReady);
 
     }
 

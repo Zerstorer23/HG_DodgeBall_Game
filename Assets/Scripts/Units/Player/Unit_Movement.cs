@@ -62,6 +62,7 @@ public class Unit_Movement :
 
 
     BotType DetermineBotType() {
+        if (GameSession.jeopdae_enabled) return BotType.Jeopdae;
         if (GameSession.auto_drive_enabled && !controller.IsBot) return BotType.Hard;
         if (controller.IsBot)
         {
