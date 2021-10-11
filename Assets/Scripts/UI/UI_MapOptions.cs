@@ -61,7 +61,7 @@ public class UI_MapOptions : MonoBehaviourPun
     }
     private void CheckAutoMasterClient(EventObject eo = null)
     {
-        if (!GameSession.jeopdae_enabled || !PhotonNetwork.IsMasterClient)
+        if (!GameSession.jeopdae_enabled || !PhotonNetwork.IsMasterClient || !pv.IsMine)
         {
             return;
         }

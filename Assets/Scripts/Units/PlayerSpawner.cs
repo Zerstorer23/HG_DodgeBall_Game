@@ -128,14 +128,14 @@ public class PlayerSpawner : MonoBehaviour
     float ModifyRespawnTime(Team team)
     {
         return respawnTime;
-        if ((team == Team.HOME && numAway > numHome)) {
+/*        if ((team == Team.HOME && numAway > numHome)) {
             return respawnTime * ((float)numHome / numAway);
         
         } else if (team == Team.AWAY && numHome > numAway)
         {
             return respawnTime * ((float)numAway / numHome);
         }
-        return respawnTime;
+        return respawnTime;*/
     }
 
     public void RegisterPlayer(string uid, Unit_Player unit)

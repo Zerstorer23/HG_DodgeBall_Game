@@ -10,7 +10,6 @@ public class Bot_Normal : IEvaluationMachine {
         myInstanceID = player.gameObject.GetInstanceID();
         movement = player.movement;
         skillManager = player.skillManager;
-        lazyEvalInterval = 0.33d;
         SetRange(8f);
     }
     public override void DetermineAttackType(CharacterType thisCharacter = CharacterType.NONE)
@@ -85,6 +84,7 @@ public class Bot_Normal : IEvaluationMachine {
             move = Vector3.zero;
         }
         lastMove = move;
+        lastEvalTime = PhotonNetwork.Time;
         return move;
     }
     public override Vector3 EvaluatePlayer(GameObject go, int tid, Vector3 directionToTarget, float distance)

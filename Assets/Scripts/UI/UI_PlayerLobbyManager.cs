@@ -99,8 +99,10 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
 
     }
     public void RemovePlayer(string uid) {
-        Debug.Assert(playerDictionary.ContainsKey(uid), "Removing p doesnt exist");
-        playerDictionary.Remove(uid);
+        if (playerDictionary.ContainsKey(uid)) {
+            Debug.Assert(playerDictionary.ContainsKey(uid), "Removing p doesnt exist");
+            playerDictionary.Remove(uid);
+        }
         UpdateReadyStatus();
         debugUI();
     }

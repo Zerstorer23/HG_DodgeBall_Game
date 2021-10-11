@@ -39,6 +39,7 @@ public class Unit_AutoDrive : MonoBehaviour
                 machine = new IEvaluationMachine(this);
                 break;
             case BotType.Jeopdae:
+              //  machine = new IEvaluationMachine(this);
                 machine = new Bot_JeopDae(this);
                 break;
         }
@@ -61,11 +62,7 @@ public class Unit_AutoDrive : MonoBehaviour
         if (!machine.IsFireSkillDecision(player.skillManager)) return false;
         //    if (player.myCharacter == CharacterType.SPECTATOR) return false;
         FindNearestPlayer();
-        if (GameSession.jeopdae_enabled)
-        {
-            return true;
-        }
-        else if (targetEnemy == null)
+        if (targetEnemy == null)
         {
             return false;
         }

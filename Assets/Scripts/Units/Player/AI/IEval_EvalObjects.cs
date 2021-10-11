@@ -81,6 +81,7 @@ public partial class IEvaluationMachine
         move = AbsoluteEvasion(move);
     //    move = PreventExtremeMove(move);
         lastMove = move;
+        lastEvalTime = PhotonNetwork.Time;
         //Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
         return move;
     }

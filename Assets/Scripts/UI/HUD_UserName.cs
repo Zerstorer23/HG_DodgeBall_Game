@@ -45,7 +45,7 @@ public class HUD_UserName : MonoBehaviourPun
 
     private void CheckAutoReady(EventObject eo = null)
     {
-        if (!GameSession.jeopdae_enabled) return;
+        if (!GameSession.jeopdae_enabled || !pv.IsMine) return;
         StartCoroutine(ReadyCoroutine());
         StartCoroutine(ChooseCharacter());
 
@@ -62,7 +62,7 @@ public class HUD_UserName : MonoBehaviourPun
         {
             float randTime = Random.Range(0.5f, 2f);
             yield return new WaitForSeconds(randTime);
-            pv.RPC("ChangeCharacter", RpcTarget.AllBuffered, (int)charSelection);
+            EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_SELECTED_CHARACTER, new EventObject() { intObj = (int)charSelection, objData = ConfigsManager.unitDictionary[(CharacterType)charSelection]  });
         }
 
     }

@@ -72,7 +72,7 @@ public class UI_ChatBox : MonoBehaviour
 	}
 
 	public static bool isSelected = false;
-	void Update()
+	void LateUpdate()
 	{
 		if (Input.GetKeyUp(KeyCode.Return))
 		{
@@ -149,7 +149,13 @@ public class UI_ChatBox : MonoBehaviour
 			if(PhotonNetwork.IsMasterClient)
 			GameSession.instance.photonView.RPC("TriggerEvent", RpcTarget.AllBuffered, (int)MyEvents.EVENT_CHAT_BAN);
 		}
+		else if (text.Contains("디버그"))
+		{
+			reporter.GetComponent<AndroidOnly>().enabled = false;
+			reporter.SetActive(!reporter.activeInHierarchy);
+		}
 	}
+	[SerializeField] GameObject reporter;
 	public void AddLine(string lineString)
 	{
 		string newMsg = lineString + "\r\n";
@@ -191,7 +197,7 @@ public class UI_ChatBox : MonoBehaviour
 			inputField.ActivateInputField();
 			inputField.Select();
 			placeholderText.text = "<color=#5675FF>채팅을 입력</color>";
-			inputField.text = " ";
+			//inputField.text = " ";
 		}
 		else
 		{

@@ -10,6 +10,7 @@ public class Bot_JeopDae : IEvaluationMachine {
         myInstanceID = player.gameObject.GetInstanceID();
         movement = player.movement;
         skillManager = player.skillManager;
+        lazyEvalInterval = 0.8d;
         SetRange(15f);
     }
     public override Vector3 EvaluateMoves()
@@ -81,6 +82,8 @@ public class Bot_JeopDae : IEvaluationMachine {
 
         move = AbsoluteEvasion(move);
         lastMove = move;
+        lastEvalTime = PhotonNetwork.Time;
+        lazyEvalInterval = Random.Range(0.5f, 1.1f);
         //Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
         return move;
     }
