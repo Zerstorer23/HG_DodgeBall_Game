@@ -16,6 +16,6 @@ MonoBehaviour:
   modifier: 1
   duration: -1
   triggerByID: 
-  buff_name: "\uD391!"
+  buff_name: _buff_boom
   spriteImage: {fileID: 4102214370187749153, guid: 77dcc64b9241cad47acac6ba8a22d293,
     type: 3}

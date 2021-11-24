@@ -16,5 +16,5 @@ MonoBehaviour:
   modifier: -1
   duration: 4
   triggerByID: 
-  buff_name: "\uBB34\uC8014\uCD08"
+  buff_name: _buff_invincible
   spriteImage: {fileID: 21300000, guid: 3321fef168404b24fa9117251341b701, type: 3}

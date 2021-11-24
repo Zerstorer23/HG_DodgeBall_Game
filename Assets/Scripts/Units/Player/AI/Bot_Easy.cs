@@ -51,7 +51,6 @@ public class Bot_Easy : IEvaluationMachine {
         }
         move += GetAwayFromWalls();
         move += GetToCapturePoint();
-        // Debug.Log("Wall move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
         if (move.magnitude > 1f)
         {
             move.Normalize();

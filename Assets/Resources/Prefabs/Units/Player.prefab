@@ -2847,7 +2847,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_BoneTransforms.Array.data[0]
       value: 
-      objectReference: {fileID: 4446382069462193250}
+      objectReference: {fileID: 0}
     - target: {fileID: 7780571104850000517, guid: 35ed23f3269498f42a8ff5e4b166a5bc,
         type: 3}
       propertyPath: m_LocalRotation.w
@@ -2915,12 +2915,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 35ed23f3269498f42a8ff5e4b166a5bc, type: 3}
---- !u!4 &1385208306508102319 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4799072008147955793, guid: 35ed23f3269498f42a8ff5e4b166a5bc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5881847404234803966}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1743256954223984165 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5301246916368528603, guid: 35ed23f3269498f42a8ff5e4b166a5bc,
@@ -2933,9 +2927,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85535eee7f6eac147b8c7f6d03b45034, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &4446382069462193250 stripped
+--- !u!4 &1385208306508102319 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 7787917697199496860, guid: 35ed23f3269498f42a8ff5e4b166a5bc,
+  m_CorrespondingSourceObject: {fileID: 4799072008147955793, guid: 35ed23f3269498f42a8ff5e4b166a5bc,
     type: 3}
   m_PrefabInstance: {fileID: 5881847404234803966}
   m_PrefabAsset: {fileID: 0}

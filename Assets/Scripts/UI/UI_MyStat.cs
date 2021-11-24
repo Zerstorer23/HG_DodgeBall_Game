@@ -15,9 +15,9 @@ public class UI_MyStat : MonoBehaviour
         int wins = PlayerPrefs.GetInt(ConstantStrings.PREFS_WINS,0);  
         int evades = PlayerPrefs.GetInt(ConstantStrings.PREFS_EVADES,0);
 
-        killStat.text = "살해:\t" + kills;
-        winStat.text = "승리:\t" + wins;
-        evadeStat.text = "회피:\t" + evades;
+        killStat.text = LocalizationManager.Convert("_stat_kills")+"\t" + kills;
+        winStat.text = LocalizationManager.Convert("_stat_wins") + "\t" + wins;
+        evadeStat.text = LocalizationManager.Convert("_stat_evades") + "\t" + evades;
     }
 
 

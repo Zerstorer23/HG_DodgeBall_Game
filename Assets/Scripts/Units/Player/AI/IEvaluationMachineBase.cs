@@ -32,12 +32,13 @@ public partial class IEvaluationMachine
 
     public IEvaluationMachine(Unit_AutoDrive autoDriver) {
         this.autoDriver = autoDriver;
-        this.player = autoDriver.player;
+        player = autoDriver.player;
         myInstanceID = player.gameObject.GetInstanceID();
         movement = player.movement;
         skillManager = player.skillManager;
         SetRange(20f);
     }
+
 
     public void AddFoundObject(int tid, GameObject go) {
         foundObjects.Add(tid, go);

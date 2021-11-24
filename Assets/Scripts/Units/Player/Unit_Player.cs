@@ -139,7 +139,7 @@ public class Unit_Player : MonoBehaviourPun
     public void TriggerMessage(string msg)
     {
         if (!controller.IsLocal) return;
-        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(msg));
+        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(LocalizationManager.Convert(msg)));
     }
     void Start()
     {

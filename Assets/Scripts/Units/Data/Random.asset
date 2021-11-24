@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: Random
   m_EditorClassIdentifier: 
   characterID: 0
-  txt_name: "\uB79C\uB364"
-  colorHex: 
-  txt_skill_desc: "\uB79C\uB364"
+  txt_name: _random
+  noRandom: 0
+  txt_skill_desc: _random_desc
   portraitImage: {fileID: 21300000, guid: bd293dc32f4aaf94e8274f2fac2cdf89, type: 3}
+  isKamikaze: 0
+  attackRange: 0
+  DoPredictionShot: 0

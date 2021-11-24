@@ -48,7 +48,7 @@ public class BuffObject : MonoBehaviourPun
     void ParseBuffConfig(int index) {
         buffConfig = ConfigsManager.instance.buffConfigs[index];
         buff = buffConfig.Build();
-        objectName = buffConfig.buff_name;
+        objectName = LocalizationManager.Convert(buffConfig.buff_name);
         originalBuffImage = buffConfig.spriteImage;
     }
 
@@ -73,7 +73,7 @@ public class BuffObject : MonoBehaviourPun
     {
         BuffManager buffManager = collision.gameObject.GetComponent<BuffManager>();
         if (buffManager == null) return;
-        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = string.Format("{0}님이 {1} 효과를 받았습니다..!", buffManager.controller.Owner.NickName, objectName) });
+        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = LocalizationManager.Convert("_msg_p_gets_buff", buffManager.controller.Owner.NickName, objectName) });
         if (buffManager.pv.IsMine)
         {
             buffManager.pv.RPC("AddBuff", RpcTarget.AllBuffered, (int)buff.buffType, buff.modifier, buff.duration);

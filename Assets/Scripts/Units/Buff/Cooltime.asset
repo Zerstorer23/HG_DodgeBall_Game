@@ -16,5 +16,5 @@ MonoBehaviour:
   modifier: 0.5
   duration: 8
   triggerByID: 
-  buff_name: "\uCFE8\uD0C0\uC784\uAC10\uC18C!"
+  buff_name: _buff_cooltime
   spriteImage: {fileID: 21300000, guid: d7522fef7c6660a4598c2f2d23064463, type: 3}

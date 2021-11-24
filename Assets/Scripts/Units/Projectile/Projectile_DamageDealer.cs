@@ -234,7 +234,6 @@ public class Projectile_DamageDealer : MonoBehaviourPun
         if (otherHP.unitType == UnitType.Player)
         {
             string sourceID = (isMapObject) ? null : myHealth.controller.uid;
-      //      Debug.Log("Damage player");
             otherHP.pv.RPC("DoDamage", RpcTarget.AllBuffered, sourceID, false);
             if (isMapObject) myHealth.Kill_Immediate();
         }

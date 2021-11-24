@@ -153,7 +153,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     {
         localPlayerInfo.pv.RPC("ToggleReady", RpcTarget.AllBuffered);
         bool ready = localPlayerInfo.GetReady();
-        readyButtonText.text = (ready) ? "다른사람을 기다리는 중" : "준비되었음!";
+        readyButtonText.text = (ready) ? LocalizationManager.Convert("_IS_WAITING") : LocalizationManager.Convert("_IS_READY");
         UpdateReadyStatus();
         if (readyPlayers == totalPlayers)
         {
@@ -181,29 +181,18 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         if (numHome == 0 || numAway == 0)
         {
 
-            ChatManager.SendNotificationMessage("최소 한명은 팀이 달라야합니다 장애인들아");
+            ChatManager.SendNotificationMessage(LocalizationManager.Convert("_game_imba_team_numbers"));
             return false;
         }
         else {
             return true;
         }
-/*        Team masterTeam = (Team)PhotonNetwork.LocalPlayer.CustomProperties["TEAM"];
-        Player[] players = PhotonNetwork.PlayerList;
-        foreach (Player p in players)
-        {
-            Team away = (Team)p.CustomProperties["TEAM"];
-            if (masterTeam != away) {
-                return true;
-            }
-        }
-        ChatManager.SendNotificationMessage("최소 한명은 팀이 달라야합니다 장애인들아");
-        return false;*/
     }
     public bool CheckHalfAgreement()
     {
         if (readyPlayers < (totalPlayers) / 2 && GameSession.instance.requireHalfAgreement)
         {
-            ChatManager.SendNotificationMessage(string.Format("{0}님이 강제시작을 하려다 실패하였습니다. 요구인원 :{1}", PhotonNetwork.MasterClient.NickName, (totalPlayers / 2)));
+            ChatManager.SendNotificationMessage(LocalizationManager.Convert("_game_not_enough_ready", PhotonNetwork.MasterClient.NickName, (totalPlayers / 2).ToString()));
             return false;
         }
         return true;
@@ -256,11 +245,11 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
                 readyPlayers++;
             }
         }
-        numOfPlayers.text = "현재접속: " + totalPlayers + " / " + MenuManager.MAX_PLAYER_PER_ROOM;
-        numReadyText.text = "준비: " + readyPlayers + " / " + totalPlayers;
+        numOfPlayers.text = LocalizationManager.Convert("_CURRENT_CONNECTED")+totalPlayers + " / " + MenuManager.MAX_PLAYER_PER_ROOM;
+        numReadyText.text = LocalizationManager.Convert("_CURRENT_CONNECTED") + "" + readyPlayers + " / " + totalPlayers;
         if (localPlayerInfo != null)
         {
-            readyButtonText.text = (localPlayerInfo.GetReady()) ? "다른사람을 기다리는 중" : "준비되었음!";
+            readyButtonText.text = (localPlayerInfo.GetReady()) ? LocalizationManager.Convert("_IS_WAITING") : LocalizationManager.Convert("_IS_READY");
         }
     }
 

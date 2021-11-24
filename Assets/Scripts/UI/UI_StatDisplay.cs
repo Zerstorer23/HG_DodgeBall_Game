@@ -33,6 +33,6 @@ public class UI_StatDisplay : MonoBehaviour
     void FixedUpdate()
     {
         if (myPlayer == null) return;
-        displayText.text = string.Format("{0}...{1}킬 {2}회피", PhotonNetwork.NickName, kills.ToString(),StatisticsManager.GetStat(StatTypes.EVADE,PhotonNetwork.LocalPlayer.UserId));
+        displayText.text = LocalizationManager.Convert("_hud_kda", PhotonNetwork.NickName, kills.ToString(), StatisticsManager.GetStat(StatTypes.EVADE, PhotonNetwork.LocalPlayer.UserId).ToString());
     }
 }

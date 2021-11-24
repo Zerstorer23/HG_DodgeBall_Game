@@ -147,7 +147,7 @@ public class BulletManager : MonoBehaviour
             }
         }
         if (yasumiCount > players.Length / 2) {
-            ChatManager.SendLocalMessage("야스미가 너무 많습니다");
+            ChatManager.SendLocalMessage(LocalizationManager.Convert("_game_toomany_yasumi"));
             activeMax = 96;
         }
     }

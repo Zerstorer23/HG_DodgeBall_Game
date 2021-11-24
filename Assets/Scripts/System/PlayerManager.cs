@@ -235,7 +235,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public override void OnDisconnected(DisconnectCause cause)
     {
         Debug.LogWarning("Disconnected " + cause.ToString());
-        ChatManager.SendLocalMessage("게임연결이 끊겼습니다. 클라이언트를 재가동해주세요.");
+        ChatManager.SendLocalMessage(LocalizationManager.Convert("_chat_fail_please_reboot"));
         instance.init = false;
         SceneManager.LoadScene(0);
        

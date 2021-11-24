@@ -58,7 +58,7 @@ public class UI_RemainingPlayerDisplay : MonoBehaviour
     IEnumerator WaitAFrame() {
         yield return new WaitForFixedUpdate();
         int remain = GameFieldManager.GetRemainingPlayerNumber();
-        displayText.text = "남은 플레이어 : " + remain;
+        displayText.text = LocalizationManager.Convert("_game_remaining_player")+" : " + remain;
     }
 
     IEnumerator UpdateScore() {
@@ -71,8 +71,6 @@ public class UI_RemainingPlayerDisplay : MonoBehaviour
             float point = cpManager.currentPoint;
             bool homeMajor = point > 0;
             if (point < 0) point *= -1;
-         //   scoreText.text = "점수 : " + point.ToString("0");
-          //  scoreText.color = GetColorByHex(homeMajor ? team_color[1] : team_color[2]);
             fillImage.color = GetColorByHex(homeMajor ? team_color[1] : team_color[2]);
             fillImage.fillAmount = ((float)point / cpManager.endThreshold);            
            yield return new WaitForSeconds(1f);

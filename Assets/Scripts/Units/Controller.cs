@@ -53,7 +53,8 @@ public class Controller : MonoBehaviourPun
     }
     public bool IsBot
     {
-        get { return controllerType == ControllerType.Bot; }
+        get {
+            return controllerType == ControllerType.Bot; }
     }
     public bool IsMine {
          get=> photonView.IsMine;

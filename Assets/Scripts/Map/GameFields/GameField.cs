@@ -49,7 +49,6 @@ public class GameField : MonoBehaviourPun
 
         if (!suddenDeathCalled)
         {
-            Debug.Log("Time out do suddendeath");
             CheckSuddenDeath(0, true);
         }
     }
@@ -110,7 +109,7 @@ public class GameField : MonoBehaviourPun
             StopCoroutine(resizeNumerator);
         }
         startTime = PhotonNetwork.Time;
-        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = "맵 크기가 줄어듭니다!!" });
+        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = LocalizationManager.Convert("_game_map_reduces")}) ;
         resizeNumerator = ResizeMapByTime();
         StartCoroutine(resizeNumerator);
     }
@@ -153,7 +152,6 @@ public class GameField : MonoBehaviourPun
 
     public void InitialiseMap(int id = 0)
     {
-        Debug.Log("Initialised");
         fieldNo = id;
         InitialiseMapSize();
     }
@@ -265,11 +263,6 @@ public class GameField : MonoBehaviourPun
         float randX = Random.Range(-width / 4, width / 4);
         float randY = Random.Range(-height / 4, height / 4);
         Vector3 location = new Vector3(mapSpec.xMin + xOffset + width * x + randX, mapSpec.yMin + yOffset + height * y + randY);
-      /* Debug.Log("Width units " + width + "," + height);
-        Debug.Log("Offset units " + xOffset + "," + yOffset);
-        Debug.Log("rand units " + randX + "," + randY);
-        Debug.Log("start units " + mapSpec.xMin + "," + mapSpec.yMin);
-        Debug.Log("Indicated location " + location);*/
         return location;
     }
 

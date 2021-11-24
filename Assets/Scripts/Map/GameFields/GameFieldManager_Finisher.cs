@@ -72,7 +72,7 @@ public partial class GameFieldManager : MonoBehaviourPun
 
         //All Field Finished
         Debug.LogWarning("Error game ");
-        ChatManager.SendNotificationMessage("게임 에러");
+        ChatManager.SendNotificationMessage(LocalizationManager.Convert("_game_error"));
         instance.photonView.RPC("EjectGame",RpcTarget.AllBuffered, winner.uid);
     }
     [PunRPC]
@@ -80,7 +80,6 @@ public partial class GameFieldManager : MonoBehaviourPun
     {
         for (int i = 0; i < instance.numActiveFields; i++)
         {
-            Debug.Log("Trigger field finish");
             EventManager.TriggerEvent(MyEvents.EVENT_FIELD_FINISHED, new EventObject() { intObj = i });
         }
         instance.gameFinished = true;
@@ -113,7 +112,6 @@ public partial class GameFieldManager : MonoBehaviourPun
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                Debug.LogWarning("Check game end ....");
                 QueryGameFinished();
             }
             yield return new WaitForSeconds(2f);

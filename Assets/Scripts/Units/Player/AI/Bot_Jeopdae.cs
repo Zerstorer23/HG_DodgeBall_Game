@@ -70,7 +70,6 @@ public class Bot_JeopDae : IEvaluationMachine {
         //2. KNNs
 
         move += Drive_KNN();
-        // Debug.Log("Wall move " + move + " mag " + move.magnitude + " / " + move.sqrMagnitude);
         if (move.magnitude > 1f)
         {
             move.Normalize();
@@ -84,7 +83,6 @@ public class Bot_JeopDae : IEvaluationMachine {
         lastMove = move;
         lastEvalTime = PhotonNetwork.Time;
         lazyEvalInterval = Random.Range(0.5f, 1.1f);
-        //Debug.Log("Final move " + move +" mag "+move.magnitude + " / "+move.sqrMagnitude);
         return move;
     }
 

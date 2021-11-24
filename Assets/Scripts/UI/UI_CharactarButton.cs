@@ -11,7 +11,7 @@ public class UI_CharactarButton : MonoBehaviour
     private void Awake()
     {
         portraitImage.sprite = myConfig.portraitImage;
-        nameText.text = myConfig.txt_name;
+        nameText.text = LocalizationManager.Convert(myConfig.txt_name);
 
     }
     public void OnClickCharacter() {

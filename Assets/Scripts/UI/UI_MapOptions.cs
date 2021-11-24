@@ -186,7 +186,7 @@ public class UI_MapOptions : MonoBehaviourPun
         {
             int index = mapDiffDropdown.value;
             pv.RPC("SetMapDifficulty", RpcTarget.AllBuffered, index);
-            ChatManager.SendNotificationMessage(string.Format("난이도가 {0}로 변경되었습니다.", mapDiff));
+            ChatManager.SendNotificationMessage(LocalizationManager.Convert("_game_change_diff", mapDiff.ToString()));
         }
     }
     public void OnDropdown_PlayerDifficulty()
@@ -195,7 +195,7 @@ public class UI_MapOptions : MonoBehaviourPun
         {
             int index = livesDropdown.value;
             pv.RPC("SetPlayerLives", RpcTarget.AllBuffered, index);
-            ChatManager.SendNotificationMessage(string.Format("라이프가 {0}로 변경되었습니다.", lives[livesIndex]));
+            ChatManager.SendNotificationMessage(LocalizationManager.Convert("_game_change_lives", lives[livesIndex].ToString()));
         }
     }
     public void OnDropdown_GameMode()
@@ -204,7 +204,7 @@ public class UI_MapOptions : MonoBehaviourPun
         {
             int index = gamemodeDropdown.value;
             pv.RPC("SetGameMode", RpcTarget.AllBuffered, index);
-            ChatManager.SendNotificationMessage(string.Format("게임모드가 {0}로 변경되었습니다.", (GameMode)index));
+            ChatManager.SendNotificationMessage(LocalizationManager.Convert("_game_mode_changes", ((GameMode)index).ToString()));
         }
     }
     public void UpdateSettingsUI()
@@ -245,8 +245,8 @@ public class UI_MapOptions : MonoBehaviourPun
         if (versionCode != GameSession.GetVersionCode())
         {
             Debug.Log("Received Wrong " + versionCode);
-            PhotonNetwork.NickName = string.Format(
-            "<color=#ff0000>클라이언트 버전</color>이 맞지않습니다. 방장 버전 {0}",
+            PhotonNetwork.NickName = LocalizationManager.Convert(
+            "_game_version_mismatch",
              versionCode);
         }
         gameStarted = (bool)hash[HASH_GAME_STARTED];

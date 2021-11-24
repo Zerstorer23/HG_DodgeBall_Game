@@ -126,7 +126,7 @@ public class BuffManager : MonoBehaviourPun
         int numFire = CountTrigger(BuffType.OnFire);
         if (numFire >= 12)
         {
-            LoseHealthByBuff("!!체력손실!!"); 
+            LoseHealthByBuff(LocalizationManager.Convert("_game_hp_loss")); 
             DeactivateNbuffs(BuffType.OnFire, 6);
         }
     }
@@ -137,7 +137,7 @@ public class BuffManager : MonoBehaviourPun
         {
             if (GetTrigger(BuffType.InvincibleFromBullets)) return;
         }
-        LoseHealthByBuff("!!체력손실!!");
+        LoseHealthByBuff(LocalizationManager.Convert("_game_hp_loss"));
     }
 
     public void RemoveBuff(BuffData buff)
@@ -168,7 +168,7 @@ public class BuffManager : MonoBehaviourPun
             int numDamage = GetStat(BuffType.NumDamageReceivedWhileBuff);
             if (numDamage <= 0)
             {
-                LoseHealthByBuff(" 반사 실패 패널티 -1");
+                LoseHealthByBuff(LocalizationManager.Convert("_game_reflection_penalty"));
             }
         }
         ToggleStat(BuffType.NumDamageReceivedWhileBuff, false);
@@ -282,7 +282,6 @@ public class BuffManager : MonoBehaviourPun
         {
             buffTriggers.Add(type, 0);
         }
-        //Debug.Log("Num trigger " + buffTriggers[type] + " tpye " + type);
         return buffTriggers[type] > 0;
     }
     public int CountTrigger(BuffType type)
@@ -291,7 +290,6 @@ public class BuffManager : MonoBehaviourPun
         {
             return 0;
         }
-        //Debug.Log("Num trigger " + buffTriggers[type] + " tpye " + type);
         return buffTriggers[type];
     }
     void UpdateBuffIndicator(BuffType changedBuff, bool enable) {

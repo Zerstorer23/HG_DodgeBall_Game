@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Mikuru
   m_EditorClassIdentifier: 
   characterID: 3
-  txt_name: "\uBBF8\uCFE0\uB8E8"
+  txt_name: _mikuru
   noRandom: 0
-  txt_skill_desc: "\uBE54\uACF5\uACA9\uC744 \uC2E4\uC2DC\uD569\uB2C8\uB2E4."
+  txt_skill_desc: _mikuru_desc
   portraitImage: {fileID: 21300000, guid: 091209a4286f21545a0183247ceaaccb, type: 3}
   isKamikaze: 0
   attackRange: 999
-  evadeRange: 0
+  DoPredictionShot: 0

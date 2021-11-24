@@ -149,8 +149,8 @@ public class HealthPoint : MonoBehaviourPun
             Unit_Player unit= GameFieldManager.gameFields[associatedField].playerSpawner.GetUnitByControllerID(attackerUserID);
             if (unit == null) return;
             if (controller.IsLocal) {
-                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = unit.controller.Owner.NickName + "님에게 피해 반사" });
-                unit.pv.RPC("TriggerMessage", RpcTarget.AllBuffered, "피해가 반사되었습니다!");
+                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = LocalizationManager.Convert("_game_reflect_damage_to", unit.controller.Owner.NickName) });
+                unit.pv.RPC("TriggerMessage", RpcTarget.AllBuffered, "_game_damage_is_reflected");
             }
             buffManager.AddStat(BuffType.NumDamageReceivedWhileBuff,1);
             unit.pv.RPC("ChangeHP", RpcTarget.AllBuffered, -1);
@@ -197,33 +197,33 @@ public class HealthPoint : MonoBehaviourPun
             { //AttackedByMapObject
                 if (controller.IsLocal)
                 {
-                    EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = "회피실패" });
+                    EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = LocalizationManager.Convert("_msg_fail_evade" )});
                 }
                 if (targetIsDead)
                 {
                     if (killerUID == null)
                     {
                         killerUID = "mapobj";
-                        ChatManager.SendNotificationMessage(PhotonNetwork.NickName + "님이 사망했습니다.", "#FF0000");
+                        ChatManager.SendNotificationMessage(LocalizationManager.Convert("_msg_player_dead"), "#FF0000");
                     }
                 }
             }
             else if (controller.IsLocal)
             {
-                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = string.Format("{0}에게 피격", attackerNickname) });
+                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = LocalizationManager.Convert("_msg_hit_by", attackerNickname) });
             }
 
         }
         else if (PhotonNetwork.LocalPlayer.UserId == attackerUserID)
         {
-            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = string.Format("{0}를 타격..!", controller.Owner.NickName) });
+            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = LocalizationManager.Convert("_msg_hit_to", controller.Owner.NickName) });
             if (targetIsDead)
             {
                 if (killerUID == null)
                 {
                     killerUID = attackerUserID;
                     EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID, hitHealthPoint = this });
-                    ChatManager.SendNotificationMessage(attackerNickname + " 님이 " + controller.Owner.NickName + "님을 살해했습니다.", "#FF0000");
+                    ChatManager.SendNotificationMessage(LocalizationManager.Convert("_msg_p_kills_p",  attackerNickname ,controller.Owner.NickName , "#FF0000"));
                 }
             }
         }
@@ -262,14 +262,12 @@ public class HealthPoint : MonoBehaviourPun
         if (stream.IsWriting)
         {
             stream.SendNext(currentLife);
-            Debug.Log("Sent life " + currentLife);
         }
 
         //클론이 통신을 받는 
         else
         {
             currentLife = (int)stream.ReceiveNext();
-            Debug.Log("receive life " + currentLife);
         }
     }
 }

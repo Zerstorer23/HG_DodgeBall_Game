@@ -20,14 +20,14 @@ public class UI_SkillBox : MonoBehaviour
     public static void SetSkillInfo(SkillManager skm) {
         instance.skill = skm;
         instance.portrait.sprite = ConfigsManager.unitDictionary[skm.myCharacter].portraitImage;
-        instance.desc.text = ConfigsManager.unitDictionary[skm.myCharacter].txt_skill_desc;
+        instance.desc.text = LocalizationManager.Convert(ConfigsManager.unitDictionary[skm.myCharacter].txt_skill_desc);
     }
     public static void SetSkillInfo(SkillManager skm, CharacterType character)
     {
         if (!skm.controller.IsLocal) return;
             instance.skill = skm;
         instance.portrait.sprite = ConfigsManager.unitDictionary[character].portraitImage;
-        instance.desc.text = ConfigsManager.unitDictionary[character].txt_skill_desc;
+        instance.desc.text = LocalizationManager.Convert( ConfigsManager.unitDictionary[character].txt_skill_desc);
     }
     private void FixedUpdate()
     {

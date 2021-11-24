@@ -319,10 +319,10 @@ public class Map_CapturePoint : MonoBehaviourPun
         EventManager.TriggerEvent(MyEvents.EVENT_CP_CAPTURED, new EventObject(owner) { intObj = captureIndex });
         if (owner == Team.NONE)
         {
-            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(string.Format("{0}번 지역이 중립화되었습니다.",(captureIndex+1))));
+            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(LocalizationManager.Convert("_game_point_neutralised", (captureIndex+1).ToString())));
         }
         else {
-            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(string.Format("{0}번 지역이 {1}팀에게 점령되었습니다.",(captureIndex+1),team_name[(int)owner])));
+            EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(LocalizationManager.Convert("_game_point_captured", (captureIndex+1).ToString(),team_name[(int)owner])));
         }
     }
 }

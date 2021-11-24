@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Kyon
   m_EditorClassIdentifier: 
   characterID: 15
-  txt_name: "\uCFC8"
+  txt_name: _kyon
   noRandom: 0
-  txt_skill_desc: "\uC0B4\uD574\uC2DC \uC2A4\uD0AC\uC2B5\uB4DD"
+  txt_skill_desc: _kyon_desc
   portraitImage: {fileID: 21300000, guid: efb105cd76c40054083dde0d848bd34d, type: 3}
   isKamikaze: 0
   attackRange: 4

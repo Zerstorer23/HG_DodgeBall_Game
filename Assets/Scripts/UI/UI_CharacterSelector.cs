@@ -22,7 +22,7 @@ public class UI_CharacterSelector : MonoBehaviour
     {
         int charID = eo.intObj;
         UnitConfig u = (UnitConfig)eo.objData;
-        myCharName.text = u.txt_name;
+        myCharName.text = LocalizationManager.Convert(u.txt_name);
         myCharImage.sprite = u.portraitImage;
         UI_PlayerLobbyManager.localPlayerInfo.pv.RPC("ChangeCharacter", RpcTarget.AllBuffered, charID);
     }
@@ -30,7 +30,7 @@ public class UI_CharacterSelector : MonoBehaviour
     internal void SetInformation(CharacterType character)
     {
         UnitConfig u = ConfigsManager.unitDictionary[character];
-        myCharName.text = u.txt_name;
+        myCharName.text = LocalizationManager.Convert(u.txt_name);
         myCharImage.sprite = u.portraitImage;
     }
 }

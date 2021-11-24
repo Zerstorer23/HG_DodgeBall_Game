@@ -57,11 +57,11 @@ public class UI_ChatBox : MonoBehaviour
 		}
 		if (isChatBan)
 		{
-			ChatManager.SendLocalMessage("채팅이 비활성화되었습니다.");
+			ChatManager.SendLocalMessage(LocalizationManager.Convert("_chat_disable_chat"));
 		}
 		else
 		{
-			ChatManager.SendLocalMessage("채팅이 활성화되었습니다.");
+			ChatManager.SendLocalMessage(LocalizationManager.Convert("_chat_enable_chat"));
 
 		}
 	}
@@ -196,14 +196,14 @@ public class UI_ChatBox : MonoBehaviour
 		{
 			inputField.ActivateInputField();
 			inputField.Select();
-			placeholderText.text = "<color=#5675FF>채팅을 입력</color>";
+			placeholderText.text = LocalizationManager.Convert("_ENTER_TEXT");
 			//inputField.text = " ";
 		}
 		else
 		{
 			inputField.DeactivateInputField();
 			if (!EventSystem.current.alreadySelecting) EventSystem.current.SetSelectedGameObject(null);
-			placeholderText.text = "Enter로 채팅시작";
+			placeholderText.text = LocalizationManager.Convert("_chat_press_enter_to");
 		}
 		isSelected = enable;
 	}

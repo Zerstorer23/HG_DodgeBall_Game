@@ -20,9 +20,8 @@ public class Unit_AutoDrive : MonoBehaviour
 
     public bool secondPrediction = true;
     public IEvaluationMachine machine;
-    public void StartBot(BotType bType)//bool useBot, bool isNormalBot)
+    public void StartBot(BotType bType)
     {
-
         gameObject.SetActive(bType != BotType.None);
         botType = bType;
         switch (bType)

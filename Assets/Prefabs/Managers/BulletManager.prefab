@@ -44,11 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed673a1da4a4dd4b8e0992a577e264c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  map_transforms:
-  - {fileID: 0}
-  - {fileID: 0}
-  Home_Bullets: {fileID: 0}
-  isMaster: 0
+  startSpawnAfter: 2
   activeMax: 15
   currentSpawned: 0
   minDelay: 0.33
@@ -56,9 +52,15 @@ MonoBehaviour:
   minDuration: 1
   maxDuration: 11
   maxProjSpeed: 10
-  maxProjRotateScale: 90
+  maxProjRotateSpeed: 120
+  minProjSize: 0.5
+  maxProjSize: 1.5
   maxWidth: 6.7
   spawnDelay: 3
+  modPerPerson: 5
+  modPerStep: 0.5
+  gameField: {fileID: 0}
+  boxProbability: 0.25
 --- !u!114 &4143743908714911222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78,6 +80,6 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 3
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

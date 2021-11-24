@@ -812,6 +812,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2017249847}
     m_Modifications:
+    - target: {fileID: 365445591984285507, guid: 580cd314f1145f541aebf10204f20634,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -7.4999847
+      objectReference: {fileID: 0}
     - target: {fileID: 889115821263335031, guid: 580cd314f1145f541aebf10204f20634,
         type: 3}
       propertyPath: m_Pivot.x
@@ -1716,6 +1721,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -165
+      objectReference: {fileID: 0}
+    - target: {fileID: 6100335522186903375, guid: 580cd314f1145f541aebf10204f20634,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -7.4999847
       objectReference: {fileID: 0}
     - target: {fileID: 7213054513859204408, guid: 580cd314f1145f541aebf10204f20634,
         type: 3}
@@ -4299,6 +4309,7 @@ GameObject:
   m_Component:
   - component: {fileID: 844291301}
   - component: {fileID: 844291302}
+  - component: {fileID: 844291306}
   - component: {fileID: 844291305}
   - component: {fileID: 844291304}
   - component: {fileID: 844291303}
@@ -4348,7 +4359,7 @@ MonoBehaviour:
   skillPanelUI: {fileID: 1564884124}
   leaderboardUI: {fileID: 0}
   gameOverManager: {fileID: 165690841}
-  versionCode: 0910
+  versionCode: 1123
   requireHalfAgreement: 1
   gameSpeed: 1
   devMode: 0
@@ -4440,6 +4451,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ef509d950f755d64db6476ff92e1cac9, type: 2}
   - {fileID: 11400000, guid: ff3542d6ec935c549b55fd8170bb7b50, type: 2}
   - {fileID: 11400000, guid: e3b0993411268d94fbcbda5b2da4320e, type: 2}
+--- !u!114 &844291306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844291300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e655f1ede8f1c2945beb745050c5fbe1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &878243802 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 597600238458559236, guid: 67185f280c8227546b556a08b487e7aa,
@@ -4852,16 +4875,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 977187986}
     m_Modifications:
-    - target: {fileID: 438848437494991674, guid: c3746f5ffa90d7246ab35afc9e76da55,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 120
-      objectReference: {fileID: 0}
-    - target: {fileID: 1079205351530407109, guid: c3746f5ffa90d7246ab35afc9e76da55,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 320
-      objectReference: {fileID: 0}
     - target: {fileID: 4018366476400379895, guid: c3746f5ffa90d7246ab35afc9e76da55,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -4886,26 +4899,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.x
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4018366476546787363, guid: c3746f5ffa90d7246ab35afc9e76da55,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4018366476546787363, guid: c3746f5ffa90d7246ab35afc9e76da55,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: -120
-      objectReference: {fileID: 0}
-    - target: {fileID: 4018366476546787363, guid: c3746f5ffa90d7246ab35afc9e76da55,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4018366476546787363, guid: c3746f5ffa90d7246ab35afc9e76da55,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 4018366476604516144, guid: c3746f5ffa90d7246ab35afc9e76da55,
         type: 3}
@@ -5051,11 +5044,6 @@ PrefabInstance:
         type: 3}
       propertyPath: sceneViewId
       value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 9146037561615756203, guid: c3746f5ffa90d7246ab35afc9e76da55,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3746f5ffa90d7246ab35afc9e76da55, type: 3}

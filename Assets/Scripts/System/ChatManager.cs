@@ -80,7 +80,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 			Debug.LogError("You need to set the chat app ID in the PhotonServerSettings file in order to continue.");
 		}
 		chatClient.Connect(chatAppSettings.AppIdChat, "1.0", new AuthenticationValues(userName));
-		AddLine(string.Format("연결시도", userName));
+		AddLine(LocalizationManager.Convert("_chat_attempt_connect", userName));
 	}
 
 	public void AddLine(string lineString)
@@ -167,7 +167,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
 	public void OnConnected()
 	{
-		AddLine("서버에 연결되었습니다.");
+		AddLine(LocalizationManager.Convert("_chat_connected_to_server"));
 		currTry = 0;
 		chatClient.Subscribe(new string[] { currentChannelName }, 10);
 	}
@@ -175,7 +175,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 	int currTry = 0;
 	public void OnDisconnected()
 	{
-		AddLine("채팅서버에 연결이 끊어졌습니다. 재연결 시도 : "+currTry);
+		AddLine(LocalizationManager.Convert("_chat_connection_fail_retry") + currTry);
 		if (Application.isPlaying) {
 			StartCoroutine(RetryRoutine());
 		}
@@ -197,12 +197,12 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
 	public void OnSubscribed(string[] channels, bool[] results)
 	{
-		AddLine(string.Format("채널 입장 ({0})", string.Join(",", channels)));
+		AddLine(string.Format(LocalizationManager.Convert("_chat_enter")+" ({0})", string.Join(",", channels)));
 	}
 
 	public void OnUnsubscribed(string[] channels)
 	{
-		AddLine(string.Format("채널 퇴장 ({0})", string.Join(",", channels)));
+		AddLine(string.Format(LocalizationManager.Convert("_chat_quit")+"({0})", string.Join(",", channels)));
 	}
 
 	public void OnGetMessages(string channelName, string[] senders, object[] messages)

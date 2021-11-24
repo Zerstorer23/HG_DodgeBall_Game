@@ -63,7 +63,7 @@ public class GameOverManager : MonoBehaviour
         }
         else
         {
-            returnMenuText.text = timeoutWait.ToString("0") + " 초후 돌아갑니다...";
+            returnMenuText.text =  LocalizationManager.Convert("_end_return_after", timeoutWait.ToString("0"));
         }
     }
     IEnumerator WaitAndOut()
@@ -81,17 +81,17 @@ public class GameOverManager : MonoBehaviour
     private void SetGameInfo()
     {
         float gameTime = (float)(PhotonNetwork.Time - UI_Timer.startTime);
-        miniWinnerName.text = string.Format("{0}초", gameTime.ToString("0.0"));
+        miniWinnerName.text = LocalizationManager.Convert("_end_seconds",gameTime.ToString("0.0"));
         if (GameSession.gameModeInfo.gameMode == GameMode.PVE)
         {
             float prevScore = PlayerPrefs.GetFloat(PREFS_TIME_RECORD, 0f);
             GooglePlayManager.AddToLeaderboard(GPGSIds.leaderboard_pve_time, (int)gameTime);
             if (gameTime > prevScore)
             {
-                miniWinnerName.text = string.Format("<color=#ff00ff>[신기록]{0}초</color>", gameTime.ToString("0.0"));
+                miniWinnerName.text = LocalizationManager.Convert("_end_new_records", gameTime.ToString("0.0"));
                 try
                 {
-                    PlayerPrefs.SetFloat(ConstantStrings.PREFS_TIME_RECORD, prevScore);
+                    PlayerPrefs.SetFloat(PREFS_TIME_RECORD, prevScore);
                     PlayerPrefs.Save();
                 }
                 catch (Exception e)
@@ -121,7 +121,7 @@ public class GameOverManager : MonoBehaviour
             int score = StatisticsManager.GetStat(StatTypes.SCORE, winnerUID);
             int kill = StatisticsManager.GetStat(StatTypes.KILL, winnerUID);
             int evade = StatisticsManager.GetStat(StatTypes.EVADE, winnerUID);
-            subWinnerTitle.text = string.Format("최고득점: {0}점 {1}킬 {2}회피", score.ToString(), kill.ToString(), evade.ToString());
+            subWinnerTitle.text = LocalizationManager.Convert("_end_highest_scores", score.ToString(), kill.ToString(), evade.ToString());
         }
 
     }
@@ -142,7 +142,7 @@ public class GameOverManager : MonoBehaviour
                 if (!finalWinner.HasProperty("TEAM")) return;
                 Team winnerTeam = finalWinner.GetProperty< Team>("TEAM");
                 winnerName.color = GetColorByHex(team_color[(int)winnerTeam]);
-                winnerName.text = string.Format("{0}님의 {1}팀", finalWinner.NickName, team_name[(int)winnerTeam]);
+                winnerName.text = LocalizationManager.Convert("_end_assoc_team", finalWinner.NickName, team_name[(int)winnerTeam]);
             }
             else
             {
@@ -151,7 +151,7 @@ public class GameOverManager : MonoBehaviour
         }
         else
         {
-            winnerName.text = "무승부...";
+            winnerName.text = LocalizationManager.Convert("_end_draw");
         }
     }
 

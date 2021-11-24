@@ -72,7 +72,7 @@ public class PlayerSpawner : MonoBehaviour
         else
         {
             //  PhotonNetwork.NickName = UI_ChangeName.default_name;
-            ChatManager.SendNotificationMessage(PhotonNetwork.NickName + " 님이 난입했습니다.");
+            ChatManager.SendNotificationMessage(LocalizationManager.Convert("_msg_joined_in_middle", PhotonNetwork.NickName));
             MainCamera.FocusOnField(true);
             ChatManager.SetInputFieldVisibility(true);
         }
@@ -119,7 +119,7 @@ public class PlayerSpawner : MonoBehaviour
         {
             if (player.IsLocal)
             {
-                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject((modRespawnTime - i).ToString("0") + " 초후 리스폰"));
+                EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject(LocalizationManager.Convert("_msg_respawn_after",(modRespawnTime - i).ToString("0"))));
             }
             yield return new WaitForSeconds(1f);
         }

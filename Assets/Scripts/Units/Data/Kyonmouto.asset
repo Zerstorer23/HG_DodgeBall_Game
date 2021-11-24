@@ -13,11 +13,10 @@ MonoBehaviour:
   m_Name: Kyonmouto
   m_EditorClassIdentifier: 
   characterID: 9
-  txt_name: "\uCFC8\uB3D9\uC0DD"
+  txt_name: _kyonmouto
   noRandom: 0
-  txt_skill_desc: "\uC804\uBC29\uC5D0 \uC989\uC2DC \uAC00\uC704\uAC00 \uC0DD\uC131\uB429\uB2C8\uB2E4.
-    \uAC00\uC704\uB294 \uD50C\uB808\uC774\uC5B4 \uC704\uCE58\uB85C \uC774\uB3D9\uD569\uB2C8\uB2E4."
+  txt_skill_desc: _kyonmouto_desc
   portraitImage: {fileID: 21300000, guid: 7b7408bbb037c4449bee8668b537cc1a, type: 3}
   isKamikaze: 0
   attackRange: 5.5
-  evadeRange: 0
+  DoPredictionShot: 0

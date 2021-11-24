@@ -107,7 +107,7 @@ public class BoxObstacle : MonoBehaviourPun
                switch (c.gameObject.tag) {
                   case ConstantStrings.TAG_PLAYER:
                     if (healthPoint.controller.IsLocal) {
-                        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = "갇혀죽었습니다!" });
+                        EventManager.TriggerEvent(MyEvents.EVENT_SEND_MESSAGE, new EventObject() { stringObj = LocalizationManager.Convert("_msg_die_by_trapped") });
                     }
                     healthPoint.Kill_Immediate();
                       break;

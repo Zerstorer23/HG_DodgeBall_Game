@@ -57,7 +57,7 @@ public class UI_TournamentPanel : MonoBehaviour
         }
         else
         {
-            returnText.text = remain.ToString("0") + " 초후 다음 경기가 시작됩니다...";
+            returnText.text = LocalizationManager.Convert("_end_newgame_after", remain.ToString("0"));
           //  Debug.Log(returnText.text);
         }
     }

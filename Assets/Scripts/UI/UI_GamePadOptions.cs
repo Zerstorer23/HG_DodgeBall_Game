@@ -51,15 +51,15 @@ public class UI_GamePadOptions : MonoBehaviour
     public void UpdateUI() {
         if (Application.platform == RuntimePlatform.Android) {
 
-            nowUsingText.text = "사용중:모바일";
+            nowUsingText.text = LocalizationManager.Convert("_option_use_mobile");
         }
         else if (useGamepad)
         {
-            nowUsingText.text = "사용중:게임패드";
+            nowUsingText.text = LocalizationManager.Convert("_option_use_gamepad");
         }
         else
         {
-            nowUsingText.text = "사용중:키보드";
+            nowUsingText.text = LocalizationManager.Convert("_option_use_keyboard");
         }
         optionPanel.SetActive(useGamepad);
     }

@@ -74,6 +74,7 @@ public class GameSession : MonoBehaviourPun
         pv = GetComponent<PhotonView>();
         configsManager = GetComponent<ConfigsManager>();
         versionText.text = versionCode + " 버전";
+        LocalizationManager.LoadLocalizedText();
         EventManager.StartListening(MyEvents.EVENT_GAME_STARTED, OnGameStarted);
         EventManager.StartListening(MyEvents.EVENT_GAME_FINISHED, OnGameFinished);
     }
