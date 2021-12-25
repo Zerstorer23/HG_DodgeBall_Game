@@ -152,12 +152,14 @@ public class Chat_DC_Client : MonoBehaviour
     private void SendAMessage(string str)
     {
 
-        byte[] packet = new byte[BUFFER];
-        MemoryStream ms = new MemoryStream(packet);
-        BinaryWriter bw = new BinaryWriter(ms);
-        bw.Write(str);
-        bw.Close();
-        ms.Close();
+        /*        byte[] packet = new byte[BUFFER];
+                MemoryStream ms = new MemoryStream(packet);
+                BinaryWriter bw = new BinaryWriter(ms);
+                bw.Write(str);
+                bw.Close();
+                ms.Close();*/
+
+        byte[] packet = System.Text.Encoding.UTF8.GetBytes(str);
         mySocket.Send(packet);
 
     }

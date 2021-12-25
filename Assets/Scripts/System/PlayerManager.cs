@@ -68,8 +68,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public Dictionary<string, UniversalPlayer> playerDict = new Dictionary<string, UniversalPlayer>();
 
     public int currentPlayerNum = 0;
-    public void Init() {
-        if (init) return;
+    public void Init( bool force = false) {
+        if (init && !force) return;
         init = true;
         playerDict.Clear();
         Player[] players = PhotonNetwork.PlayerList;
@@ -207,9 +207,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks
             return instance.playerDict[id];
         }
         else
-        {
-            Debug.LogWarning("Couldnt find " + id + " size "+instance.playerDict.Count);
-            return null;
+        {    
+            instance.Init(true);
+            if (instance.playerDict.ContainsKey(id))
+            {
+                return instance.playerDict[id];
+            }
+            else {
+                Debug.LogWarning("Couldnt find " + id + " size " + instance.playerDict.Count);
+                return instance.playerDict[PhotonNetwork.MasterClient.UserId];
+            }
         }
     }
     public static UniversalPlayer GetPlayerOfTeam(Team team)

@@ -204,7 +204,7 @@ public class HealthPoint : MonoBehaviourPun
                     if (killerUID == null)
                     {
                         killerUID = "mapobj";
-                        ChatManager.SendNotificationMessage(LocalizationManager.Convert("_msg_player_dead"), "#FF0000");
+                        ChatManager.SendNotificationMessage(LocalizationManager.Convert("_msg_player_dead", controller.Owner.NickName), "#FF0000");
                     }
                 }
             }
@@ -223,7 +223,7 @@ public class HealthPoint : MonoBehaviourPun
                 {
                     killerUID = attackerUserID;
                     EventManager.TriggerEvent(MyEvents.EVENT_PLAYER_KILLED_A_PLAYER, new EventObject() { stringObj = attackerUserID, hitHealthPoint = this });
-                    ChatManager.SendNotificationMessage(LocalizationManager.Convert("_msg_p_kills_p",  attackerNickname ,controller.Owner.NickName , "#FF0000"));
+                    ChatManager.SendNotificationMessage(LocalizationManager.Convert("_msg_p_kills_p",  attackerNickname ,controller.Owner.NickName) , "#FF0000");
                 }
             }
         }

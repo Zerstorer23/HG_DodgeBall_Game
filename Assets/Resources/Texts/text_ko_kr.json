@@ -1,1 +1,508 @@
-{"items":[{"key":"_ENTER_TEXT","value":"<color=#5675FF>채팅을 입력</color>\r"},{"key":"_SUBMIT","value":"전송\r"},{"key":"_GAME_STARTS_WHEN","value":"모두가 준비하면 자동으로 게임이 시작됩니다.\r"},{"key":"_CURRENT_CONNECTED","value":"접속중: \r"},{"key":"_CURRENT_READY","value":"준비: \r"},{"key":"_IS_WAITING","value":"다른사람을 기다리는 중\r"},{"key":"_IS_READY","value":"준비되었음!\r"},{"key":"_NAME","value":"이름\r"},{"key":"_game_name","value":"사수좌의 날 IV\r"},{"key":"_is_connecting","value":"접속중...\r"},{"key":"_select_character","value":"캐릭터 선택\r"},{"key":"_game_mode","value":"게임모드\r"},{"key":"_obstacles","value":"장애물\r"},{"key":"_lives","value":"라이프:\r"},{"key":"_maps","value":"맵:\r"},{"key":"_settings","value":"개인설정\r"},{"key":"_leaderboards","value":"리더보드\r"},{"key":"_add_bots","value":"봇생성\r"},{"key":"_remove_bot","value":"봇제거\r"},{"key":"_anon_game","value":"익명게임\r"},{"key":"_change_team","value":"팀변경\r"},{"key":"_asakura","value":"아사쿠라\r"},{"key":"_asakura_desc","value":"무작위로 탄막을 생성해서 공격합니다.\r"},{"key":"_fujiwara","value":"후지와라\r"},{"key":"_fujiwara_desc","value":"화염방사를 합니다. 타격시마다 불씨 1 디버프가 생기며 10개가 쌓이면 데미지를 입습니다. 데미지를 입은 후에도 불씨 5가 남습니다. \r"},{"key":"_haruhi","value":"하루히\r"},{"key":"_haruhi_desc","value":"주변의 플레이어에게 피해를 입힙니다.\r"},{"key":"_kimidori","value":"키미도리\r"},{"key":"_kimidori_desc","value":"플레이어 주위를 공전하는 풍선이 생선됩니다.\r"},{"key":"_koihime","value":"이츠姬\r"},{"key":"_koihime_desc","value":"돌진중 치이는 플레이어는 데미지를 입습니다. 세번까지 끊어서 사용가능합니다.\r"},{"key":"_koizumi","value":"코이즈미\r"},{"key":"_koizumi_desc","value":"돌진중 치이는 플레이어는 데미지를 입습니다.\r"},{"key":"_kuyou","value":"쿠요우\r"},{"key":"_kuyou_desc","value":"전방에 빳따를 휘둘러 피해를 입힙니다.\r"},{"key":"_kyon","value":"쿈\r"},{"key":"_kyon_desc","value":"살해시 스킬습득\r"},{"key":"_kyonko","value":"쿈코\r"},{"key":"_kyonko_desc","value":"타격시 스킬습득\r"},{"key":"_kyonmouto","value":"쿈동생\r"},{"key":"_kyonmouto_desc","value":"전방에 즉시 가위가 생성됩니다. 가위는 플레이어 위치로 이동합니다.\r"},{"key":"_kyouko","value":"쿄코\r"},{"key":"_kyouko_desc","value":"전방에 3개의 폭탄 발사. 타격즉시 범위피해를 입힙니다. 쿄코 자신도 피해를 입을 수 있습니다.\r"},{"key":"_mikuru","value":"미쿠루\r"},{"key":"_mikuru_desc","value":"빔공격을 실시합니다.\r"},{"key":"_mori","value":"모리\r"},{"key":"_mori_desc","value":"전방으로 대시. 대시하면서 피해를 입힙니다.\r"},{"key":"_nagato","value":"나가토\r"},{"key":"_nagato_desc","value":"책상을 던집니다. 책상에 맞는 플레이어는 사망.\r"},{"key":"_random","value":"랜덤\r"},{"key":"_random_desc","value":"랜덤\r"},{"key":"_sasaki","value":"사사키\r"},{"key":"_sasaki_desc","value":"지나가는 자리에 폐쇄공간 생성. 닿는 플레이어는 피해를 입습니다.\r"},{"key":"_spectator","value":"관전\r"},{"key":"_spectator_desc","value":"스킬시전 즉시 사망합니다. 무작위픽으로 선택되지 않습니다.\r"},{"key":"_character_t","value":"T\r"},{"key":"_character_t_desc","value":"유도능력이 있는 카드를 발사. 카드는 3회까지 유도공격이 가능하며 중간에 공격받으면 유도 횟수가 감소합니다.\r"},{"key":"_taniguchi","value":"타니구치\r"},{"key":"_taniguchi_desc","value":"조준방향으로 직선 공격\r"},{"key":"_tsuruya","value":"츠루야\r"},{"key":"_tsuruya_desc","value":"주위 넓은 범위에 무작위로 범위공격을 실시. 실시중 이동속도가 소폭 감소함. 최대 3회 중첩\r"},{"key":"_yasumi","value":"야스미\r"},{"key":"_yasumi_desc","value":"5초간 모든데미지 반사하지만 5초간 아무 데미지도 반사하지 못하면 1의 피해를 입음. 다른 플레이어는 야스미의 스킬시전 여부를 알수 없음. <color=#ff0000> 스킬시전 순간 회피범위내에 투사체가 존재할경우 피해를 받음</color>\r"},{"key":"_hud_key_desc","value":"이동: W A S D \\n 스킬: 스페이스\r"},{"key":"_hud_kda","value":"$…$킬 $회피\r"},{"key":"_end_return_after","value":"$ 초후 돌아갑니다...\r"},{"key":"_end_seconds","value":"$초\r"},{"key":"_end_new_records","value":"<color=#ff00ff>[신기록]$초</color>\r"},{"key":"_end_highest_scores","value":"최고득점: $점 $킬 $회피\r"},{"key":"_end_assoc_team","value":"$님의 $팀\r"},{"key":"_end_draw","value":"무승부…\r"},{"key":"_stat_kills","value":"살해:\r"},{"key":"_stat_wins","value":"승리:\r"},{"key":"_stat_evades","value":"회피:\r"},{"key":"_option_mute","value":"소리끄기\r"},{"key":"_option_aim_at_mouse","value":"마우스방향 조준\r"},{"key":"_option_force_move","value":"강제WASD이동(wasd조작이 이상하면 체크)\r"},{"key":"_option_use_xbox","value":"XBOX패드사용\r"},{"key":"_option_use_ps4","value":"PS4사용\r"},{"key":"_option_close","value":"닫기\r"},{"key":"_option_use_mobile","value":"사용중:모바일\r"},{"key":"_option_use_gamepad","value":"사용중:게임패드\r"},{"key":"_option_use_keyboard","value":"사용중:키보드\r"},{"key":"_option_pic_support","value":"그림지원:jhbk0902\r"},{"key":"_game_map_reduces","value":"맵 크기가 줄어듭니다!!\r"},{"key":"_game_error","value":"게임 에러\r"},{"key":"_game_point_neutralised","value":"$번 지역이 중립화되었습니다.\r"},{"key":"_game_point_captured","value":"$번 지역이 $팀에게 점령되었습니다.\r"},{"key":"_chat_attempt_connect","value":"연결시도\r"},{"key":"_chat_connected_to_server","value":"서버에 연결되었습니다.\r"},{"key":"_chat_connection_fail_retry","value":"채팅서버에 연결이 끊어졌습니다. 재연결 시도 : \r"},{"key":"_chat_enter","value":"채널 입장\r"},{"key":"_chat_quit","value":"채널 퇴장\r"},{"key":"_game_toomany_yasumi","value":"야스미가 너무 많습니다\r"},{"key":"_chat_fail_please_reboot","value":"게임연결이 끊겼습니다. 클라이언트를 재가동해주세요.\r"},{"key":"_chat_disable_chat","value":"채팅이 비활성화되었습니다.\r"},{"key":"_chat_enable_chat","value":"채팅이 활성화되었습니다.\r"},{"key":"_chat_press_enter_to","value":"Enter로 채팅시작\r"},{"key":"_game_change_diff","value":"난이도가 $로 변경되었습니다.\r"},{"key":"_game_change_lives","value":"라이프가 $로 변경되었습니다.\r"},{"key":"_game_mode_changes","value":"게임모드가 $로 변경되었습니다.\r"},{"key":"_game_version_mismatch","value":"<color=#ff0000>클라이언트 버전</color>이 맞지않습니다. 방장 버전 $\r"},{"key":"_game_imba_team_numbers","value":" 한명은 팀이 달라야합니다 장애인들아\r"},{"key":"_game_not_enough_ready","value":"$님이 강제시작을 하려다 실패하였습니다. 요구인원 :$\r"},{"key":"_game_remaining_player","value":"남은 플레이어\r"},{"key":"_end_newgame_after","value":"$초후 다음 경기가 시작됩니다...\r"},{"key":"_game_hp_loss","value":"!!체력손실!!\r"},{"key":"_game_reflection_penalty","value":"반사 실패 패널티 -1\r"},{"key":"_game_reflect_damage_to","value":"$님에게 피해 반사\r"},{"key":"_game_damage_is_reflected","value":"피해가 반사되었습니다!\r"},{"key":"_msg_fail_evade","value":"회피실패\r"},{"key":"_msg_player_dead","value":"$님이 사망했습니다\r"},{"key":"_msg_hit_by","value":"$에게 피격\r"},{"key":"_msg_hit_to","value":"$를 타격..!\r"},{"key":"_msg_p_kills_p","value":"$님이 $님을 살해했습니다.\r"},{"key":"_msg_die_by_trapped","value":"갇혀죽었습니다!\r"},{"key":"_msg_p_gets_buff","value":"$님이 $ 효과를 받았습니다..!\r"},{"key":"_msg_joined_in_middle","value":"$님이 난입했습니다.\r"},{"key":"_msg_respawn_after","value":"$초후 리스폰\r"},{"key":"_obs_suboptions","value":"맵기믹\r"},{"key":"_buff_boom","value":"펑!\r"},{"key":"_buff_cam_shake","value":"뱅글뱅글\r"},{"key":"_buff_cooltime","value":"쿨타임감소!\r"},{"key":"_buff_heal","value":"체력회복\r"},{"key":"_buff_invincible","value":"무적\r"},{"key":"_buff_movespeed","value":"이동속도\r"}]}
+{
+  "items": [
+    {
+      "key": "_ENTER_TEXT",
+      "value": "<color=#5675FF>채팅을 입력</color>\r"
+    },
+    {
+      "key": "_SUBMIT",
+      "value": "전송\r"
+    },
+    {
+      "key": "_GAME_STARTS_WHEN",
+      "value": "모두가 준비하면 자동으로 게임이 시작됩니다.\r"
+    },
+    {
+      "key": "_CURRENT_CONNECTED",
+      "value": "접속중: \r"
+    },
+    {
+      "key": "_CURRENT_READY",
+      "value": "준비: \r"
+    },
+    {
+      "key": "_IS_WAITING",
+      "value": "다른사람을 기다리는 중\r"
+    },
+    {
+      "key": "_IS_READY",
+      "value": "준비되었음!\r"
+    },
+    {
+      "key": "_NAME",
+      "value": "이름\r"
+    },
+    {
+      "key": "_game_name",
+      "value": "사수좌의 날 IV\r"
+    },
+    {
+      "key": "_is_connecting",
+      "value": "접속중...\r"
+    },
+    {
+      "key": "_select_character",
+      "value": "캐릭터 선택\r"
+    },
+    {
+      "key": "_game_mode",
+      "value": "게임모드\r"
+    },
+    {
+      "key": "_obstacles",
+      "value": "장애물\r"
+    },
+    {
+      "key": "_lives",
+      "value": "라이프:\r"
+    },
+    {
+      "key": "_maps",
+      "value": "맵:\r"
+    },
+    {
+      "key": "_settings",
+      "value": "개인설정\r"
+    },
+    {
+      "key": "_leaderboards",
+      "value": "리더보드\r"
+    },
+    {
+      "key": "_add_bots",
+      "value": "봇생성\r"
+    },
+    {
+      "key": "_remove_bot",
+      "value": "봇제거\r"
+    },
+    {
+      "key": "_anon_game",
+      "value": "익명게임\r"
+    },
+    {
+      "key": "_change_team",
+      "value": "팀변경\r"
+    },
+    {
+      "key": "_asakura",
+      "value": "아사쿠라\r"
+    },
+    {
+      "key": "_asakura_desc",
+      "value": "무작위로 탄막을 생성해서 공격합니다.\r"
+    },
+    {
+      "key": "_fujiwara",
+      "value": "후지와라\r"
+    },
+    {
+      "key": "_fujiwara_desc",
+      "value": "화염방사를 합니다. 타격시마다 불씨 1 디버프가 생기며 10개가 쌓이면 데미지를 입습니다. 데미지를 입은 후에도 불씨 5가 남습니다. \r"
+    },
+    {
+      "key": "_haruhi",
+      "value": "하루히\r"
+    },
+    {
+      "key": "_haruhi_desc",
+      "value": "주변의 플레이어에게 피해를 입힙니다.\r"
+    },
+    {
+      "key": "_kimidori",
+      "value": "키미도리\r"
+    },
+    {
+      "key": "_kimidori_desc",
+      "value": "플레이어 주위를 공전하는 풍선이 생선됩니다.\r"
+    },
+    {
+      "key": "_koihime",
+      "value": "이츠姬\r"
+    },
+    {
+      "key": "_koihime_desc",
+      "value": "돌진중 치이는 플레이어는 데미지를 입습니다. 세번까지 끊어서 사용가능합니다.\r"
+    },
+    {
+      "key": "_koizumi",
+      "value": "코이즈미\r"
+    },
+    {
+      "key": "_koizumi_desc",
+      "value": "돌진중 치이는 플레이어는 데미지를 입습니다.\r"
+    },
+    {
+      "key": "_kuyou",
+      "value": "쿠요우\r"
+    },
+    {
+      "key": "_kuyou_desc",
+      "value": "전방에 빳따를 휘둘러 피해를 입힙니다.\r"
+    },
+    {
+      "key": "_kyon",
+      "value": "쿈\r"
+    },
+    {
+      "key": "_kyon_desc",
+      "value": "살해시 스킬습득\r"
+    },
+    {
+      "key": "_kyonko",
+      "value": "쿈코\r"
+    },
+    {
+      "key": "_kyonko_desc",
+      "value": "타격시 스킬습득\r"
+    },
+    {
+      "key": "_kyonmouto",
+      "value": "쿈동생\r"
+    },
+    {
+      "key": "_kyonmouto_desc",
+      "value": "전방에 즉시 가위가 생성됩니다. 가위는 플레이어 위치로 이동합니다.\r"
+    },
+    {
+      "key": "_kyouko",
+      "value": "쿄코\r"
+    },
+    {
+      "key": "_kyouko_desc",
+      "value": "전방에 3개의 폭탄 발사. 타격즉시 범위피해를 입힙니다. 쿄코 자신도 피해를 입을 수 있습니다.\r"
+    },
+    {
+      "key": "_mikuru",
+      "value": "미쿠루\r"
+    },
+    {
+      "key": "_mikuru_desc",
+      "value": "빔공격을 실시합니다.\r"
+    },
+    {
+      "key": "_mori",
+      "value": "모리\r"
+    },
+    {
+      "key": "_mori_desc",
+      "value": "전방으로 대시. 대시하면서 피해를 입힙니다.\r"
+    },
+    {
+      "key": "_nagato",
+      "value": "나가토\r"
+    },
+    {
+      "key": "_nagato_desc",
+      "value": "책상을 던집니다. 책상에 맞는 플레이어는 사망.\r"
+    },
+    {
+      "key": "_random",
+      "value": "랜덤\r"
+    },
+    {
+      "key": "_random_desc",
+      "value": "랜덤\r"
+    },
+    {
+      "key": "_sasaki",
+      "value": "사사키\r"
+    },
+    {
+      "key": "_sasaki_desc",
+      "value": "지나가는 자리에 폐쇄공간 생성. 닿는 플레이어는 피해를 입습니다.\r"
+    },
+    {
+      "key": "_spectator",
+      "value": "관전\r"
+    },
+    {
+      "key": "_spectator_desc",
+      "value": "스킬시전 즉시 사망합니다. 무작위픽으로 선택되지 않습니다.\r"
+    },
+    {
+      "key": "_character_t",
+      "value": "T\r"
+    },
+    {
+      "key": "_character_t_desc",
+      "value": "유도능력이 있는 카드를 발사. 카드는 3회까지 유도공격이 가능하며 중간에 공격받으면 유도 횟수가 감소합니다.\r"
+    },
+    {
+      "key": "_taniguchi",
+      "value": "타니구치\r"
+    },
+    {
+      "key": "_taniguchi_desc",
+      "value": "조준방향으로 직선 공격\r"
+    },
+    {
+      "key": "_tsuruya",
+      "value": "츠루야\r"
+    },
+    {
+      "key": "_tsuruya_desc",
+      "value": "주위 넓은 범위에 무작위로 범위공격을 실시. 실시중 이동속도가 소폭 감소함. 최대 3회 중첩\r"
+    },
+    {
+      "key": "_yasumi",
+      "value": "야스미\r"
+    },
+    {
+      "key": "_yasumi_desc",
+      "value": "5초간 모든데미지 반사하지만 5초간 아무 데미지도 반사하지 못하면 1의 피해를 입음. 다른 플레이어는 야스미의 스킬시전 여부를 알수 없음. <color=#ff0000> 스킬시전 순간 회피범위내에 투사체가 존재할경우 피해를 받음</color>\r"
+    },
+    {
+      "key": "_hud_key_desc",
+      "value": "이동: W A S D \\n 스킬: 스페이스\r"
+    },
+    {
+      "key": "_hud_kda",
+      "value": "$…$킬 $회피\r"
+    },
+    {
+      "key": "_end_return_after",
+      "value": "$ 초후 돌아갑니다...\r"
+    },
+    {
+      "key": "_end_seconds",
+      "value": "$초\r"
+    },
+    {
+      "key": "_end_new_records",
+      "value": "<color=#ff00ff>[신기록]$초</color>\r"
+    },
+    {
+      "key": "_end_highest_scores",
+      "value": "최고득점: $점 $킬 $회피\r"
+    },
+    {
+      "key": "_end_assoc_team",
+      "value": "$님의 $팀\r"
+    },
+    {
+      "key": "_end_draw",
+      "value": "무승부…\r"
+    },
+    {
+      "key": "_stat_kills",
+      "value": "살해:\r"
+    },
+    {
+      "key": "_stat_wins",
+      "value": "승리:\r"
+    },
+    {
+      "key": "_stat_evades",
+      "value": "회피:\r"
+    },
+    {
+      "key": "_option_mute",
+      "value": "소리끄기\r"
+    },
+    {
+      "key": "_option_aim_at_mouse",
+      "value": "마우스방향 조준\r"
+    },
+    {
+      "key": "_option_force_move",
+      "value": "강제WASD이동(wasd조작이 이상하면 체크)\r"
+    },
+    {
+      "key": "_option_use_xbox",
+      "value": "XBOX패드사용\r"
+    },
+    {
+      "key": "_option_use_ps4",
+      "value": "PS4사용\r"
+    },
+    {
+      "key": "_option_close",
+      "value": "닫기\r"
+    },
+    {
+      "key": "_option_use_mobile",
+      "value": "사용중:모바일\r"
+    },
+    {
+      "key": "_option_use_gamepad",
+      "value": "사용중:게임패드\r"
+    },
+    {
+      "key": "_option_use_keyboard",
+      "value": "사용중:키보드\r"
+    },
+    {
+      "key": "_option_pic_support",
+      "value": "그림지원:jhbk0902\r"
+    },
+    {
+      "key": "_game_map_reduces",
+      "value": "맵 크기가 줄어듭니다!!\r"
+    },
+    {
+      "key": "_game_error",
+      "value": "게임 에러\r"
+    },
+    {
+      "key": "_game_point_neutralised",
+      "value": "$번 지역이 중립화되었습니다.\r"
+    },
+    {
+      "key": "_game_point_captured",
+      "value": "$번 지역이 $팀에게 점령되었습니다.\r"
+    },
+    {
+      "key": "_chat_attempt_connect",
+      "value": "연결시도\r"
+    },
+    {
+      "key": "_chat_connected_to_server",
+      "value": "서버에 연결되었습니다.\r"
+    },
+    {
+      "key": "_chat_connection_fail_retry",
+      "value": "채팅서버에 연결이 끊어졌습니다. 재연결 시도 : \r"
+    },
+    {
+      "key": "_chat_enter",
+      "value": "채널 입장\r"
+    },
+    {
+      "key": "_chat_quit",
+      "value": "채널 퇴장\r"
+    },
+    {
+      "key": "_game_toomany_yasumi",
+      "value": "야스미가 너무 많습니다\r"
+    },
+    {
+      "key": "_chat_fail_please_reboot",
+      "value": "게임연결이 끊겼습니다. 클라이언트를 재가동해주세요.\r"
+    },
+    {
+      "key": "_chat_disable_chat",
+      "value": "채팅이 비활성화되었습니다.\r"
+    },
+    {
+      "key": "_chat_enable_chat",
+      "value": "채팅이 활성화되었습니다.\r"
+    },
+    {
+      "key": "_chat_press_enter_to",
+      "value": "Enter로 채팅시작\r"
+    },
+    {
+      "key": "_game_change_diff",
+      "value": "난이도가 $로 변경되었습니다.\r"
+    },
+    {
+      "key": "_game_change_lives",
+      "value": "라이프가 $로 변경되었습니다.\r"
+    },
+    {
+      "key": "_game_mode_changes",
+      "value": "게임모드가 $로 변경되었습니다.\r"
+    },
+    {
+      "key": "_game_version_mismatch",
+      "value": "<color=#ff0000>클라이언트 버전</color>이 맞지않습니다. 방장 버전 $\r"
+    },
+    {
+      "key": "_game_imba_team_numbers",
+      "value": " 한명은 팀이 달라야합니다 장애인들아\r"
+    },
+    {
+      "key": "_game_not_enough_ready",
+      "value": "$님이 강제시작을 하려다 실패하였습니다. 요구인원 :$\r"
+    },
+    {
+      "key": "_game_remaining_player",
+      "value": "남은 플레이어\r"
+    },
+    {
+      "key": "_end_newgame_after",
+      "value": "$초후 다음 경기가 시작됩니다...\r"
+    },
+    {
+      "key": "_game_hp_loss",
+      "value": "!!체력손실!!\r"
+    },
+    {
+      "key": "_game_reflection_penalty",
+      "value": "반사 실패 패널티 -1\r"
+    },
+    {
+      "key": "_game_reflect_damage_to",
+      "value": "$님에게 피해 반사\r"
+    },
+    {
+      "key": "_game_damage_is_reflected",
+      "value": "피해가 반사되었습니다!\r"
+    },
+    {
+      "key": "_msg_fail_evade",
+      "value": "회피실패\r"
+    },
+    {
+      "key": "_msg_player_dead",
+      "value": "$님이 사망했습니다\r"
+    },
+    {
+      "key": "_msg_hit_by",
+      "value": "$에게 피격\r"
+    },
+    {
+      "key": "_msg_hit_to",
+      "value": "$를 타격..!\r"
+    },
+    {
+      "key": "_msg_p_kills_p",
+      "value": "$님이 $님을 살해했습니다.\r"
+    },
+    {
+      "key": "_msg_die_by_trapped",
+      "value": "갇혀죽었습니다!\r"
+    },
+    {
+      "key": "_msg_p_gets_buff",
+      "value": "$님이 $ 효과를 받았습니다..!\r"
+    },
+    {
+      "key": "_msg_joined_in_middle",
+      "value": "$님이 난입했습니다.\r"
+    },
+    {
+      "key": "_msg_respawn_after",
+      "value": "$초후 리스폰\r"
+    },
+    {
+      "key": "_obs_suboptions",
+      "value": "맵기믹\r"
+    },
+    {
+      "key": "_buff_boom",
+      "value": "펑!\r"
+    },
+    {
+      "key": "_buff_cam_shake",
+      "value": "뱅글뱅글\r"
+    },
+    {
+      "key": "_buff_cooltime",
+      "value": "쿨타임감소!\r"
+    },
+    {
+      "key": "_buff_heal",
+      "value": "체력회복\r"
+    },
+    {
+      "key": "_buff_invincible",
+      "value": "무적\r"
+    },
+    {
+      "key": "_buff_movespeed",
+      "value": "이동속도\r"
+    }
+  ]
+}

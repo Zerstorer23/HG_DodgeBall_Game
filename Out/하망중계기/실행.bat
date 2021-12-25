@@ -1,0 +1,1 @@
+java -jar .\shadow-1.0-SNAPSHOT-all.jar

@@ -43,6 +43,7 @@ public class CharacterBodyManager : MonoBehaviour
 
     internal void SetHairSkins(string key)
     {
+        Debug.Log(key + "_FRONT");
         hairFront.SetCategoryAndLabel(category_hairFront, key+"_FRONT");
         hairRear.SetCategoryAndLabel(category_hairRear, key+"_REAR");
         hairFront.ResolveSpriteToSpriteRenderer();

@@ -4359,7 +4359,7 @@ MonoBehaviour:
   skillPanelUI: {fileID: 1564884124}
   leaderboardUI: {fileID: 0}
   gameOverManager: {fileID: 165690841}
-  versionCode: 1123
+  versionCode: 1225
   requireHalfAgreement: 1
   gameSpeed: 1
   devMode: 0

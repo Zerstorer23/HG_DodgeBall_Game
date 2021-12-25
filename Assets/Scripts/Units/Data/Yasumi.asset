@@ -15,7 +15,7 @@ MonoBehaviour:
   characterID: 13
   txt_name: _yasumi
   noRandom: 0
-  txt_skill_desc: "_yasumi_desc\r"
+  txt_skill_desc: _yasumi_desc
   portraitImage: {fileID: 21300000, guid: e95ba76f96b637b4895f69169c610966, type: 3}
   isKamikaze: 0
   attackRange: 4

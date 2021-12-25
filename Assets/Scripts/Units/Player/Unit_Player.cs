@@ -27,8 +27,8 @@ public class Unit_Player : MonoBehaviourPun
 
     public Team myTeam = Team.HOME;
     public int fieldNo = 0;
-    internal GameObject charBody;
-    [SerializeField] CharacterBodyManager characterBodymanager;
+    [SerializeField]internal GameObject charBody;
+ //   [SerializeField] CharacterBodyManager characterBodymanager;
 
     CircleCollider2D circleCollider;
     // Start is called before the first frame update
@@ -83,7 +83,7 @@ public class Unit_Player : MonoBehaviourPun
     void ParseInstantiationData() {
         myCharacter = (CharacterType)pv.InstantiationData[0];
         myPortrait.sprite = ConfigsManager.unitDictionary[myCharacter].portraitImage;
-        CheckCustomCharacter();
+        //CheckCustomCharacter();
         int maxLife = (int)pv.InstantiationData[1];
     
         fieldNo = (int)pv.InstantiationData[2];
@@ -109,21 +109,21 @@ public class Unit_Player : MonoBehaviourPun
     public SpriteRenderer mainSprite;
     void CheckCustomCharacter()
     {
-        if (!(myCharacter == CharacterType.YASUMI
-            || myCharacter == CharacterType.TSURUYA)
-            )
-        {
-            charBody = myPortrait.gameObject;
-            characterBodymanager.gameObject.SetActive(false);
-            charBody.SetActive(true);
-            mainSprite = myPortrait;
-            return;
-        }
-        charBody = characterBodymanager.gameObject;
-        myPortrait.gameObject.SetActive(false);
-        charBody.SetActive(true);
-        characterBodymanager.SetCharacterSkin(myCharacter);
-        mainSprite = characterBodymanager.mainSprite;
+        /*        if (!(myCharacter == CharacterType.YASUMI
+                    || myCharacter == CharacterType.TSURUYA)
+                    )
+                {
+                    charBody = myPortrait.gameObject;
+                    characterBodymanager.gameObject.SetActive(false);
+                    charBody.SetActive(true);
+                    mainSprite = myPortrait;
+                    return;
+                }
+                charBody = characterBodymanager.gameObject;
+                myPortrait.gameObject.SetActive(false);
+                charBody.SetActive(true);
+                characterBodymanager.SetCharacterSkin(myCharacter);
+                mainSprite = characterBodymanager.mainSprite;*/
     }
 
     private void OnSuddenDeath(EventObject obj)

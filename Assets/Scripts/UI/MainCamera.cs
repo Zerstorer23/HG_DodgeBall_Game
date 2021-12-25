@@ -57,6 +57,20 @@ public class MainCamera : MonoBehaviour
         ChangeSpectator();
         CheckPositionZero();
     }
+    private void FixedUpdate()
+    {
+        CheckOutOfBoundError();
+    }
+    void CheckOutOfBoundError() {
+        if (mainVcam.m_Lens.OrthographicSize != 10f) {
+            mainVcam.m_Lens.OrthographicSize = 10f;
+        }
+    
+        if (fieldCam.m_Lens.OrthographicSize != 16f) {
+            fieldCam.m_Lens.OrthographicSize = 16f;
+        }
+    
+    }
     void CheckPositionZero() {
         if (instance.gameObject.transform.localPosition.x != 0
             && instance.gameObject.transform.localPosition.y != 0
@@ -144,29 +158,7 @@ public class MainCamera : MonoBehaviour
         instance.gameObject.transform.localPosition = new Vector3(0, 0,-10);
         instance.gameObject.transform.localRotation = Quaternion.identity;
     }
-    /*
-         public static void FocusOnField(bool enable) {
-        if (instance != null)
-        {
-            if (instance.shakeRoutine != null)
-            {
-                instance.StopCoroutine(instance.shakeRoutine);
-                instance.Noise(0, 0);
-            }
-        }
 
-        instance.GetComponent<Animator>().SetBool("ViewField", enable);
-        instance.isFocusedField = enable;
-        if (enable) {
-            instance.mainVcam.transform.SetParent(instance.stateCam.transform);
-            instance.mainVcam.transform.localPosition = new Vector3(0, 0, -10);
-            instance.mainVcam.transform.localRotation = Quaternion.identity;
-        }
-        instance.gameObject.transform.localPosition = new Vector3(0, 0, -10);
-        instance.gameObject.transform.localRotation = Quaternion.identity;
-
-}
-*/
 
     IEnumerator shakeRoutine = null;
 
