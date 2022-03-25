@@ -1,0 +1,129 @@
+﻿key,value
+_ENTER_TEXT,<color=#5675FF>채팅을 입력</color>
+_SUBMIT,전송
+_GAME_STARTS_WHEN,모두가 준비하면 자동으로 게임이 시작됩니다.
+_CURRENT_CONNECTED,접속중: 
+_CURRENT_READY,준비: 
+_IS_WAITING,다른사람을 기다리는 중
+_IS_READY,준비되었음!
+_NAME,이름
+_game_name,사수좌의 날 IV
+_is_connecting,접속중...
+_select_character,캐릭터 선택
+_game_mode,게임모드
+_obstacles,장애물
+_lives,라이프:
+_maps,맵:
+_settings,개인설정
+_leaderboards,리더보드
+_add_bots,봇생성
+_remove_bot,봇제거
+_anon_game,익명게임
+_change_team,팀변경
+_asakura,아사쿠라
+_asakura_desc,무작위로 탄막을 생성해서 공격합니다.
+_fujiwara,후지와라
+_fujiwara_desc,화염방사를 합니다. 타격시마다 불씨 1 디버프가 생기며 10개가 쌓이면 데미지를 입습니다. 데미지를 입은 후에도 불씨 5가 남습니다. 
+_haruhi,하루히
+_haruhi_desc,주변의 플레이어에게 피해를 입힙니다.
+_kimidori,키미도리
+_kimidori_desc,플레이어 주위를 공전하는 풍선이 생선됩니다.
+_koihime,이츠姬
+_koihime_desc,돌진중 치이는 플레이어는 데미지를 입습니다. 세번까지 끊어서 사용가능합니다.
+_koizumi,코이즈미
+_koizumi_desc,돌진중 치이는 플레이어는 데미지를 입습니다.
+_kuyou,쿠요우
+_kuyou_desc,전방에 빳따를 휘둘러 피해를 입힙니다.
+_kyon,쿈
+_kyon_desc,살해시 스킬습득
+_kyonko,쿈코
+_kyonko_desc,타격시 스킬습득
+_kyonmouto,쿈동생
+_kyonmouto_desc,전방에 즉시 가위가 생성됩니다. 가위는 플레이어 위치로 이동합니다.
+_kyouko,쿄코
+_kyouko_desc,전방에 3개의 폭탄 발사. 타격즉시 범위피해를 입힙니다. 쿄코 자신도 피해를 입을 수 있습니다.
+_mikuru,미쿠루
+_mikuru_desc,빔공격을 실시합니다.
+_mori,모리
+_mori_desc,전방으로 대시. 대시하면서 피해를 입힙니다.
+_nagato,나가토
+_nagato_desc,책상을 던집니다. 책상에 맞는 플레이어는 사망.
+_random,랜덤
+_random_desc,랜덤
+_sasaki,사사키
+_sasaki_desc,지나가는 자리에 폐쇄공간 생성. 닿는 플레이어는 피해를 입습니다.
+_spectator,관전
+_spectator_desc,스킬시전 즉시 사망합니다. 무작위픽으로 선택되지 않습니다.
+_character_t,T
+_character_t_desc,유도능력이 있는 카드를 발사. 카드는 3회까지 유도공격이 가능하며 중간에 공격받으면 유도 횟수가 감소합니다.
+_taniguchi,타니구치
+_taniguchi_desc,조준방향으로 직선 공격
+_tsuruya,츠루야
+_tsuruya_desc,주위 넓은 범위에 무작위로 범위공격을 실시. 실시중 이동속도가 소폭 감소함. 최대 3회 중첩
+_yasumi,야스미
+_yasumi_desc,5초간 모든데미지 반사하지만 5초간 아무 데미지도 반사하지 못하면 1의 피해를 입음. 다른 플레이어는 야스미의 스킬시전 여부를 알수 없음. <color=#ff0000> 스킬시전 순간 회피범위내에 투사체가 존재할경우 피해를 받음</color>
+_hud_key_desc,이동: W A S D \n 스킬: 스페이스
+_hud_kda,$…$킬 $회피
+_end_return_after,$ 초후 돌아갑니다...
+_end_seconds,$초
+_end_new_records,<color=#ff00ff>[신기록]$초</color>
+_end_highest_scores,최고득점: $점 $킬 $회피
+_end_assoc_team,$님의 $팀
+_end_draw,무승부…
+_stat_kills,살해:
+_stat_wins,승리:
+_stat_evades,회피:
+_option_mute,소리끄기
+_option_aim_at_mouse,마우스방향 조준
+_option_force_move,강제WASD이동(wasd조작이 이상하면 체크)
+_option_use_xbox,XBOX패드사용
+_option_use_ps4,PS4사용
+_option_close,닫기
+_option_use_mobile,사용중:모바일
+_option_use_gamepad,사용중:게임패드
+_option_use_keyboard,사용중:키보드
+_option_pic_support,"그림지원:jhbk0902, NAVI"
+_game_map_reduces,맵 크기가 줄어듭니다!!
+_game_error,게임 에러
+_game_point_neutralised,$번 지역이 중립화되었습니다.
+_game_point_captured,$번 지역이 $팀에게 점령되었습니다.
+_chat_attempt_connect,연결시도
+_chat_connected_to_server,서버에 연결되었습니다.
+_chat_connection_fail_retry,채팅서버에 연결이 끊어졌습니다. 재연결 시도 : 
+_chat_enter,채널 입장
+_chat_quit,채널 퇴장
+_game_toomany_yasumi,야스미가 너무 많습니다
+_chat_fail_please_reboot,게임연결이 끊겼습니다. 클라이언트를 재가동해주세요.
+_chat_disable_chat,채팅이 비활성화되었습니다.
+_chat_enable_chat,채팅이 활성화되었습니다.
+_chat_press_enter_to,Enter로 채팅시작
+_game_change_diff,난이도가 $로 변경되었습니다.
+_game_change_lives,라이프가 $로 변경되었습니다.
+_game_mode_changes,게임모드가 $로 변경되었습니다.
+_game_version_mismatch,<color=#ff0000>클라이언트 버전</color>이 맞지않습니다. 방장 버전 $
+_game_imba_team_numbers, 한명은 팀이 달라야합니다 장애인들아
+_game_not_enough_ready,$님이 강제시작을 하려다 실패하였습니다. 요구인원 :$
+_game_remaining_player,남은 플레이어
+_end_newgame_after,$초후 다음 경기가 시작됩니다...
+_game_hp_loss,!!체력손실!!
+_game_reflection_penalty,반사 실패 패널티 -1
+_game_reflect_damage_to,$님에게 피해 반사
+_game_damage_is_reflected,피해가 반사되었습니다!
+_msg_fail_evade,회피실패
+_msg_player_dead,$님이 사망했습니다
+_msg_hit_by,$에게 피격
+_msg_hit_to,$를 타격..!
+_msg_p_kills_p,$님이 $님을 살해했습니다.
+_msg_die_by_trapped,갇혀죽었습니다!
+_msg_p_gets_buff,$님이 $ 효과를 받았습니다..!
+_msg_joined_in_middle,$님이 난입했습니다.
+_msg_respawn_after,$초후 리스폰
+_obs_suboptions,맵기믹
+_buff_boom,펑!
+_buff_cam_shake,뱅글뱅글
+_buff_cooltime,쿨타임감소!
+_buff_heal,체력회복
+_buff_invincible,무적
+_buff_movespeed,이동속도
+_arakawa,아라카와
+_arakawa_desc,피슝파슝!!슉슈ㅠ규슉!! 슬로우 공격후 진짜공격

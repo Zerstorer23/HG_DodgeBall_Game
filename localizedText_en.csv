@@ -1,0 +1,129 @@
+﻿key,value
+_ENTER_TEXT,<color=#5675FF>Press enter to chat</color>
+_SUBMIT,Submit
+_GAME_STARTS_WHEN,Game stars when everyone is ready
+_CURRENT_CONNECTED,Connected:
+_CURRENT_READY,Ready:
+_IS_WAITING,Waiting for the others
+_IS_READY,Ready!
+_NAME,Name
+_game_name,Days of the Sagittarius IV
+_is_connecting,Connecting…
+_select_character,Choose a character
+_game_mode,Game mode
+_obstacles,Obtacles
+_lives,Lives:
+_maps,Map:
+_settings,Settings
+_leaderboards,Leaderboards
+_add_bots,Add bots
+_remove_bot,Remove bots
+_anon_game,Anon game
+_change_team,Change Team
+_asakura,Asakura
+_asakura_desc,Attacks with random fire barrage
+_fujiwara,Fujiwara
+_fujiwara_desc,"Flamethrower. Each hit gives 1 debuff count, every 10 count gives 1 damage. 5 counts remain after damage."
+_haruhi,Haruhi
+_haruhi_desc,Damages nearby players
+_kimidori,Kimidori
+_kimidori_desc,Generates a balloon orbiting around you
+_koihime,Itsu姬
+_koihime_desc,Short dash attack and damages colliding players. Can use 3 times
+_koizumi,Koizumi
+_koizumi_desc,Charge and damage colliding players. Invincible while charging.
+_kuyou,Kuyou
+_kuyou_desc,Swings a frozen fish and damages players
+_kyon,Kyon
+_kyon_desc,Steals skill on kills.
+_kyonko,Kyonko
+_kyonko_desc,Steals skill on hits.
+_kyonmouto,Kyon-imouto
+_kyonmouto_desc,Immediates spawns a scissor at a targeted place.
+_kyouko,Kyoko
+_kyouko_desc,Shoots 3 bombs which has splash damage. Kyoko can self damage.
+_mikuru,Mikuru
+_mikuru_desc,Beam attack
+_mori,Mori
+_mori_desc,Short dash attack and damages colliding players.
+_nagato,Nagato
+_nagato_desc,Throws desks
+_random,Random
+_random_desc,Random
+_sasaki,Sasaki
+_sasaki_desc,Generates a tail of bombs.
+_spectator,Spectator
+_spectator_desc,Dies immediately upon using skills. Cannot be picked from random.
+_character_t,T
+_character_t_desc,Shoots a homing card. Card bounces three times.
+_taniguchi,Taniguchi
+_taniguchi_desc,Straight attack to target area.
+_tsuruya,Tsuruy
+_tsuruya_desc,Wide range carpet bombing. Can be charged 3 stacks.
+_yasumi,Yasumi
+_yasumi_desc,"While activated for 5 seconds, reflects all damages received. If none was reflected gets 1 penalty damage. <color=#ff0000> Receives damage if projectile exists in the moment of activation</color>"
+_hud_key_desc,Move: W A S D \n Skill: Space
+_hud_kda,$…$Kills $Evades
+_end_return_after,Return after $ seconds…
+_end_seconds,$seconds
+_end_new_records,<color=#ff00ff>[Record]$seconds</color>
+_end_highest_scores,High score: $ points $ kill $ evasion
+_end_assoc_team,$'s $team
+_end_draw,Draw…
+_stat_kills,Kills:
+_stat_wins,Wins:
+_stat_evades,Evades:
+_option_mute,Mute
+_option_aim_at_mouse,Aim at the mouse position
+_option_force_move,Forced WASD (Check if movement has errors)
+_option_use_xbox,XBOX pads
+_option_use_ps4,PS4 pads
+_option_close,Close
+_option_use_mobile,Using: Mobile
+_option_use_gamepad,Using: Game pad
+_option_use_keyboard,Using: Keyboard
+_option_pic_support,Art:jhbk0902
+_game_map_reduces,Map size reduces!!!
+_game_error,Game Error
+_game_point_neutralised,Capture point $ is neutralised
+_game_point_captured,Capture point $ is captured by $
+_chat_attempt_connect,Trying to connect
+_chat_connected_to_server,Connected to the server
+_chat_connection_fail_retry,Lost connection to the server. Attempt to reconnect :
+_chat_enter,Entered channel
+_chat_quit,Quit channel
+_game_toomany_yasumi,Too many Yasumi in the game
+_chat_fail_please_reboot,Game lost connection. Please restart the game
+_chat_disable_chat,Chat is muted
+_chat_enable_chat,Chat is unmuted
+_chat_press_enter_to,Press Enter to chat
+_game_change_diff,Difficulty changed to $
+_game_change_lives,Lives changed to $
+_game_mode_changes,Game mode changed to $
+_game_version_mismatch,<color=#ff0000>Client version mismatch</color> Host version: $
+_game_imba_team_numbers,At least 1 player needs to be at different team
+_game_not_enough_ready,$ failed to force start. Minimum required: $
+_game_remaining_player,Remaining players
+_end_newgame_after,New game starts after $ seconds…
+_game_hp_loss,!!!HP Loss!!!
+_game_reflection_penalty,Reflection fail penalty -1
+_game_reflect_damage_to,Damage reflected to $
+_game_damage_is_reflected,Damage reflected!
+_msg_fail_evade,Evasion fail
+_msg_player_dead,$ is dead.
+_msg_hit_by,Hit by $
+_msg_hit_to,Hit $
+_msg_p_kills_p,$ killed $.
+_msg_die_by_trapped,Death by traps!
+_msg_p_gets_buff,$ has received $ effects.
+_msg_joined_in_middle,$ has joined.
+_msg_respawn_after,Respawn after $ seconds…
+_obs_suboptions,Map gimmicks
+_buff_boom,Boom!
+_buff_cam_shake,Dizzy
+_buff_cooltime,Cooltime reduction
+_buff_heal,Heal
+_buff_invincible,invincible
+_buff_movespeed,speed
+_arakawa,Arakawa
+_arakawa_desc,Slow attack and real attack
