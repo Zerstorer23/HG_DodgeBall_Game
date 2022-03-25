@@ -25,12 +25,12 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     {
         pv = GetComponent<PhotonView>();
         EventManager.StartListening(MyEvents.EVENT_PLAYER_JOINED, OnNewPlayerEnter);
-        EventManager.StartListening(MyEvents.EVENT_PLAYER_TOGGLE_READY, UpdateReadyStatus);
+        EventManager.StartListening(MyEvents.EVENT_PLAYER_TOGGLE_READY, OnOtherReady);
     }
     private void OnDestroy()
     {
         EventManager.StopListening(MyEvents.EVENT_PLAYER_JOINED, OnNewPlayerEnter);
-        EventManager.StopListening(MyEvents.EVENT_PLAYER_TOGGLE_READY, UpdateReadyStatus);
+        EventManager.StopListening(MyEvents.EVENT_PLAYER_TOGGLE_READY, OnOtherReady);
     }
     public void ConnectedToRoom()
     {
@@ -95,8 +95,8 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
 
     internal void OnPlayerLeftRoom(Player newPlayer)
     {
+        AudioManager.PlayEndingVoice();      
         RemovePlayer(newPlayer.UserId);
-
     }
     public void RemovePlayer(string uid) {
         if (playerDictionary.ContainsKey(uid)) {
@@ -112,6 +112,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     {
         string id = eo.stringObj;
         HUD_UserName info = eo.goData.GetComponent<HUD_UserName>();
+        AudioManager.PlayStartingVoice();
         if (playerDictionary.ContainsKey(id))
         {
             Debug.LogWarning("Add duplicate panel name?");
@@ -155,21 +156,17 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         bool ready = localPlayerInfo.GetReady();
         readyButtonText.text = (ready) ? LocalizationManager.Convert("_IS_WAITING") : LocalizationManager.Convert("_IS_READY");
         UpdateReadyStatus();
-        if (readyPlayers == totalPlayers)
-        {
-            Debug.Log("Same number. start");
-            pv.RPC("OnClick_ForceStart", RpcTarget.MasterClient);
-        }
+        CheckGameStart();
     }
     [PunRPC]
     public void OnClick_ForceStart()
     {
         if (PhotonNetwork.IsMasterClient)
         {
+            Debug.Log("Mastercleint push setting requested");
             if (!CheckHalfAgreement()) return;
             if (!CheckTeamValidity()) return;
             //정식유저 룸프로퍼티 대기
-            Debug.Log("Mastercleint push setting requested");
             mapOptions.SetGameStarted(true);
             mapOptions.PushRoomSettings();
         }
@@ -203,7 +200,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
         var Hash = PhotonNetwork.CurrentRoom.CustomProperties;
         bool gameStarted = (bool)Hash[HASH_GAME_STARTED];
         mapOptions.SetGameStarted(gameStarted);
-        //  Debug.Log("Start requested "+ gameStarted);
+        Debug.Log("Start requested "+ gameStarted);
         if (gameStarted)
         {
             GameFieldManager.SetGameMap(GameSession.gameModeInfo.gameMode);
@@ -223,7 +220,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
             localPlayerObject = null;
         }
         GetComponent<UI_BotLobby>().DestoryBotsPanel();
-        
+        AudioManager.PlayStartingVoice();
         EventManager.TriggerEvent(MyEvents.EVENT_SHOW_PANEL, new EventObject() { objData = ScreenType.InGame });
         EventManager.TriggerEvent(MyEvents.EVENT_GAME_STARTED, null);
     }
@@ -234,25 +231,53 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
 
     int totalPlayers;
     int readyPlayers;
-    private void UpdateReadyStatus(EventObject eo = null)
-    {
-        totalPlayers = PlayerManager.GetPlayerDictionary().Count;
-        readyPlayers = 0;
+
+    private int GetNumberOfReady() {
+        int ready = 0;
         foreach (var entry in playerDictionary.Values)
         {
             if (entry.isReady)
             {
-                readyPlayers++;
+                ready++;
             }
         }
+        return ready;
+    }
+    private void OnOtherReady(EventObject eo = null) {
+        UpdateReadyStatus();
+        CheckGameStart();
+    }
+    private void UpdateReadyStatus(EventObject eo = null)
+    {
+        totalPlayers = PlayerManager.GetPlayerDictionary().Count;
+        readyPlayers = GetNumberOfReady();
         numOfPlayers.text = LocalizationManager.Convert("_CURRENT_CONNECTED")+totalPlayers + " / " + MenuManager.MAX_PLAYER_PER_ROOM;
         numReadyText.text = LocalizationManager.Convert("_CURRENT_CONNECTED") + "" + readyPlayers + " / " + totalPlayers;
+
         if (localPlayerInfo != null)
         {
             readyButtonText.text = (localPlayerInfo.GetReady()) ? LocalizationManager.Convert("_IS_WAITING") : LocalizationManager.Convert("_IS_READY");
         }
     }
-
+    private void CheckGameStart() {
+        Debug.LogWarning(readyPlayers + " / " + totalPlayers);
+        if (readyPlayers == totalPlayers && PhotonNetwork.IsMasterClient)
+        {
+            Debug.Log("Same number. start");
+            pv.RPC("OnClick_ForceStart", RpcTarget.AllBuffered);
+        }
+    }
+    private void DebugReady() {
+        string debugout = "";
+        foreach (var entry in playerDictionary.Values)
+        {
+            debugout += entry.pv.Owner.UserId + " : " + entry.isReady + "\n";
+        }
+        debugout += numOfPlayers.text + "\n";
+        debugout += numReadyText.text + "\n";
+        debugout += PhotonNetwork.IsMasterClient + " / " + readyButtonText.text + "\n";
+        Debug.LogWarning(debugout);
+    }
 
     #endregion
 }

@@ -6,6 +6,8 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     public AudioClip[] audioLists;
+    public AudioClip[] startingVoiceList;
+    public AudioClip[] endingVoiceList;
     AudioSource audioPlayer;
 
     private static AudioManager prAudioManager;
@@ -69,5 +71,35 @@ public class AudioManager : MonoBehaviour
     {
         if (GetMuted()) return;
         instance.audioPlayer.PlayOneShot(audio);
+    }
+    private IEnumerator WaitAndRessume()
+    {
+        audioPlayer.Pause();
+        float prevVolume = audioPlayer.volume;
+        audioPlayer.volume = 1f;
+        yield return new WaitForSeconds(2f);
+       audioPlayer.volume = 0.4f;
+       audioPlayer.UnPause();
+    }
+    IEnumerator audioRoutine = null;
+    private void HandleAudioCoroutine() {
+        if (audioRoutine != null)
+        {
+            StopCoroutine(audioRoutine);
+        }
+        audioRoutine = WaitAndRessume();
+        StartCoroutine(audioRoutine);
+
+    }
+    public static void PlayEndingVoice() {
+        var randomAudio = instance.endingVoiceList[UnityEngine.Random.Range(0, instance.endingVoiceList.Length)];
+
+        instance.HandleAudioCoroutine();
+        PlayAudioOneShot(randomAudio);
+    }
+    public static void PlayStartingVoice() {
+        var randomAudio = instance.startingVoiceList[UnityEngine.Random.Range(0, instance.startingVoiceList.Length)];
+        instance.HandleAudioCoroutine();
+        PlayAudioOneShot(randomAudio);
     }
 }

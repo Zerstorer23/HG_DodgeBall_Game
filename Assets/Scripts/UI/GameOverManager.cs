@@ -52,6 +52,7 @@ public class GameOverManager : MonoBehaviour
         SetWinnerInfo();
         SetScoreInfo();
         SetGameInfo();
+        AudioManager.PlayEndingVoice();
        GameSession.instance.StartCoroutine(CheckGoogleEvents());
     }
     private void FixedUpdate()

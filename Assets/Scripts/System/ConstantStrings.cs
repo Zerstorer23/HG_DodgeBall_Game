@@ -25,6 +25,8 @@ public class ConstantStrings : MonoBehaviour
     public const string PREFAB_BULLET_KYONKO = "Prefabs/Projectiles/Bullet_kyonko";
     public const string PREFAB_BULLET_TANIGUCHI = "Prefabs/Projectiles/Bullet_taniguchi";
     public const string PREFAB_BULLET_FUJIWARA = "Prefabs/Projectiles/Bullet_fujiwara";
+    public const string PREFAB_BULLET_ARAKAWA = "Prefabs/Projectiles/Bullet_arakawa";
+    public const string PREFAB_BULLET_ARAKAWA2 = "Prefabs/Projectiles/Bullet_arakawa_2"; 
 
 
 

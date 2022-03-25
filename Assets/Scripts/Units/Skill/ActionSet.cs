@@ -58,9 +58,7 @@ public class ActionSet
             float delay= 0;
             try
             {
-
                 delay = action.Activate();
-             
             }
             catch (Exception e) {
                 Debug.LogWarning(e.Message);
