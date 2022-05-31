@@ -61,7 +61,7 @@ _taniguchi_desc,Straight attack to target area.
 _tsuruya,Tsuruy
 _tsuruya_desc,Wide range carpet bombing. Can be charged 3 stacks.
 _yasumi,Yasumi
-_yasumi_desc,"While activated for 5 seconds, reflects all damages received. If none was reflected gets 1 penalty damage. <color=#ff0000> Receives damage if projectile exists in the moment of activation</color>"
+_yasumi_desc,While activated for 5 seconds reflects all damages received. If none was reflected gets 1 penalty damage. <color=#ff0000> Receives damage if projectile exists in the moment of activation</color>
 _hud_key_desc,Move: W A S D \n Skill: Space
 _hud_kda,$…$Kills $Evades
 _end_return_after,Return after $ seconds…
@@ -82,7 +82,7 @@ _option_close,Close
 _option_use_mobile,Using: Mobile
 _option_use_gamepad,Using: Game pad
 _option_use_keyboard,Using: Keyboard
-_option_pic_support,Art:jhbk0902
+_option_pic_support,Art:jhbk0902 / NAVI
 _game_map_reduces,Map size reduces!!!
 _game_error,Game Error
 _game_point_neutralised,Capture point $ is neutralised

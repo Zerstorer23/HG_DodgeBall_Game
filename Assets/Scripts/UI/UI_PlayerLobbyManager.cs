@@ -95,7 +95,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
 
     internal void OnPlayerLeftRoom(Player newPlayer)
     {
-        AudioManager.PlayEndingVoice();      
+        //AudioManager.PlayEndingVoice();      
         RemovePlayer(newPlayer.UserId);
     }
     public void RemovePlayer(string uid) {
@@ -112,7 +112,7 @@ public class UI_PlayerLobbyManager : MonoBehaviourPun
     {
         string id = eo.stringObj;
         HUD_UserName info = eo.goData.GetComponent<HUD_UserName>();
-        AudioManager.PlayStartingVoice();
+       // AudioManager.PlayStartingVoice();
         if (playerDictionary.ContainsKey(id))
         {
             Debug.LogWarning("Add duplicate panel name?");
